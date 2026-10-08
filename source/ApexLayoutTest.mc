@@ -49,6 +49,78 @@ function ringGreysStayVisibleOnMip(logger as Logger) as Boolean {
     return true;
 }
 
+// ---- Night palette ----------------------------------------------------
+
+(:test)
+function dayPaletteUsesSettingsAndScreenGreys(logger as Logger) as Boolean {
+    var day = [0xC8FF2E, 0xF4F4EF, 0xCFE3FF, 0xB0B0AA];
+    var p = ApexLayout.palette(day, true, false);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_ACCENT], 0xC8FF2E);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_NUMERALS], 0xF4F4EF);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_INK], 0xCFE3FF);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_DIM], 0xB0B0AA);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_MINOR], 0x34342F);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_RULE], 0x2A2A28);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_AOD_MAJOR], 0x4A4A46);
+    ApexTestUtil.assertEqual(ApexLayout.palette(day, false, false)[ApexLayout.P_RULE], 0x555555);
+    return true;
+}
+
+// CLAUDE.md, Colours, Night column: everything red whatever the settings.
+(:test)
+function nightPaletteIsRedWhateverTheSettings(logger as Logger) as Boolean {
+    var p = ApexLayout.palette([0x4FD1FF, 0xCFE3FF, 0xF4F4EF, 0x98A6B4], true, true);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_ACCENT], 0xFF4A3D);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_NUMERALS], 0xFF4A3D);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_INK], 0xFF4A3D);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_DIM], 0xB3392E);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_MINOR], 0x3A120E);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_RULE], 0x3A120E);
+    for (var i = 0; i < p.size(); i++) {
+        var c = p[i];
+        Test.assertMessage(((c >> 8) & 0xFF) <= ((c >> 16) & 0xFF) / 2, "night colour " + i + " is not red");
+    }
+    return true;
+}
+
+(:test)
+function nightPaletteStaysVisibleOnMip(logger as Logger) as Boolean {
+    var p = ApexLayout.palette([0, 0, 0, 0], false, true);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_RULE], 0x550000);
+    ApexTestUtil.assertEqual(p[ApexLayout.P_MINOR], 0x550000);
+    return true;
+}
+
+(:test)
+function sleepWindowWithinOneDay(logger as Logger) as Boolean {
+    // sleep 13:00, wake 15:00 (a nap profile)
+    Test.assert(ApexLayout.inSleepWindow(13 * 60, 13 * 60, 15 * 60));
+    Test.assert(ApexLayout.inSleepWindow(14 * 60, 13 * 60, 15 * 60));
+    Test.assert(!ApexLayout.inSleepWindow(15 * 60, 13 * 60, 15 * 60));
+    Test.assert(!ApexLayout.inSleepWindow(12 * 60, 13 * 60, 15 * 60));
+    return true;
+}
+
+(:test)
+function sleepWindowAcrossMidnight(logger as Logger) as Boolean {
+    var sleep = 22 * 60 + 30;   // 22:30
+    var wake = 6 * 60 + 45;     // 06:45
+    Test.assert(ApexLayout.inSleepWindow(23 * 60, sleep, wake));
+    Test.assert(ApexLayout.inSleepWindow(0, sleep, wake));
+    Test.assert(ApexLayout.inSleepWindow(6 * 60 + 44, sleep, wake));
+    Test.assert(!ApexLayout.inSleepWindow(6 * 60 + 45, sleep, wake));
+    Test.assert(!ApexLayout.inSleepWindow(12 * 60, sleep, wake));
+    Test.assert(!ApexLayout.inSleepWindow(22 * 60 + 29, sleep, wake));
+    return true;
+}
+
+(:test)
+function sleepWindowEmptyWhenSleepEqualsWake(logger as Logger) as Boolean {
+    Test.assert(!ApexLayout.inSleepWindow(0, 0, 0));
+    Test.assert(!ApexLayout.inSleepWindow(600, 600, 600));
+    return true;
+}
+
 // ---- Pen widths (all screen sizes) --------------------------------------
 
 (:test)
@@ -102,32 +174,44 @@ function pickFontFallsBackToSmallest(logger as Logger) as Boolean {
 }
 
 (:test)
+function rowExtentForCapHeightFonts(logger as Logger) as Boolean {
+    ApexTestUtil.assertEqual(ApexLayout.rowExtent(20, true, 1.0f), 14.0f);          // 10 + 4 px gap
+    ApexTestUtil.assertEqual(ApexLayout.rowExtent(10, true, 218.0f / 454), 7.0f);   // gap never below 2 px
+    return true;
+}
+
+(:test)
+function rowExtentForSystemFonts(logger as Logger) as Boolean {
+    ApexTestUtil.assertNear(ApexLayout.rowExtent(40, false, 1.0f), 17.0f, 0.001f, "line height with leading");
+    return true;
+}
+
+(:test)
 function rowBelowKeepsDesignPositionWhenThereIsRoom(logger as Logger) as Boolean {
-    // 454 px design: label 290 (16 px font, ~19 line), value 316 (28 px font, ~33 line)
-    ApexTestUtil.assertEqual(ApexLayout.rowBelow(290.0f, 316.0f, 19, 33), 316.0f);
+    // 454 px: label 290 (Mono16, cap 11 -> extent 9.5), value 316 (Value 28, cap 20 -> extent 14)
+    ApexTestUtil.assertEqual(ApexLayout.rowBelow(290.0f, 316.0f, 9.5f, 14.0f), 316.0f);
     return true;
 }
 
 (:test)
 function rowBelowPushesDownWhenFontsAreTall(logger as Logger) as Boolean {
-    // 218 px MIP: label at 139 px, value designed at 152 px, but system fonts 19 + 23 px tall
-    var y = ApexLayout.rowBelow(139.0f, 152.0f, 19, 23);
+    // 218 px MIP with system fonts 19 + 23 px tall: extents 8.075 + 9.775
+    var y = ApexLayout.rowBelow(139.0f, 152.0f, 8.075f, 9.775f);
     ApexTestUtil.assertNear(y, 156.85f, 0.01f, "pushed value row");
-    Test.assert(y - 139.0f >= (19 + 23) * 0.4f);
     return true;
 }
 
 (:test)
 function rowAboveKeepsDesignPositionWhenThereIsRoom(logger as Logger) as Boolean {
-    // 454 px design: readout value 389 (26 px font), label 412 (14 px font)
-    ApexTestUtil.assertEqual(ApexLayout.rowAbove(412.0f, 389.0f, 17, 31), 389.0f);
+    // 454 px: readout value 389 (ArcValue 26, extent 13.5), label 412 (Mono14, extent 9)
+    ApexTestUtil.assertEqual(ApexLayout.rowAbove(412.0f, 389.0f, 9.0f, 13.5f), 389.0f);
     return true;
 }
 
 (:test)
 function rowAbovePullsUpWhenFontsAreTall(logger as Logger) as Boolean {
-    // 360 px screen without scalable fonts: label at 326.7, value designed at 308.5, fonts 30 + 30 px
-    var y = ApexLayout.rowAbove(326.7f, 308.5f, 30, 30);
+    // 360 px with system fonts 30 + 30 px tall: extents 12.75 each
+    var y = ApexLayout.rowAbove(326.7f, 308.5f, 12.75f, 12.75f);
     ApexTestUtil.assertNear(y, 301.2f, 0.01f, "pulled-up readout value");
     return true;
 }
@@ -180,6 +264,47 @@ function cometAtTwelveSpansYThreeToTwentyFive(logger as Logger) as Boolean {
     ApexTestUtil.assertNear(ApexLayout.C + outer[1], 3, 0.01f, "outer y");
     ApexTestUtil.assertNear(ApexLayout.C + inner[1], 25, 0.01f, "inner y");
     ApexTestUtil.assertNear(outer[0], 0, 0.01f, "outer x");
+    return true;
+}
+
+// ---- Partial updates (MIP low power) --------------------------------------
+
+// At 12 o'clock the comet spans y 3..25 (r 224..202), the trail sits at r 226 (y 1).
+(:test)
+function cometBoxAtTwelveCoversCometAndTrail(logger as Logger) as Boolean {
+    var box = ApexLayout.cometBox(0, 1.0f);
+    Test.assert(box[1] <= 0 && box[1] + box[3] >= 25);       // y: trail .. inner end
+    Test.assert(box[0] <= 225 && box[0] + box[2] >= 229);    // x: comet width 4 around 227
+    Test.assertMessage(box[2] * box[3] < 400, "box too big: " + box[2] + "x" + box[3]);
+    return true;
+}
+
+(:test)
+function cometBoxStaysSmallAtEveryAngle(logger as Logger) as Boolean {
+    for (var sec = 0; sec < 60; sec++) {
+        var box = ApexLayout.cometBox(sec, 1.0f);
+        Test.assertMessage(box[2] > 0 && box[3] > 0, "empty box at " + sec);
+        Test.assertMessage(box[2] <= 32 && box[3] <= 32, "box at " + sec + " is " + box[2] + "x" + box[3]);
+        Test.assert(box[0] >= -4 && box[1] >= -4 && box[0] + box[2] <= 458 && box[1] + box[3] <= 458);   // a few px off-screen is fine (clipped)
+    }
+    return true;
+}
+
+(:test)
+function cometBoxScalesWithTheScreen(logger as Logger) as Boolean {
+    var box = ApexLayout.cometBox(15, 260.0f / 454);   // 3 o'clock on a 260 px screen
+    Test.assert(box[0] <= 245 && box[0] + box[2] >= 259);
+    Test.assert(box[1] <= 129 && box[1] + box[3] >= 131);
+    return true;
+}
+
+(:test)
+function unionBoxCoversBoth(logger as Logger) as Boolean {
+    var u = ApexLayout.unionBox([10, 20, 5, 5] as [Number, Number, Number, Number], [12, 30, 10, 4] as [Number, Number, Number, Number]);
+    ApexTestUtil.assertEqual(u[0], 10);
+    ApexTestUtil.assertEqual(u[1], 20);
+    ApexTestUtil.assertEqual(u[2], 12);
+    ApexTestUtil.assertEqual(u[3], 14);
     return true;
 }
 

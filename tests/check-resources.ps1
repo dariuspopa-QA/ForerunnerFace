@@ -53,6 +53,7 @@ $expectedDefaults = [ordered]@{
     NumeralColor = 0xF4F4EF # Chalk
     InkColor = 0xF4F4EF
     DimColor = 0xB0B0AA
+    NightMode = 0         # Off
 }
 $props = @{}
 foreach ($p in $properties.properties.property) {
@@ -85,6 +86,7 @@ foreach ($key in 'Field1', 'Field2', 'Field3') {
     Check (SameSet $lists[$key] $fieldIds) "$key lists every field id except READY (7)"
 }
 Check (SameSet $lists['Arc'] @(0, 1, 2, 3, 5, 6)) "Arc lists every arc id except READINESS (4)"
+Check (SameSet $lists["NightMode"] @(0, 1, 2)) "NightMode lists Off, Auto, On"
 
 $accents = @(0xC8FF2E, 0xFF5A1F, 0x4FD1FF, 0xFF3D7F, 0xF4F4EF)  # design's five
 foreach ($c in $accents) {
@@ -162,7 +164,7 @@ $app = $manifest.manifest.application
 Check ($app.type -eq 'watchface') "manifest app type is watchface"
 Check (@($app.products.product | ForEach-Object { $_.id }) -contains 'fr970') "manifest targets fr970"
 $permissions = @($app.permissions.'uses-permission' | ForEach-Object { $_.id })
-foreach ($perm in 'SensorHistory', 'ComplicationSubscriber') {
+foreach ($perm in "SensorHistory", "ComplicationSubscriber", "UserProfile") {
     Check ($permissions -contains $perm) "manifest requests $perm"
 }
 Check ([version]$app.minApiLevel -ge [version]'5.0.0') "minApiLevel is 5.0+ (the editor itself is used only where the watch has it)"

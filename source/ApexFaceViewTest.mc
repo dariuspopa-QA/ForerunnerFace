@@ -193,6 +193,40 @@ function reloadingSettingsPicksUpChangedProperties(logger as Logger) as Boolean 
     return true;
 }
 
+// MIP watches redraw the seconds in low power through onPartialUpdate; AMOLED
+// watches ignore it. Either way it must be safe to call at any time.
+(:test)
+function partialUpdateIsSafeAwakeAndAsleep(logger as Logger) as Boolean {
+    var view = new ApexFaceView(false);
+    var dc = ApexTestUtil.render(view);
+    view.onPartialUpdate(dc);
+    view.onEnterSleep();
+    view.onUpdate(dc);
+    view.onPartialUpdate(dc);
+    view.onPartialUpdate(dc);
+    view.onExitSleep();
+    view.onUpdate(dc);
+    return true;
+}
+
+(:test)
+function nightModeSettingsRender(logger as Logger) as Boolean {
+    var saved = ApexTestUtil.saveProperties(["NightMode"]);
+    try {
+        for (var mode = 0; mode <= 3; mode++) {      // Off, Auto, On, and an invalid value
+            Application.Properties.setValue("NightMode", mode);
+            var view = new ApexFaceView(false);
+            view.loadPhoneSettings();
+            var dc = ApexTestUtil.render(view);
+            view.onEnterSleep();
+            view.onUpdate(dc);
+        }
+    } finally {
+        ApexTestUtil.restoreProperties(saved);
+    }
+    return true;
+}
+
 // Colour and odd property values must not break loading or drawing.
 (:test)
 function colourSettingsIncludingAccentSentinelRender(logger as Logger) as Boolean {

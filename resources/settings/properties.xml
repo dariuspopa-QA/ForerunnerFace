@@ -12,4 +12,7 @@
     <property id="InkColor" type="number">0xF4F4EF</property>
     <property id="DimColor" type="number">0xB0B0AA</property>
 
+    <!-- Red night palette: 0 Off, 1 Auto (profile sleep / wake times), 2 On -->
+    <property id="NightMode" type="number">0</property>
+
 </properties>

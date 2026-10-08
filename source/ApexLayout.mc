@@ -36,6 +36,46 @@ module ApexLayout {
         return amoled ? [MINOR_AMOLED, RULE_AMOLED] : [GREY_MIP, GREY_MIP];
     }
 
+    // Always-On major ticks (AMOLED only)
+    const AOD_MAJOR = 0x4A4A46;
+
+    // Night (red) palette, CLAUDE.md Colours. MIP rounds 0x3A120E to 0x550000 anyway;
+    // it is set explicitly so both screen types are predictable.
+    const NIGHT_RED = 0xFF4A3D;
+    const NIGHT_DIM = 0xB3392E;
+    const NIGHT_RULE_AMOLED = 0x3A120E;
+    const NIGHT_RULE_MIP = 0x550000;
+    const NIGHT_AOD_MAJOR = 0x5C1E18;   // same visual weight as AOD_MAJOR
+
+    // Palette indices
+    enum { P_ACCENT, P_NUMERALS, P_INK, P_DIM, P_MINOR, P_RULE, P_AOD_MAJOR }
+
+    // Colours in use: the day colours from settings, or the red night palette.
+    // day = [accent, numerals, ink, dim]; result is indexed by the P_* values.
+    function palette(day as Array<Number>, amoled as Boolean, night as Boolean) as Array<Number> {
+        if (night) {
+            var rule = amoled ? NIGHT_RULE_AMOLED : NIGHT_RULE_MIP;
+            return [NIGHT_RED, NIGHT_RED, NIGHT_RED, NIGHT_DIM, rule, rule, NIGHT_AOD_MAJOR];
+        }
+        var greys = ringGreys(amoled);
+        return [day[0], day[1], day[2], day[3], greys[0], greys[1], AOD_MAJOR];
+    }
+
+    // NightMode setting values
+    enum { NIGHT_OFF = 0, NIGHT_AUTO = 1, NIGHT_ON = 2 }
+
+    // Whether a minute of the day falls in the sleep window [sleep, wake), which
+    // may wrap past midnight. All values are minutes since midnight.
+    function inSleepWindow(minute as Number, sleep as Number, wake as Number) as Boolean {
+        if (sleep == wake) {
+            return false;
+        }
+        if (sleep < wake) {
+            return minute >= sleep && minute < wake;
+        }
+        return minute >= sleep || minute < wake;
+    }
+
     // Colour at the given visual weight over the black ground.
     function blend(color as Number, weight as Float) as Number {
         var r = (((color >> 16) & 0xFF) * weight).toNumber();
@@ -76,17 +116,29 @@ module ApexLayout {
         return best >= 0 ? best : smallest;
     }
 
+    // Half the vertical space (px) a text row needs, from its font height. Custom
+    // fonts report their cap height (line box cropped to the ink), so they get half
+    // of it plus a small gap; system fonts report a line height with built-in
+    // leading, so a bit under half of it is enough.
+    function rowExtent(fontHeight as Number, capHeight as Boolean, scale as Float) as Float {
+        if (capHeight) {
+            var gap = 4.0f * scale;
+            return fontHeight / 2.0f + (gap < 2.0f ? 2.0f : gap);
+        }
+        return fontHeight * 0.425f;
+    }
+
     // Centre y (px) of a text row under another: its design position, pushed
-    // down when the real font heights would make the two rows overlap.
-    function rowBelow(aboveY as Float, designY as Float, aboveHeight as Numeric, height as Numeric) as Float {
-        var minY = (aboveY + (aboveHeight + height) * 0.425f).toFloat();
+    // down when the two rows' extents (see rowExtent) would overlap.
+    function rowBelow(aboveY as Float, designY as Float, aboveExtent as Float, extent as Float) as Float {
+        var minY = aboveY + aboveExtent + extent;
         return designY > minY ? designY : minY;
     }
 
     // Centre y (px) of a text row over another: its design position, pulled up
-    // when the real font heights would make the two rows overlap.
-    function rowAbove(belowY as Float, designY as Float, belowHeight as Numeric, height as Numeric) as Float {
-        var maxY = (belowY - (belowHeight + height) * 0.425f).toFloat();
+    // when the two rows' extents would overlap.
+    function rowAbove(belowY as Float, designY as Float, belowExtent as Float, extent as Float) as Float {
+        var maxY = belowY - belowExtent - extent;
         return designY < maxY ? designY : maxY;
     }
 
@@ -98,6 +150,32 @@ module ApexLayout {
     // CIQ end angle of the seconds trail, drawn clockwise from 12 o'clock (CIQ 90).
     function trailEnd(sec as Number) as Number {
         return 90 - sec * 6;
+    }
+
+    // Screen box [x, y, w, h] (px) covering the seconds comet at a second (r 202 -> 224,
+    // round caps) plus the trail at r 226: what a partial update must redraw.
+    function cometBox(sec as Number, scale as Float) as [Number, Number, Number, Number] {
+        var a = clockPoint(sec * 6, 202.0f);
+        var b = clockPoint(sec * 6, 227.0f);
+        var margin = 3.0f;   // half the comet width + the trail pen, design px
+        var x1 = (a[0] < b[0] ? a[0] : b[0]) - margin;
+        var x2 = (a[0] > b[0] ? a[0] : b[0]) + margin;
+        var y1 = (a[1] < b[1] ? a[1] : b[1]) - margin;
+        var y2 = (a[1] > b[1] ? a[1] : b[1]) + margin;
+        var left = Math.floor((C + x1) * scale).toNumber();
+        var top = Math.floor((C + y1) * scale).toNumber();
+        var right = Math.ceil((C + x2) * scale).toNumber();
+        var bottom = Math.ceil((C + y2) * scale).toNumber();
+        return [left, top, right - left, bottom - top];
+    }
+
+    // Smallest box covering two boxes.
+    function unionBox(a as [Number, Number, Number, Number], b as [Number, Number, Number, Number]) as [Number, Number, Number, Number] {
+        var left = a[0] < b[0] ? a[0] : b[0];
+        var top = a[1] < b[1] ? a[1] : b[1];
+        var right = (a[0] + a[2]) > (b[0] + b[2]) ? (a[0] + a[2]) : (b[0] + b[2]);
+        var bottom = (a[1] + a[3]) > (b[1] + b[3]) ? (a[1] + a[3]) : (b[1] + b[3]);
+        return [left, top, right - left, bottom - top];
     }
 
     // Degrees of arc fill for a 0..1 fraction; 0 without a reading.
