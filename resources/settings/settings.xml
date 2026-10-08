@@ -1,0 +1,127 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <setting propertyKey="@Properties.Field1" title="@Strings.Field1Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MetricHr</listEntry>
+            <listEntry value="1">@Strings.MetricSteps</listEntry>
+            <listEntry value="2">@Strings.MetricDistance</listEntry>
+            <listEntry value="3">@Strings.MetricCalories</listEntry>
+            <listEntry value="4">@Strings.MetricFloors</listEntry>
+            <listEntry value="5">@Strings.MetricStress</listEntry>
+            <listEntry value="6">@Strings.MetricBodyBattery</listEntry>
+            <listEntry value="8">@Strings.MetricRecovery</listEntry>
+            <listEntry value="9">@Strings.MetricSunrise</listEntry>
+            <listEntry value="10">@Strings.MetricSunset</listEntry>
+            <listEntry value="11">@Strings.MetricAltitude</listEntry>
+            <listEntry value="12">@Strings.MetricTemp</listEntry>
+            <listEntry value="13">@Strings.MetricBattery</listEntry>
+            <listEntry value="14">@Strings.MetricNotifs</listEntry>
+            <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="16">@Strings.MetricEmpty</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.Field2" title="@Strings.Field2Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MetricHr</listEntry>
+            <listEntry value="1">@Strings.MetricSteps</listEntry>
+            <listEntry value="2">@Strings.MetricDistance</listEntry>
+            <listEntry value="3">@Strings.MetricCalories</listEntry>
+            <listEntry value="4">@Strings.MetricFloors</listEntry>
+            <listEntry value="5">@Strings.MetricStress</listEntry>
+            <listEntry value="6">@Strings.MetricBodyBattery</listEntry>
+            <listEntry value="8">@Strings.MetricRecovery</listEntry>
+            <listEntry value="9">@Strings.MetricSunrise</listEntry>
+            <listEntry value="10">@Strings.MetricSunset</listEntry>
+            <listEntry value="11">@Strings.MetricAltitude</listEntry>
+            <listEntry value="12">@Strings.MetricTemp</listEntry>
+            <listEntry value="13">@Strings.MetricBattery</listEntry>
+            <listEntry value="14">@Strings.MetricNotifs</listEntry>
+            <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="16">@Strings.MetricEmpty</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.Field3" title="@Strings.Field3Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MetricHr</listEntry>
+            <listEntry value="1">@Strings.MetricSteps</listEntry>
+            <listEntry value="2">@Strings.MetricDistance</listEntry>
+            <listEntry value="3">@Strings.MetricCalories</listEntry>
+            <listEntry value="4">@Strings.MetricFloors</listEntry>
+            <listEntry value="5">@Strings.MetricStress</listEntry>
+            <listEntry value="6">@Strings.MetricBodyBattery</listEntry>
+            <listEntry value="8">@Strings.MetricRecovery</listEntry>
+            <listEntry value="9">@Strings.MetricSunrise</listEntry>
+            <listEntry value="10">@Strings.MetricSunset</listEntry>
+            <listEntry value="11">@Strings.MetricAltitude</listEntry>
+            <listEntry value="12">@Strings.MetricTemp</listEntry>
+            <listEntry value="13">@Strings.MetricBattery</listEntry>
+            <listEntry value="14">@Strings.MetricNotifs</listEntry>
+            <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="16">@Strings.MetricEmpty</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.Arc" title="@Strings.ArcTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MetricBodyBattery</listEntry>
+            <listEntry value="1">@Strings.ArcStepGoal</listEntry>
+            <listEntry value="2">@Strings.MetricBattery</listEntry>
+            <listEntry value="3">@Strings.MetricStress</listEntry>
+            <listEntry value="5">@Strings.ArcIntensity</listEntry>
+            <listEntry value="6">@Strings.ArcOff</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0xC8FF2E">@Strings.ColorVolt</listEntry>
+            <listEntry value="0xFF5A1F">@Strings.ColorEmber</listEntry>
+            <listEntry value="0x4FD1FF">@Strings.ColorGlacier</listEntry>
+            <listEntry value="0xFF3D7F">@Strings.ColorSignal</listEntry>
+            <listEntry value="0xFFB300">@Strings.ColorAmber</listEntry>
+            <listEntry value="0x3DFFB0">@Strings.ColorMint</listEntry>
+            <listEntry value="0x3D7BFF">@Strings.ColorCobalt</listEntry>
+            <listEntry value="0xA879FF">@Strings.ColorViolet</listEntry>
+            <listEntry value="0xFF2B2B">@Strings.ColorScarlet</listEntry>
+            <listEntry value="0xF4F4EF">@Strings.ColorGhost</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.NumeralColor" title="@Strings.NumeralTitle">
+        <settingConfig type="list">
+            <listEntry value="0xF4F4EF">@Strings.ColorChalk</listEntry>
+            <listEntry value="0xE9DFC9">@Strings.ColorBone</listEntry>
+            <listEntry value="0xCFE3FF">@Strings.ColorIce</listEntry>
+            <listEntry value="0xB4B4AE">@Strings.ColorSilver</listEntry>
+            <listEntry value="-1">@Strings.ColorAccent</listEntry>
+            <listEntry value="0xC8FF2E">@Strings.ColorVolt</listEntry>
+            <listEntry value="0xFF5A1F">@Strings.ColorEmber</listEntry>
+            <listEntry value="0x4FD1FF">@Strings.ColorGlacier</listEntry>
+            <listEntry value="0xFF3D7F">@Strings.ColorSignal</listEntry>
+            <listEntry value="0xFFB300">@Strings.ColorAmber</listEntry>
+            <listEntry value="0x3DFFB0">@Strings.ColorMint</listEntry>
+            <listEntry value="0x3D7BFF">@Strings.ColorCobalt</listEntry>
+            <listEntry value="0xA879FF">@Strings.ColorViolet</listEntry>
+            <listEntry value="0xFF2B2B">@Strings.ColorScarlet</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.InkColor" title="@Strings.InkTitle">
+        <settingConfig type="list">
+            <listEntry value="0xF4F4EF">@Strings.ColorChalk</listEntry>
+            <listEntry value="0xE9DFC9">@Strings.ColorBone</listEntry>
+            <listEntry value="0xCFE3FF">@Strings.ColorIce</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.DimColor" title="@Strings.DimTitle">
+        <settingConfig type="list">
+            <listEntry value="0xB0B0AA">@Strings.ColorStone</listEntry>
+            <listEntry value="0x98A6B4">@Strings.ColorSlate</listEntry>
+            <listEntry value="0xB3A68E">@Strings.ColorSand</listEntry>
+        </settingConfig>
+    </setting>
+
+</settings>

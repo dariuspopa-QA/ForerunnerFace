@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APEX — states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;600;800&amp;family=DM+Mono:wght@400;500&amp;family=DM+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E0C}
+</style>
+</helmet>
+<div style="width: 1680px; height: 900px; box-sizing: border-box; padding: 72px 72px; display: flex; flex-direction: column; gap: 56px; background: #0E0E0C; color: #F4F4EF; font-family: 'DM Sans', sans-serif">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.24em; color: #8C8C86">STATES</div>
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 72px; line-height: 0.9; letter-spacing: -1px">Wrist up. Wrist down. Lights out.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 80px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 32px">
+<div style="width: 454px; height: 454px; border-radius: 50%; box-shadow: 0 0 0 1px #262624">
+<dc-import name="Face" variant="active" accent="{{accent}}" numerals="{{numerals}}" field1="{{field1}}" field2="{{field2}}" field3="{{field3}}" arc="{{arc}}" hint-size="454px,454px"></dc-import>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 600; line-height: 1">Active</span>
+<span style="font-size: 16px; line-height: 1.5; color: #B5B5AE; max-width: 380px">Wrist raised. Seconds sweep the rim, the arc and fields are live.</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 32px">
+<div style="width: 454px; height: 454px; border-radius: 50%; box-shadow: 0 0 0 1px #262624">
+<dc-import name="Face" variant="aod" accent="{{accent}}" numerals="{{numerals}}" field1="{{field1}}" field2="{{field2}}" field3="{{field3}}" arc="{{arc}}" hint-size="454px,454px"></dc-import>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 600; line-height: 1">Always-On</span>
+<span style="font-size: 16px; line-height: 1.5; color: #B5B5AE; max-width: 380px">Wrist down. Thin numerals, twelve markers, no seconds — as few lit pixels as possible.</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 32px">
+<div style="width: 454px; height: 454px; border-radius: 50%; box-shadow: 0 0 0 1px #262624">
+<dc-import name="Face" variant="night" accent="{{accent}}" numerals="{{numerals}}" field1="{{field1}}" field2="{{field2}}" field3="{{field3}}" arc="{{arc}}" hint-size="454px,454px"></dc-import>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 600; line-height: 1">Red Shift</span>
+<span style="font-size: 16px; line-height: 1.5; color: #B5B5AE; max-width: 380px">Sleep window. Every pixel shifts to red so a glance at 3 a.m. doesn't wake you up.</span>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"field1":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"hr","section":"Data"},"field2":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"steps","section":"Data"},"field3":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"sunset","section":"Data"},"arc":{"editor":"enum","options":["bodybattery","steps","battery","stress","readiness","intensity","none"],"default":"bodybattery","section":"Data"},"accent":{"editor":"color","options":["#C8FF2E","#FF5A1F","#4FD1FF","#FF3D7F","#F4F4EF"],"default":"#C8FF2E","section":"Colour"},"numerals":{"editor":"color","options":["#F4F4EF","#E9DFC9","#CFE3FF","#C8FF2E"],"default":"#F4F4EF","section":"Colour"},"$preview":{"width":1680,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    return {
+      accent: p.accent ?? '#C8FF2E',
+      numerals: p.numerals ?? '#F4F4EF',
+      field1: p.field1 ?? 'hr',
+      field2: p.field2 ?? 'steps',
+      field3: p.field3 ?? 'sunset',
+      arc: p.arc ?? 'bodybattery'
+    };
+  }
+}
+</script>
+</body>
+</html>

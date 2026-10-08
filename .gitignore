@@ -1,0 +1,5 @@
+bin/
+dist/
+*.der
+*.pem
+developer_key*

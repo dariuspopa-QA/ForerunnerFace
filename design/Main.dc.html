@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APEX — hero</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;600;800&amp;family=DM+Mono:wght@400;500&amp;family=DM+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E0C}
+a{color:#F4F4EF}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; background: #0E0E0C; color: #F4F4EF; font-family: 'DM Sans', sans-serif; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+<div style="display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 0 0 0 112px">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<div style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.24em; color: #8C8C86">WATCH FACE  /  FORERUNNER 970</div>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 232px; line-height: 0.8; letter-spacing: -5px">APEX</h1>
+<p style="margin: 0; max-width: 500px; font-size: 19px; line-height: 1.55; color: #B5B5AE">Heavy hours, light minutes, and the number you care about wrapped around the edge. Pick three fields, an arc and your colours — the watch updates as you go.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 600px">
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<label for="apex-f1" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">FIELD 1</label>
+<div style="position: relative">
+<select id="apex-f1" value="{{f1}}" onChange="{{setF1}}" style="width: 100%; height: 44px; box-sizing: border-box; appearance: none; color-scheme: dark; padding: 0 28px 0 12px; border-radius: 10px; border: 1px solid #34342F; background: #1A1A18; color: #F4F4EF; font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer">
+<option value="hr">Heart rate</option>
+<option value="steps">Steps</option>
+<option value="distance">Distance</option>
+<option value="calories">Calories</option>
+<option value="floors">Floors</option>
+<option value="stress">Stress</option>
+<option value="bodybattery">Body Battery</option>
+<option value="readiness">Readiness</option>
+<option value="recovery">Recovery</option>
+<option value="sunrise">Sunrise</option>
+<option value="sunset">Sunset</option>
+<option value="altitude">Altitude</option>
+<option value="temp">Temperature</option>
+<option value="battery">Battery</option>
+<option value="notifications">Notifications</option>
+<option value="seconds">Seconds</option>
+<option value="none">Empty</option>
+</select>
+<svg width="12" height="12" viewBox="0 0 12 12" style="position: absolute; right: 11px; top: 16px; pointer-events: none"><path d="M2 4l4 4 4-4" fill="none" stroke="#8C8C86" style="stroke-width: 1.5px"></path></svg>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<label for="apex-f2" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">FIELD 2</label>
+<div style="position: relative">
+<select id="apex-f2" value="{{f2}}" onChange="{{setF2}}" style="width: 100%; height: 44px; box-sizing: border-box; appearance: none; color-scheme: dark; padding: 0 28px 0 12px; border-radius: 10px; border: 1px solid #34342F; background: #1A1A18; color: #F4F4EF; font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer">
+<option value="hr">Heart rate</option>
+<option value="steps">Steps</option>
+<option value="distance">Distance</option>
+<option value="calories">Calories</option>
+<option value="floors">Floors</option>
+<option value="stress">Stress</option>
+<option value="bodybattery">Body Battery</option>
+<option value="readiness">Readiness</option>
+<option value="recovery">Recovery</option>
+<option value="sunrise">Sunrise</option>
+<option value="sunset">Sunset</option>
+<option value="altitude">Altitude</option>
+<option value="temp">Temperature</option>
+<option value="battery">Battery</option>
+<option value="notifications">Notifications</option>
+<option value="seconds">Seconds</option>
+<option value="none">Empty</option>
+</select>
+<svg width="12" height="12" viewBox="0 0 12 12" style="position: absolute; right: 11px; top: 16px; pointer-events: none"><path d="M2 4l4 4 4-4" fill="none" stroke="#8C8C86" style="stroke-width: 1.5px"></path></svg>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<label for="apex-f3" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">FIELD 3</label>
+<div style="position: relative">
+<select id="apex-f3" value="{{f3}}" onChange="{{setF3}}" style="width: 100%; height: 44px; box-sizing: border-box; appearance: none; color-scheme: dark; padding: 0 28px 0 12px; border-radius: 10px; border: 1px solid #34342F; background: #1A1A18; color: #F4F4EF; font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer">
+<option value="hr">Heart rate</option>
+<option value="steps">Steps</option>
+<option value="distance">Distance</option>
+<option value="calories">Calories</option>
+<option value="floors">Floors</option>
+<option value="stress">Stress</option>
+<option value="bodybattery">Body Battery</option>
+<option value="readiness">Readiness</option>
+<option value="recovery">Recovery</option>
+<option value="sunrise">Sunrise</option>
+<option value="sunset">Sunset</option>
+<option value="altitude">Altitude</option>
+<option value="temp">Temperature</option>
+<option value="battery">Battery</option>
+<option value="notifications">Notifications</option>
+<option value="seconds">Seconds</option>
+<option value="none">Empty</option>
+</select>
+<svg width="12" height="12" viewBox="0 0 12 12" style="position: absolute; right: 11px; top: 16px; pointer-events: none"><path d="M2 4l4 4 4-4" fill="none" stroke="#8C8C86" style="stroke-width: 1.5px"></path></svg>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<label for="apex-arc" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">ARC</label>
+<div style="position: relative">
+<select id="apex-arc" value="{{arc}}" onChange="{{setArc}}" style="width: 100%; height: 44px; box-sizing: border-box; appearance: none; color-scheme: dark; padding: 0 28px 0 12px; border-radius: 10px; border: 1px solid #34342F; background: #1A1A18; color: #F4F4EF; font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer">
+<option value="bodybattery">Body Battery</option>
+<option value="steps">Step goal</option>
+<option value="battery">Battery</option>
+<option value="stress">Stress</option>
+<option value="readiness">Readiness</option>
+<option value="intensity">Intensity min</option>
+<option value="none">Off</option>
+</select>
+<svg width="12" height="12" viewBox="0 0 12 12" style="position: absolute; right: 11px; top: 16px; pointer-events: none"><path d="M2 4l4 4 4-4" fill="none" stroke="#8C8C86" style="stroke-width: 1.5px"></path></svg>
+</div>
+</div>
+</div>
+<div style="display: flex; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">ACCENT</span>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{swatches}}" as="sw" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<button type="button" aria-label="{{sw.label}}" onClick="{{sw.pick}}" style="width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid {{sw.ring}}; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+<span style="display: block; width: 28px; height: 28px; border-radius: 50%; background: {{sw.hex}}"></span>
+</button>
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">{{sw.name}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: #8C8C86">NUMERALS</span>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{numSwatches}}" as="sw" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<button type="button" aria-label="{{sw.label}}" onClick="{{sw.pick}}" style="width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid {{sw.ring}}; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+<span style="display: block; width: 28px; height: 28px; border-radius: 50%; background: {{sw.hex}}"></span>
+</button>
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">{{sw.name}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: center">
+<div style="width: 640px; height: 640px; position: relative">
+<div style="position: absolute; left: 170px; top: -220px; width: 300px; height: 1080px; border-radius: 48px; background: #151514; border: 1px solid #1F1F1D"></div>
+<div style="position: absolute; left: 573.7px; top: 141.5px; width: 14px; height: 56px; border-radius: 6px; background: #3C3C3E; transform: rotate(-30deg)"></div>
+<div style="position: absolute; left: 573.7px; top: 442.5px; width: 14px; height: 56px; border-radius: 6px; background: #3C3C3E; transform: rotate(30deg)"></div>
+<div style="position: absolute; left: 52.3px; top: 141.5px; width: 14px; height: 56px; border-radius: 6px; background: #3C3C3E; transform: rotate(30deg)"></div>
+<div style="position: absolute; left: 12px; top: 292px; width: 14px; height: 56px; border-radius: 6px; background: #3C3C3E"></div>
+<div style="position: absolute; left: 52.3px; top: 442.5px; width: 14px; height: 56px; border-radius: 6px; background: #3C3C3E; transform: rotate(-30deg)"></div>
+<div style="position: absolute; left: 20px; top: 20px; width: 600px; height: 600px; box-sizing: border-box; border-radius: 50%; background: #1E1E20; border: 1px solid #343436; box-shadow: 0 50px 120px rgba(0, 0, 0, 0.55)"></div>
+<div style="position: absolute; left: 36px; top: 36px; width: 568px; height: 568px; border-radius: 50%; background: #2C2C2E"></div>
+<div style="position: absolute; left: 51px; top: 51px; width: 538px; height: 538px; box-sizing: border-box; border-radius: 50%; background: #000000; border: 1px solid #111111"></div>
+<div style="position: absolute; left: 61px; top: 61px; width: 518px; height: 518px; border-radius: 50%; overflow: hidden">
+<div style="position: absolute; left: 0; top: 0; width: 454px; height: 454px; transform: scale(1.141); transform-origin: 0 0">
+<dc-import name="Face" accent="{{accent}}" numerals="{{numerals}}" field1="{{f1}}" field2="{{f2}}" field3="{{f3}}" arc="{{arc}}" hint-size="454px,454px"></dc-import>
+</div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","options":["#C8FF2E","#FF5A1F","#4FD1FF","#FF3D7F","#F4F4EF"],"default":"#C8FF2E"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = { accent: null, numerals: 'chalk', f1: 'hr', f2: 'steps', f3: 'sunset', arc: 'bodybattery' };
+  renderVals() {
+    const st = this.state;
+    const accent = st.accent ?? this.props.accent ?? '#C8FF2E';
+    const ring = (on) => (on ? '#F4F4EF' : 'transparent');
+    const set = (key) => (e) => this.setState({ [key]: e.target.value });
+    const accentOpts = [['Volt', '#C8FF2E'], ['Ember', '#FF5A1F'], ['Glacier', '#4FD1FF'], ['Signal', '#FF3D7F'], ['Ghost', '#F4F4EF']];
+    const numOpts = [['chalk', 'Chalk', '#F4F4EF'], ['bone', 'Bone', '#E9DFC9'], ['ice', 'Ice', '#CFE3FF'], ['accent', 'Accent', accent]];
+    const numerals = (numOpts.find((o) => o[0] === st.numerals) || numOpts[0])[2];
+    return {
+      accent,
+      numerals,
+      f1: st.f1,
+      f2: st.f2,
+      f3: st.f3,
+      arc: st.arc,
+      setF1: set('f1'),
+      setF2: set('f2'),
+      setF3: set('f3'),
+      setArc: set('arc'),
+      swatches: accentOpts.map(([name, hex]) => ({
+        name,
+        hex,
+        label: 'Use ' + name + ' accent',
+        ring: ring(hex.toLowerCase() === String(accent).toLowerCase()),
+        pick: () => this.setState({ accent: hex })
+      })),
+      numSwatches: numOpts.map(([key, name, hex]) => ({
+        name,
+        hex,
+        label: 'Use ' + name + ' numerals',
+        ring: ring(key === st.numerals),
+        pick: () => this.setState({ numerals: key })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

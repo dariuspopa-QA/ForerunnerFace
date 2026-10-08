@@ -1,0 +1,42 @@
+APP NAME
+APEX
+
+SHORT DESCRIPTION
+A bold, minimal face: huge time, one accent colour, one arc, three data fields.
+
+DESCRIPTION
+APEX is a clean, high-contrast watch face for round Garmin watches, AMOLED and MIP. Pure black ground, near-white type and a single accent colour. Nothing more.
+
+Big time, one font
+Hours in the heaviest weight, minutes in the thinnest weight of the same condensed type. The difference is weight, not colour, so the time reads at a glance.
+
+What's on the face
+• A 270° arc around the dial, with its value at 6 o'clock: Body Battery, Step goal, Battery, Stress or Intensity minutes (or turn it off)
+• Three data fields under the time, each one your choice
+• A single accent tick that sweeps the rim for seconds
+• Weekday and date
+
+Data fields
+Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
+In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score, VO2 max, Pressure or Weekly run distance.
+
+Colours
+• Accent: Volt, Ember, Glacier, Signal, Amber, Mint, Cobalt, Violet, Scarlet, Ghost
+• Time digits: Chalk, Bone, Ice, Silver, Same as accent, or any accent hue
+• Data values and labels: three tones each
+
+Always-on mode
+On AMOLED watches, always-on mode shows only the date, a thin time and the 12 hour marks. It uses few lit pixels and shifts the content slightly every minute to protect the screen. On MIP watches the full face stays on, without the seconds.
+
+Customise
+• On the watch: edit the face from the watch face menu and change the data and colours with Garmin's watch face editor (on watches that have it).
+• On your phone: open APEX in the Connect IQ Store app and change its settings.
+
+Notes
+• Distance, altitude and temperature follow your watch's unit settings.
+• Sunrise, sunset and temperature come from your watch's weather data. They show "--" until weather is available (phone connected).
+• Any value that isn't available is shown as "--".
+• Your data stays on the watch. APEX doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0)
+First release.

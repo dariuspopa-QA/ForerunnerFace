@@ -1,0 +1,15 @@
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <!-- Metric ids: see the field / arc tables in CLAUDE.md -->
+    <property id="Field1" type="number">0</property>
+    <property id="Field2" type="number">1</property>
+    <property id="Field3" type="number">10</property>
+    <property id="Arc" type="number">0</property>
+
+    <!-- Colors as 0xRRGGBB; NumeralColor -1 = same as the accent -->
+    <property id="AccentColor" type="number">0xC8FF2E</property>
+    <property id="NumeralColor" type="number">0xF4F4EF</property>
+    <property id="InkColor" type="number">0xF4F4EF</property>
+    <property id="DimColor" type="number">0xB0B0AA</property>
+
+</properties>
