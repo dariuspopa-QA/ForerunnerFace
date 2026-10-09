@@ -26,3 +26,11 @@ The drawing code is the face's own.
 
 The same build + capture steps check any product's layout (`-Device <id>`), and Always-On
 frames for consecutive minutes (`-Aod -Min <m>`) feed `tools\aod-burnin.ps1`.
+
+## Showcase screenshots (face on a watch)
+
+`compose-showcase.ps1 -Faces face -Out <repo>\store` puts the face captures (volt, ember,
+glacier, signal, night, aod) into a procedurally drawn generic watch (no Garmin product
+imagery or branding) in a studio style: `store/showcase/` (five 500 x 500 screenshots and a
+1440 x 720 hero). Save the script as UTF-8 with BOM (Windows PowerShell 5.1 reads it as ANSI
+otherwise).
