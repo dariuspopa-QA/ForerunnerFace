@@ -228,6 +228,12 @@ All seven steps are done.
   `monkeydo bin\ApexFaceTest.prg fr970 /t` with the simulator open), and
   `powershell -ExecutionPolicy Bypass -File tests\check-resources.ps1` for the resource XML. Keep pure
   logic in `ApexFormat` / `ApexLayout` / `ApexMetrics` so it stays testable.
+- Per-watch tests: `source/ApexDeviceTest.mc` checks the layout on the screen it runs on (fonts, row
+  overlap, time inside the arc, palette, low power). `tools\run-device-tests.ps1` runs the whole
+  suite on one watch per screen size, API version and editor config (16 watches, ~25 min, simulator
+  open); the resource check fails if a product's screen size or API version isn't in that matrix.
+  View tests render at the running watch's own size (`ApexTestUtil.render` / `px`); the view's
+  `testProbe` is `(:debug)` so release builds leave it out.
 - `manifest.xml` is generated — change products / permissions through the "Monkey C: …" commands.
 - Keep the look minimal: if a change adds a colour, a font or a new element, check it against the
   concept above first.

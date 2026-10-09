@@ -210,13 +210,14 @@ class ApexData {
             case ApexMetrics.F_CALORIES:
                 return ApexFormat.thousandsText(info != null ? info.calories : null);
             case ApexMetrics.F_FLOORS:
-                return ApexFormat.numberText(info != null ? info.floorsClimbed : null);
+                return ApexFormat.numberText(info != null && (info has :floorsClimbed) ? info.floorsClimbed : null);
             case ApexMetrics.F_STRESS:
                 return ApexFormat.numberText(stress());
             case ApexMetrics.F_BODY_BATTERY:
                 return ApexFormat.numberText(bodyBattery());
             case ApexMetrics.F_RECOVERY:
-                return ApexFormat.recoveryText(info != null ? info.timeToRecovery : null);
+                // Not every watch tracks recovery time (e.g. Venu 2, vivoactive 6): check the member exists
+                return ApexFormat.recoveryText(info != null && (info has :timeToRecovery) ? info.timeToRecovery : null);
             case ApexMetrics.F_SUNRISE:
                 return sunText(false);
             case ApexMetrics.F_SUNSET:
@@ -250,7 +251,8 @@ class ApexData {
             case ApexMetrics.A_STRESS:
                 return ApexMetrics.percentFraction(stress());
             case ApexMetrics.A_INTENSITY:
-                return info != null ? ApexMetrics.goalFraction(intensityMinutes(), info.activeMinutesWeekGoal) : null;
+                return info != null && (info has :activeMinutesWeekGoal)
+                    ? ApexMetrics.goalFraction(intensityMinutes(), info.activeMinutesWeekGoal) : null;
         }
         return null;
     }
@@ -297,7 +299,7 @@ class ApexData {
     private function stress() as Number or Null {
         if (!mHaveStress) {
             var info = mInfo;
-            mStress = (info != null) ? info.stressScore : null;
+            mStress = (info != null && (info has :stressScore)) ? info.stressScore : null;
             if (mStress == null) {
                 mStress = latest(SensorHistory.getStressHistory({:period => 1}));
             }
@@ -308,10 +310,11 @@ class ApexData {
 
     private function intensityMinutes() as Number or Null {
         var info = mInfo;
-        if (info == null || info.activeMinutesWeek == null) {
+        if (info == null || !(info has :activeMinutesWeek)) {
             return null;
         }
-        return (info.activeMinutesWeek as ActivityMonitor.ActiveMinutes).total;
+        var week = (info as ActivityMonitor.Info).activeMinutesWeek;
+        return week != null ? (week as ActivityMonitor.ActiveMinutes).total : null;
     }
 
     private function distance() as String {

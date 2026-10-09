@@ -753,4 +753,28 @@ class ApexFaceView extends WatchUi.WatchFace {
     private function px(size as Numeric) as Number {
         return Math.round(size * mScale).toNumber();
     }
+
+    // Computed layout and state for the per-watch tests (debug builds only; release
+    // builds, as exported for the store, leave it out). Positions are row centres in
+    // px, heights are the fonts' line heights in px.
+    (:debug)
+    function testProbe(dc as Dc) as Dictionary<Symbol, Numeric or Boolean> {
+        return {
+            :scale => mScale, :customFonts => mCustomFonts, :amoled => mAmoled,
+            :partialSeconds => mPartialSeconds, :night => mNight,
+            :minor => mMinor, :rule => mRule, :accent => mAccent,
+            :dateY => DATE_Y * mScale, :timeY => TIME_Y * mScale, :sepY => SEP_Y * mScale,
+            :labelY => FIELD_LABEL_Y * mScale, :valueY => mFieldValueY * mScale,
+            :readoutValueY => mReadoutValueY * mScale, :readoutLabelY => READOUT_LABEL_Y * mScale,
+            :hoursRight => HOURS_RIGHT_X * mScale, :minutesLeft => MINUTES_LEFT_X * mScale,
+            :arcInner => (ARC_R - ARC_W) * mScale,
+            :hDate => dc.getFontHeight(mFontDate), :hHours => dc.getFontHeight(mFontHours),
+            :hLabel => dc.getFontHeight(mFontLabel), :hValue => dc.getFontHeight(mFontValue),
+            :hReadoutValue => dc.getFontHeight(mFontReadoutValue),
+            :hReadoutLabel => dc.getFontHeight(mFontReadoutLabel),
+            :wHours => dc.getTextWidthInPixels("00", mFontHours),
+            :wMinutes => dc.getTextWidthInPixels("00", mFontMinutes),
+            :wHoursAod => dc.getTextWidthInPixels("00", mFontTimeAod)
+        };
+    }
 }

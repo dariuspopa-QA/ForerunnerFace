@@ -204,6 +204,27 @@ if (Test-Path $deviceDir) {
             }
         }
     }
+    # tools\run-device-tests.ps1 must cover every screen size, API version and editor
+    # config among the products
+    $runner = Get-Content -Raw (Join-Path $root 'tools\run-device-tests.ps1')
+    $tested = @([regex]::Matches($runner, "'(\w+)'\s*=\s*'\d+ (MIP|AMOLED)") | ForEach-Object { $_.Groups[1].Value })
+    $keyOf = {
+        param($id)
+        $j = Get-Content (Join-Path $deviceDir "$id\compiler.json") -Raw | ConvertFrom-Json
+        $api = ([version](($j.partNumbers | ForEach-Object { $_.connectIQVersion } | Sort-Object -Descending | Select-Object -First 1))).ToString(2)
+        @("$($j.deviceFamily)", "API $api")
+    }
+    $testedKeys = @{}
+    foreach ($id in $tested) {
+        Check ($products -contains $id) "device test $id is a product"
+        foreach ($k in (& $keyOf $id)) { $testedKeys[$k] = $true }
+    }
+    $needed = @{}
+    foreach ($id in $products) { foreach ($k in (& $keyOf $id)) { $needed[$k] = $true } }
+    foreach ($k in ($needed.Keys | Sort-Object)) {
+        Check ($testedKeys.ContainsKey($k)) "device tests cover $k"
+    }
+
     $typesIn = @{}
     foreach ($cfgName in 'editor-full', 'editor-basic') {
         $text = Get-Content -Raw (Join-Path $root "$cfgName/configs/watchface.xml")
