@@ -56,5 +56,10 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.0)
-First release.
+WHAT'S NEW (version 1.0.1)
+• New typefaces: the time now uses a true heavy/thin condensed pair (hours bold, minutes light), with crisp labels, each sized for your watch's screen.
+• Night mode: a red palette that's easy on your eyes in the dark. Off, On, or Auto between your sleep and wake times. Find it in the face's settings in the Connect IQ app.
+• MIP watches (fēnix 7/8 Solar, Forerunner 255/955, Enduro 3 and others) now keep the seconds when your wrist is down.
+• Better burn-in protection in always-on mode on AMOLED watches.
+• The on-watch editor only offers Sleep score on watches that have it.
+• Fixes a crash when the Recovery field was selected on watches that don't track recovery time (Venu 2, Venu 2S, vívoactive 6, Approach S50).
