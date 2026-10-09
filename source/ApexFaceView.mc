@@ -238,7 +238,9 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Only the date, a thin time (minutes dim) and the 12 major ticks, shifted
     // each minute. Nothing accent-coloured, no seconds, arc or fields.
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, now as Gregorian.Info) as Void {
-        var shift = ApexLayout.aodShift(clock.min);
+        // Everything moves with ApexLayout.AOD_TIME_SHIFTS; the ticks are inset by the
+        // largest shift so they stay on the round screen.
+        var shift = ApexLayout.aodTimeShift(clock.min);
         mShiftX = shift[0].toFloat();
         mShiftY = shift[1].toFloat();
 
@@ -246,8 +248,9 @@ class ApexFaceView extends WatchUi.WatchFace {
         dc.clear();
         dc.setPenWidth(ApexLayout.penWidth(MAJOR_W, mScale, mAmoled));
         dc.setColor(mAodMajor, Graphics.COLOR_TRANSPARENT);
+        var inset = ApexLayout.AOD_SHIFT_MAX;
         for (var i = 0; i < 60; i += 5) {
-            drawRadial(dc, i * 6, MAJOR_R_IN, MAJOR_R_OUT);
+            drawRadial(dc, i * 6, MAJOR_R_IN - inset, MAJOR_R_OUT - inset);
         }
         dc.setPenWidth(1);
 

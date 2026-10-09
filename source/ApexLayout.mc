@@ -18,10 +18,6 @@ module ApexLayout {
     // Taps outside this radius select the arc (the rim)
     const ARC_HIT_R = 170.0f;
 
-    // Always-On: content moves through these design-pixel offsets, one step per
-    // minute, so no pixel stays lit in the same place (AMOLED burn-in).
-    const AOD_SHIFTS = [[0, 0], [3, 1], [-1, 3], [-3, -1], [1, -3], [2, 2], [-2, 2], [0, -2]];
-
     // NumeralColor setting value meaning "same as the accent"
     const NUMERALS_ACCENT = -1;
 
@@ -142,9 +138,38 @@ module ApexLayout {
         return designY < maxY ? designY : maxY;
     }
 
-    // Burn-in offset [x, y] for the given minute.
-    function aodShift(minute as Number) as Array<Number> {
-        return AOD_SHIFTS[minute % AOD_SHIFTS.size()] as Array<Number>;
+    // The Always-On time and date move further: the hour strokes are ~12 design px
+    // wide, and no pixel may stay lit for more than 3 minutes, so every 4 consecutive
+    // minutes must move them more than a stroke width both across and down (>= 14 px).
+    // Eight distinct positions keep changing minute digits from lining up by chance.
+    const AOD_TIME_SHIFTS = [[-9, -9], [9, -7], [-7, 9], [7, 7], [-9, -7], [9, -9], [-7, 7], [7, 9]];
+    // Largest offset in AOD_TIME_SHIFTS (the Always-On ticks are inset by it)
+    const AOD_SHIFT_MAX = 9.0f;
+
+    function aodTimeShift(minute as Number) as Array<Number> {
+        return AOD_TIME_SHIFTS[minute % AOD_TIME_SHIFTS.size()] as Array<Number>;
+    }
+
+    // Smallest horizontal and vertical spread [dx, dy] of a shift pattern over any
+    // window of consecutive minutes: a stroke thinner than this can't stay lit
+    // for the whole window.
+    function minShiftSpan(shifts as Array, window as Number) as [Number, Number] {
+        var minX = 1000;
+        var minY = 1000;
+        var n = shifts.size();
+        for (var start = 0; start < n; start++) {
+            var loX = 1000; var hiX = -1000; var loY = 1000; var hiY = -1000;
+            for (var k = 0; k < window; k++) {
+                var s = shifts[(start + k) % n] as Array<Number>;
+                if (s[0] < loX) { loX = s[0]; }
+                if (s[0] > hiX) { hiX = s[0]; }
+                if (s[1] < loY) { loY = s[1]; }
+                if (s[1] > hiY) { hiY = s[1]; }
+            }
+            if (hiX - loX < minX) { minX = hiX - loX; }
+            if (hiY - loY < minY) { minY = hiY - loY; }
+        }
+        return [minX, minY];
     }
 
     // CIQ end angle of the seconds trail, drawn clockwise from 12 o'clock (CIQ 90).
