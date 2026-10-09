@@ -92,13 +92,15 @@ The display may quantise to fewer colours; pick the nearest if a value renders v
 
 1. **Active** (wrist raised, high power): everything above, redraw every second.
 2. **Always-On** (`onEnterSleep`, and `System.getDeviceSettings().requiresBurnInProtection` is true):
-   only date, hours (thin), minutes (dim), and the 12 major ticks in `0x4A4A46` (inset 9 px).
+   only date, hours (thin), minutes (dim), and the 12 major ticks in `0x4A4A46` (inset 10 px).
    No seconds, no arc, no fields, no readout. Garmin's AMOLED rules: at most 10 % of pixels lit per
    update, and (older models) no pixel lit for more than 3 minutes. Everything moves by
    `ApexLayout.AOD_TIME_SHIFTS`, which spreads ≥ 14 px across and down over any 4 minutes (hour
    strokes are ~12 px wide). Measure with `tools\aod-burnin.ps1` on 8 consecutive Always-On frames:
-   currently ~5.5 % lit; only a few dozen pixels where successive minute digits overlap by chance
-   can stay lit up to 6 minutes. `onExitSleep` returns to Active.
+   currently ~5.6 % lit, and 16 pixels (where successive minute digits overlap by chance) stay lit
+   4–5 minutes. The pattern was searched with `tools\aod-optimize.ps1` (offline render of minutes
+   00–59: ~37 px per hour over the limit, down from 275); a residual this small can't be ruled out
+   for every minute sequence. `onExitSleep` returns to Active.
 3. **Night (Red Shift)**: the red palette above, via the `NightMode` setting: Off / Auto
    (`UserProfile.getProfile()` sleep and wake times) / On. The fr970's system Red Shift does tint
    third-party faces (luminance-based, no API to detect it), but most of the 66 watches have no Red

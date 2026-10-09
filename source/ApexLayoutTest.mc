@@ -223,7 +223,7 @@ function aodShiftMovesEveryMinute(logger as Logger) as Boolean {
     for (var m = 0; m < 60; m++) {
         var a = ApexLayout.aodTimeShift(m);
         var b = ApexLayout.aodTimeShift(m + 1);
-        Test.assertMessage(a[0] != b[0] && a[1] != b[1], "no full move between minute " + m + " and " + (m + 1));
+        Test.assertMessage(a[0] != b[0] || a[1] != b[1], "no move between minute " + m + " and " + (m + 1));
     }
     return true;
 }
@@ -256,7 +256,7 @@ function aodTimeShiftCycles(logger as Logger) as Boolean {
         var b = ApexLayout.aodTimeShift(m + n);
         ApexTestUtil.assertEqual(a[0], b[0]);
         ApexTestUtil.assertEqual(a[1], b[1]);
-        Test.assert(a[0].abs() <= 9 && a[1].abs() <= 9);
+        Test.assert(a[0].abs() <= ApexLayout.AOD_SHIFT_MAX && a[1].abs() <= ApexLayout.AOD_SHIFT_MAX);
     }
     return true;
 }

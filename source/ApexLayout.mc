@@ -141,10 +141,11 @@ module ApexLayout {
     // The Always-On time and date move further: the hour strokes are ~12 design px
     // wide, and no pixel may stay lit for more than 3 minutes, so every 4 consecutive
     // minutes must move them more than a stroke width both across and down (>= 14 px).
-    // Eight distinct positions keep changing minute digits from lining up by chance.
-    const AOD_TIME_SHIFTS = [[-9, -9], [9, -7], [-7, 9], [7, 7], [-9, -7], [9, -9], [-7, 7], [7, 9]];
+    // The eight positions were searched (offline render of minutes 00-59) to keep changing
+    // minute digits from lining up: ~37 px of the time stay lit > 3 min per hour, down from 275.
+    const AOD_TIME_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
     // Largest offset in AOD_TIME_SHIFTS (the Always-On ticks are inset by it)
-    const AOD_SHIFT_MAX = 9.0f;
+    const AOD_SHIFT_MAX = 10.0f;
 
     function aodTimeShift(minute as Number) as Array<Number> {
         return AOD_TIME_SHIFTS[minute % AOD_TIME_SHIFTS.size()] as Array<Number>;
