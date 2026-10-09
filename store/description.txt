@@ -18,7 +18,7 @@ What's on the face
 
 Data fields
 Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
-In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score, VO2 max, Pressure or Weekly run distance.
+In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score (where your watch has it), VO2 max, Pressure or Weekly run distance.
 
 Colours
 • Accent: Volt, Ember, Glacier, Signal, Amber, Mint, Cobalt, Violet, Scarlet, Ghost
@@ -26,11 +26,29 @@ Colours
 • Data values and labels: three tones each
 
 Always-on mode
-On AMOLED watches, always-on mode shows only the date, a thin time and the 12 hour marks. It uses few lit pixels and shifts the content slightly every minute to protect the screen. On MIP watches the full face stays on, without the seconds.
+On AMOLED watches, always-on mode shows only the date, a thin time and the 12 hour marks. It lights few pixels and moves the content every minute to protect the screen. On MIP watches the full face stays on, seconds included.
+
+Night mode
+A red palette that's easy on your eyes in the dark: Off, On, or Auto (between the sleep and wake times in your user profile). Watches with Garmin's Red Shift tint the face red on their own, too.
 
 Customise
-• On the watch: edit the face from the watch face menu and change the data and colours with Garmin's watch face editor (on watches that have it).
-• On your phone: open APEX in the Connect IQ Store app and change its settings.
+• On the watch: from the watch face, hold the menu button, select Watch Face, then START > Customize to change the data and colours.
+• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode.
+
+Supported watches (66 models, round screens from 218 to 466 px)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
 
 Notes
 • Distance, altitude and temperature follow your watch's unit settings.

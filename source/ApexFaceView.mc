@@ -6,6 +6,7 @@ import Toybox.Math;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
+import Toybox.UserProfile;
 import Toybox.WatchUi;
 
 // APEX watch face. Geometry and colours follow CLAUDE.md; every coordinate is
@@ -62,13 +63,15 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mReadoutValueY as Float = READOUT_VALUE_Y;
     private const READOUT_LABEL_SIZE = 14;
 
-    // Fixed colours (Active palette)
     private const COLOR_GROUND = 0x000000;
-    // Minor ticks and rule (arc track, separator): set per screen type in initialize
-    private var mMinor as Number = ApexLayout.MINOR_AMOLED;
-    private var mRule as Number = ApexLayout.RULE_AMOLED;
     private var mAmoled as Boolean = true;
-    private const COLOR_AOD_MAJOR = 0x4A4A46;
+
+    // MIP watches keep the seconds in low power through onPartialUpdate (AMOLED
+    // watches switch to Always-On instead). mLastSec: second last drawn, -1 = none.
+    private var mPartialSeconds as Boolean = false;
+    private var mLastSec as Number = -1;
+    // Arc fill of the last full update, reused by partial updates
+    private var mArcSweep as Float = 0.0f;
 
     // Seconds (Active mode only): trail on the rim, comet rotated to sec x 6 degrees
     private const TRAIL_R = 226.0f;
@@ -77,11 +80,26 @@ class ApexFaceView extends WatchUi.WatchFace {
     private const COMET_R_OUT = 224.0f;
     private const COMET_W = 4.0f;
 
-    // Colours from settings / the watch face editor
+    // Day colours from settings / the watch face editor
+    private var mDayAccent as Number = 0xC8FF2E;
+    private var mDayNumerals as Number = 0xF4F4EF;
+    private var mDayInk as Number = 0xF4F4EF;
+    private var mDayDim as Number = 0xB0B0AA;
+
+    // Night (red) mode: the NightMode setting, whether it is on now, and the
+    // minute it was last evaluated
+    private var mNightMode as Number = ApexLayout.NIGHT_OFF;
+    private var mNight as Boolean = false;
+    private var mNightMinute as Number = -1;
+
+    // Colours in use (ApexLayout.palette of the above)
     private var mAccent as Number = 0xC8FF2E;
     private var mNumerals as Number = 0xF4F4EF;
     private var mInk as Number = 0xF4F4EF;
     private var mDim as Number = 0xB0B0AA;
+    private var mMinor as Number = ApexLayout.MINOR_AMOLED;
+    private var mRule as Number = ApexLayout.RULE_AMOLED;
+    private var mAodMajor as Number = ApexLayout.AOD_MAJOR;
 
     // Data from settings / the watch face editor. A field shows its built-in
     // metric unless the editor picked a system data field the face has no
@@ -101,7 +119,9 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mRing as BufferedBitmapReference or Null;
     private var mRingDirty as Boolean = true;
 
-    // Stand-in fonts until the custom bitmap fonts exist (build step 6)
+    // Custom bitmap fonts (Barlow Condensed / DM Mono, per screen size in
+    // resources-round-*/fonts). System fonts stand in if they can't be loaded.
+    private var mCustomFonts as Boolean = false;
     private var mFontHours as FontType = Graphics.FONT_NUMBER_THAI_HOT;
     private var mFontMinutes as FontType = Graphics.FONT_NUMBER_THAI_HOT;
     private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_THAI_HOT;
@@ -124,9 +144,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         WatchFace.initialize();
         mEditMode = editMode;
         mAmoled = burnInProtection();
-        var greys = ApexLayout.ringGreys(mAmoled);
-        mMinor = greys[0];
-        mRule = greys[1];
+        mPartialSeconds = !mAmoled && !editMode;
         loadSettings();
     }
 
@@ -138,19 +156,27 @@ class ApexFaceView extends WatchUi.WatchFace {
     }
 
     // Rows keep their design positions unless the fonts are taller than designed
-    // (system font stand-ins): field values move down, the arc readout value moves
-    // up so its label stays clear of the rim.
+    // (minimum sizes on small screens, system font stand-ins): field values move
+    // down, the arc readout value moves up so its label stays clear of the rim.
     private function layoutRows(dc as Dc) as Void {
         mFieldValueY = ApexLayout.rowBelow(FIELD_LABEL_Y * mScale, FIELD_VALUE_Y * mScale,
-            dc.getFontHeight(mFontLabel), dc.getFontHeight(mFontValue)) / mScale;
+            rowExtent(dc, mFontLabel), rowExtent(dc, mFontValue)) / mScale;
         mReadoutValueY = ApexLayout.rowAbove(READOUT_LABEL_Y * mScale, READOUT_VALUE_Y * mScale,
-            dc.getFontHeight(mFontReadoutLabel), dc.getFontHeight(mFontReadoutValue)) / mScale;
+            rowExtent(dc, mFontReadoutLabel), rowExtent(dc, mFontReadoutValue)) / mScale;
+    }
+
+    // Half the height a text row needs, in px. Custom fonts report their cap height
+    // (line box cropped to the ink), system fonts a line height with leading.
+    private function rowExtent(dc as Dc, font as FontType) as Float {
+        var h = dc.getFontHeight(font);
+        return ApexLayout.rowExtent(h, mCustomFonts, mScale);
     }
 
     function onUpdate(dc as Dc) as Void {
         dc.setAntiAlias(true);
         var clock = System.getClockTime();
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        updateNight(clock);
 
         if (!mAwake && !mEditMode && burnInProtection()) {
             drawAlwaysOn(dc, clock, now);
@@ -175,7 +201,7 @@ class ApexFaceView extends WatchUi.WatchFace {
 
         mData.refresh(clock);
 
-        if (mAwake) {
+        if (mAwake || mPartialSeconds) {
             drawSeconds(dc, clock.sec);
         }
         if (arcVisible() && mEditingSlot != ApexEditor.SLOT_ARC) {
@@ -212,26 +238,50 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Only the date, a thin time (minutes dim) and the 12 major ticks, shifted
     // each minute. Nothing accent-coloured, no seconds, arc or fields.
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, now as Gregorian.Info) as Void {
-        var shift = ApexLayout.aodShift(clock.min);
+        // Everything moves with ApexLayout.AOD_TIME_SHIFTS; the ticks are inset by the
+        // largest shift so they stay on the round screen.
+        var shift = ApexLayout.aodTimeShift(clock.min);
         mShiftX = shift[0].toFloat();
         mShiftY = shift[1].toFloat();
 
         dc.setColor(COLOR_GROUND, COLOR_GROUND);
         dc.clear();
         dc.setPenWidth(ApexLayout.penWidth(MAJOR_W, mScale, mAmoled));
-        dc.setColor(COLOR_AOD_MAJOR, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mAodMajor, Graphics.COLOR_TRANSPARENT);
+        var inset = ApexLayout.AOD_SHIFT_MAX;
         for (var i = 0; i < 60; i += 5) {
-            drawRadial(dc, i * 6, MAJOR_R_IN, MAJOR_R_OUT);
+            drawRadial(dc, i * 6, MAJOR_R_IN - inset, MAJOR_R_OUT - inset);
         }
         dc.setPenWidth(1);
 
         drawDate(dc, now);
-        drawTime(dc, now, mFontTimeAod, mFontTimeAod, mNumerals, mDim);
+        drawTime(dc, now, mFontTimeAod, mFontMinutes, mNumerals, mDim);
     }
 
     // ---- Seconds -------------------------------------------------------
 
+    // MIP watches in low power: called once a second between the minute updates.
+    // Only the box around the previous and the new comet is redrawn (ring background,
+    // arc fill, trail, comet), which keeps the update inside the power budget.
+    function onPartialUpdate(dc as Dc) as Void {
+        var ring = mRing;
+        if (!mPartialSeconds || ring == null || mLastSec < 0) {
+            return;
+        }
+        var sec = System.getClockTime().sec;
+        if (sec == mLastSec) {
+            return;
+        }
+        var box = ApexLayout.unionBox(ApexLayout.cometBox(mLastSec, mScale), ApexLayout.cometBox(sec, mScale));
+        dc.setClip(box[0], box[1], box[2], box[3]);
+        dc.drawBitmap(0, 0, ring);
+        drawArcFill(dc);
+        drawSeconds(dc, sec);
+        dc.clearClip();
+    }
+
     private function drawSeconds(dc as Dc, sec as Number) as Void {
+        mLastSec = sec;
         var centre = C * mScale;
         if (sec > 0) {
             dc.setColor(ApexLayout.blend(mAccent, TRAIL_WEIGHT), Graphics.COLOR_TRANSPARENT);
@@ -267,11 +317,15 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     // Settings from the Garmin Connect app only.
     function loadPhoneSettings() as Void {
-        mAccent = prop("AccentColor", 0xC8FF2E);
+        mDayAccent = prop("AccentColor", 0xC8FF2E);
         var numerals = prop("NumeralColor", 0xF4F4EF);
-        mNumerals = ApexLayout.numeralColor(numerals, mAccent);
-        mInk = prop("InkColor", 0xF4F4EF);
-        mDim = prop("DimColor", 0xB0B0AA);
+        mDayNumerals = ApexLayout.numeralColor(numerals, mDayAccent);
+        mDayInk = prop("InkColor", 0xF4F4EF);
+        mDayDim = prop("DimColor", 0xB0B0AA);
+        var night = prop("NightMode", ApexLayout.NIGHT_OFF);
+        mNightMode = (night >= ApexLayout.NIGHT_OFF && night <= ApexLayout.NIGHT_ON) ? night : ApexLayout.NIGHT_OFF;
+        mNightMinute = -1;
+        mNight = nightNow(System.getClockTime());
         mFieldIds = [
             ApexMetrics.validField(prop("Field1", ApexMetrics.F_HR)),
             ApexMetrics.validField(prop("Field2", ApexMetrics.F_STEPS)),
@@ -279,6 +333,52 @@ class ApexFaceView extends WatchUi.WatchFace {
         ];
         mFieldComplications = [null, null, null];
         mArcId = ApexMetrics.validArc(prop("Arc", ApexMetrics.A_BODY_BATTERY));
+        applyPalette();
+    }
+
+    // ---- Night mode ----------------------------------------------------
+
+    // Re-evaluates Auto night mode once a minute and switches the palette on change.
+    private function updateNight(clock as System.ClockTime) as Void {
+        var minute = clock.hour * 60 + clock.min;
+        if (minute == mNightMinute) {
+            return;
+        }
+        mNightMinute = minute;
+        var night = nightNow(clock);
+        if (night != mNight) {
+            mNight = night;
+            applyPalette();
+        }
+    }
+
+    // On: always. Auto: between the sleep and wake times of the user profile.
+    private function nightNow(clock as System.ClockTime) as Boolean {
+        if (mNightMode == ApexLayout.NIGHT_ON) {
+            return true;
+        }
+        if (mNightMode != ApexLayout.NIGHT_AUTO) {
+            return false;
+        }
+        var profile = UserProfile.getProfile();
+        var sleep = profile.sleepTime;
+        var wake = profile.wakeTime;
+        if (sleep == null || wake == null) {
+            return false;
+        }
+        return ApexLayout.inSleepWindow(clock.hour * 60 + clock.min,
+            (sleep as Time.Duration).value() / 60 % 1440, (wake as Time.Duration).value() / 60 % 1440);
+    }
+
+    private function applyPalette() as Void {
+        var p = ApexLayout.palette([mDayAccent, mDayNumerals, mDayInk, mDayDim], mAmoled, mNight);
+        mAccent = p[ApexLayout.P_ACCENT];
+        mNumerals = p[ApexLayout.P_NUMERALS];
+        mInk = p[ApexLayout.P_INK];
+        mDim = p[ApexLayout.P_DIM];
+        mMinor = p[ApexLayout.P_MINOR];
+        mRule = p[ApexLayout.P_RULE];
+        mAodMajor = p[ApexLayout.P_AOD_MAJOR];
         mRingDirty = true;
     }
 
@@ -297,11 +397,11 @@ class ApexFaceView extends WatchUi.WatchFace {
     function applyEditor(settings as Application.WatchFaceConfig.Settings, editedType as WatchUi.WatchFaceConfigType or Null) as Void {
         var accent = settings.accentColor;
         if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
+            mDayAccent = accent.color as Number;
         }
         var dataColor = settings.complicationColor;
         if (dataColor != null && dataColor.color instanceof Number) {
-            mNumerals = dataColor.color as Number;
+            mDayNumerals = dataColor.color as Number;
         }
 
         var refs = settings.complicationSettings;
@@ -334,7 +434,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
             mEditingSlot = null;
         }
-        mRingDirty = true;
+        applyPalette();
         WatchUi.requestUpdate();
     }
 
@@ -387,6 +487,24 @@ class ApexFaceView extends WatchUi.WatchFace {
     // ---- Setup ---------------------------------------------------------
 
     private function loadFonts(dc as Dc) as Void {
+        try {
+            mFontHours = WatchUi.loadResource(Rez.Fonts.TimeHeavy) as FontResource;
+            mFontMinutes = WatchUi.loadResource(Rez.Fonts.TimeThin) as FontResource;
+            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
+            mFontDate = WatchUi.loadResource(Rez.Fonts.Mono22) as FontResource;
+            mFontLabel = WatchUi.loadResource(Rez.Fonts.Mono16) as FontResource;
+            mFontValue = WatchUi.loadResource(Rez.Fonts.Value) as FontResource;
+            mFontReadoutValue = WatchUi.loadResource(Rez.Fonts.ArcValue) as FontResource;
+            mFontReadoutLabel = WatchUi.loadResource(Rez.Fonts.Mono14) as FontResource;
+            mCustomFonts = true;
+            return;
+        } catch (e) {
+            mCustomFonts = false;
+        }
+        loadSystemFonts(dc);
+    }
+
+    private function loadSystemFonts(dc as Dc) as Void {
         var numbers = [Graphics.FONT_NUMBER_MILD, Graphics.FONT_NUMBER_MEDIUM,
             Graphics.FONT_NUMBER_HOT, Graphics.FONT_NUMBER_THAI_HOT] as Array<FontType>;
         var texts = [Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_SMALL,
@@ -569,25 +687,30 @@ class ApexFaceView extends WatchUi.WatchFace {
         if (mArcId == ApexMetrics.A_OFF) {
             return;
         }
-        var fraction = mData.arcFraction(mArcId);
-        var sweep = ApexLayout.arcSweep(fraction);
-        if (sweep >= 1.0f) {
-            var cx = C * mScale;
-            var r = ARC_R * mScale;
-            var end = ARC_START - sweep;
-            dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
-            dc.setPenWidth(ApexLayout.penWidth(ARC_W, mScale, mAmoled));
-            dc.drawArc(cx, cx, r, Graphics.ARC_CLOCKWISE, ARC_START, end);
-            dc.setPenWidth(1);
-            var capR = ARC_W * mScale / 2;
-            fillCap(dc, cx, r, ARC_START, capR);
-            fillCap(dc, cx, r, end, capR);
-        }
+        mArcSweep = ApexLayout.arcSweep(mData.arcFraction(mArcId));
+        drawArcFill(dc);
 
         dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         dc.drawText(C * mScale, mReadoutValueY * mScale, mFontReadoutValue, mData.arcReadout(mArcId),
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         drawTracked(dc, ApexMetrics.arcLabel(mArcId), C, READOUT_LABEL_Y, mFontReadoutLabel, LABEL_TRACKING, mDim);
+    }
+
+    // The accent part of the arc, mArcSweep degrees from the bottom-left end.
+    private function drawArcFill(dc as Dc) as Void {
+        if (mArcId == ApexMetrics.A_OFF || mArcSweep < 1.0f) {
+            return;
+        }
+        var cx = C * mScale;
+        var r = ARC_R * mScale;
+        var end = ARC_START - mArcSweep;
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(ApexLayout.penWidth(ARC_W, mScale, mAmoled));
+        dc.drawArc(cx, cx, r, Graphics.ARC_CLOCKWISE, ARC_START, end);
+        dc.setPenWidth(1);
+        var capR = ARC_W * mScale / 2;
+        fillCap(dc, cx, r, ARC_START, capR);
+        fillCap(dc, cx, r, end, capR);
     }
 
     // Round cap at a CIQ angle (0 = 3 o'clock, counter-clockwise) on the arc.
@@ -629,5 +752,29 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     private function px(size as Numeric) as Number {
         return Math.round(size * mScale).toNumber();
+    }
+
+    // Computed layout and state for the per-watch tests (debug builds only; release
+    // builds, as exported for the store, leave it out). Positions are row centres in
+    // px, heights are the fonts' line heights in px.
+    (:debug)
+    function testProbe(dc as Dc) as Dictionary<Symbol, Numeric or Boolean> {
+        return {
+            :scale => mScale, :customFonts => mCustomFonts, :amoled => mAmoled,
+            :partialSeconds => mPartialSeconds, :night => mNight,
+            :minor => mMinor, :rule => mRule, :accent => mAccent,
+            :dateY => DATE_Y * mScale, :timeY => TIME_Y * mScale, :sepY => SEP_Y * mScale,
+            :labelY => FIELD_LABEL_Y * mScale, :valueY => mFieldValueY * mScale,
+            :readoutValueY => mReadoutValueY * mScale, :readoutLabelY => READOUT_LABEL_Y * mScale,
+            :hoursRight => HOURS_RIGHT_X * mScale, :minutesLeft => MINUTES_LEFT_X * mScale,
+            :arcInner => (ARC_R - ARC_W) * mScale,
+            :hDate => dc.getFontHeight(mFontDate), :hHours => dc.getFontHeight(mFontHours),
+            :hLabel => dc.getFontHeight(mFontLabel), :hValue => dc.getFontHeight(mFontValue),
+            :hReadoutValue => dc.getFontHeight(mFontReadoutValue),
+            :hReadoutLabel => dc.getFontHeight(mFontReadoutLabel),
+            :wHours => dc.getTextWidthInPixels("00", mFontHours),
+            :wMinutes => dc.getTextWidthInPixels("00", mFontMinutes),
+            :wHoursAod => dc.getTextWidthInPixels("00", mFontTimeAod)
+        };
     }
 }

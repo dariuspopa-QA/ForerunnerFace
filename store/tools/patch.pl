@@ -45,12 +45,16 @@ edit('ApexFaceView.mc', sub {
     $t =~ s/(        mEditMode = editMode;\n(?:.*\n)*?        loadSettings\(\);\n)/$1        applyShot();\n/ or die 'init';
     $t =~ s/(    function loadSettings\(\) as Void \{)/    private function applyShot() as Void {
         mAwake = !ShotConfig.AOD;
-        mAccent = ShotConfig.ACCENT;
-        mNumerals = ApexLayout.numeralColor(ShotConfig.NUMERALS, mAccent);
+        mDayAccent = ShotConfig.ACCENT;
+        mDayNumerals = ApexLayout.numeralColor(ShotConfig.NUMERALS, mDayAccent);
+        mDayInk = 0xF4F4EF;
+        mDayDim = 0xB0B0AA;
         mFieldIds = ShotConfig.FIELDS;
         mFieldComplications = [null, null, null];
         mArcId = ShotConfig.ARC;
-        mRingDirty = true;
+        mNightMode = ShotConfig.NIGHT ? ApexLayout.NIGHT_ON : ApexLayout.NIGHT_OFF;
+        mNight = ShotConfig.NIGHT;
+        applyPalette();
     }
 
 $1/ or die 'loadSettings';

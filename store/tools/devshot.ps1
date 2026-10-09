@@ -1,27 +1,29 @@
 # devshot.ps1 -Device fenix7 -BuildOnly [-Aod]   : builds the sample-data face for a device
 # devshot.ps1 -Device fenix7 -Out dev\fenix7.png  : captures the round display from the simulator
 # (launch the prg in between from a foreground console; see devloop.sh)
-param([string]$Device, [string]$Out, [switch]$Aod, [switch]$BuildOnly)
+param([string]$Device, [string]$Out, [switch]$Aod, [switch]$BuildOnly, [int]$Min = 8, [string]$Tag = "", [switch]$Night, [string]$Accent = "0xC8FF2E", [string]$Numerals = "0xF4F4EF", [string]$Fields = "0, 1, 10", [int]$Arc = 0, [int]$Hour = 10, [int]$Sec = 34)
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 $sdk = "$env:APPDATA\Garmin\ConnectIQ\Sdks\connectiq-sdk-win-9.2.0-2026-06-09-92a1605b2"
 
 if ($BuildOnly) {
-    $aodFlag = if ($Aod) { 'true' } else { 'false' }
+    $aodFlag = if ($Aod) { "true" } else { "false" }
+    $nightFlag = if ($Night) { "true" } else { "false" }
     @"
 import Toybox.Lang;
 module ShotConfig {
     const AOD = $aodFlag;
-    const ACCENT = 0xC8FF2E;
-    const NUMERALS = 0xF4F4EF;
-    const FIELDS = [0, 1, 10] as Array<Number>;
-    const ARC = 0;
-    const HOUR = 10;
-    const MIN = 8;
-    const SEC = 34;
+    const NIGHT = $nightFlag;
+    const ACCENT = $Accent;
+    const NUMERALS = $Numerals;
+    const FIELDS = [$Fields] as Array<Number>;
+    const ARC = $Arc;
+    const HOUR = $Hour;
+    const MIN = $Min;
+    const SEC = $Sec;
 }
 "@ | Set-Content -Encoding ascii source\ShotConfig.mc
-    & "$sdk\bin\monkeyc.bat" -f monkey.jungle -d $Device -o "bin\dev_$Device.prg" -y C:\Users\dariu\developer_key | Select-Object -Last 1
+    & "$sdk\bin\monkeyc.bat" -f monkey.jungle -d $Device -o "bin\dev_$Device$Tag.prg" -y C:\Users\dariu\developer_key | Select-Object -Last 1
     exit 0
 }
 

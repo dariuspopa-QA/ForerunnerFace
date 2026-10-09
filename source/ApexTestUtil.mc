@@ -1,6 +1,8 @@
 import Toybox.Application;
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.Math;
+import Toybox.System;
 import Toybox.Test;
 
 // Helpers shared by the unit tests (test builds only).
@@ -31,13 +33,33 @@ module ApexTestUtil {
             what + ": expected " + expected + ", got " + actual);
     }
 
-    // Lays out and draws the view once into an offscreen 454 x 454 bitmap; returns its Dc.
+    // Width of the screen of the watch the tests run on (they run on every screen type,
+    // see tools\run-device-tests.ps1), and a 454 px design position scaled to it.
+    function screen() as Number {
+        return System.getDeviceSettings().screenWidth;
+    }
+
+    function px(design as Numeric) as Number {
+        return Math.round(design * screen() / 454.0f).toNumber();
+    }
+
+    // Lays out and draws the view once into an offscreen bitmap the size of this
+    // watch's screen (its fonts are sized for it); returns its Dc.
     function render(view as ApexFaceView) as Graphics.Dc {
-        var bitmap = Graphics.createBufferedBitmap({:width => 454, :height => 454}).get() as Graphics.BufferedBitmap;
+        var w = screen();
+        var bitmap = Graphics.createBufferedBitmap({:width => w, :height => w}).get() as Graphics.BufferedBitmap;
         var dc = bitmap.getDc();
         view.onLayout(dc);
         view.onUpdate(dc);
         return dc;
+    }
+
+    // The default face rendered on this screen, and its testProbe (layout and state).
+    function probe() as Dictionary<Symbol, Numeric or Boolean> {
+        var view = new ApexFaceView(false);
+        view.loadPhoneSettings();
+        var dc = render(view);
+        return view.testProbe(dc);
     }
 
     function saveProperties(keys as Array<String>) as Dictionary {

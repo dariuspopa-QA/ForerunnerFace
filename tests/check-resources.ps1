@@ -10,13 +10,14 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $script:failures = 0
 $script:checks = 0
+$script:prefix = ""
 
 function Check([bool]$ok, [string]$what) {
     $script:checks++
     if ($ok) {
-        Write-Host "PASS  $what"
+        Write-Host "PASS  $script:prefix$what"
     } else {
-        Write-Host "FAIL  $what" -ForegroundColor Red
+        Write-Host "FAIL  $script:prefix$what" -ForegroundColor Red
         $script:failures++
     }
 }
@@ -39,7 +40,6 @@ function SameSet($a, $b) {
 $properties = Load 'resources/settings/properties.xml'
 $settings = Load 'resources/settings/settings.xml'
 $strings = Load 'resources/strings/strings.xml'
-$config = Load 'resources/configs/watchface.xml'
 $manifest = Load 'manifest.xml'
 
 # ---- Property defaults (CLAUDE.md, Settings) ------------------------------
@@ -53,6 +53,7 @@ $expectedDefaults = [ordered]@{
     NumeralColor = 0xF4F4EF # Chalk
     InkColor = 0xF4F4EF
     DimColor = 0xB0B0AA
+    NightMode = 0         # Off
 }
 $props = @{}
 foreach ($p in $properties.properties.property) {
@@ -85,6 +86,7 @@ foreach ($key in 'Field1', 'Field2', 'Field3') {
     Check (SameSet $lists[$key] $fieldIds) "$key lists every field id except READY (7)"
 }
 Check (SameSet $lists['Arc'] @(0, 1, 2, 3, 5, 6)) "Arc lists every arc id except READINESS (4)"
+Check (SameSet $lists["NightMode"] @(0, 1, 2)) "NightMode lists Off, Auto, On"
 
 $accents = @(0xC8FF2E, 0xFF5A1F, 0x4FD1FF, 0xFF3D7F, 0xF4F4EF)  # design's five
 foreach ($c in $accents) {
@@ -101,7 +103,7 @@ foreach ($c in $lists['AccentColor']) {
 
 $stringIds = @($strings.strings.string | ForEach-Object { $_.id })
 $refs = @()
-foreach ($file in 'resources/settings/settings.xml', 'resources/configs/watchface.xml', 'manifest.xml') {
+foreach ($file in "resources/settings/settings.xml", "editor-full/configs/watchface.xml", "editor-basic/configs/watchface.xml", "manifest.xml") {
     $text = Get-Content -Raw (Join-Path $root $file)
     $refs += [regex]::Matches($text, '@Strings\.(\w+)') | ForEach-Object { $_.Groups[1].Value }
 }
@@ -110,8 +112,11 @@ foreach ($ref in ($refs | Sort-Object -Unique)) {
 }
 Check ($stringIds.Count -eq ($stringIds | Sort-Object -Unique).Count) "string ids are unique"
 
-# ---- Watch face editor (resources/configs/watchface.xml) ------------------
+# ---- Watch face editor (editor-full / editor-basic configs) ------------------
 
+foreach ($cfgName in "editor-full", "editor-basic") {
+$script:prefix = "[$cfgName] "
+$config = Load "$cfgName/configs/watchface.xml"
 $wf = $config.resources.'watchface-config'
 $slots = @{}
 foreach ($c in $wf.data.complication) {
@@ -155,14 +160,17 @@ Check ((Num (@($wf.accentColors.color | Where-Object { $_.default -eq 'true' })[
 Check ((Num (@($wf.dataColors.color | Where-Object { $_.default -eq 'true' })[0].InnerText)) -eq 0xF4F4EF) "editor data colour defaults to Chalk"
 Check (SameSet $editorAccents $lists['AccentColor']) "editor and phone accent lists match"
 Check (SameSet $editorData @($lists['NumeralColor'] | Where-Object { $_ -ne -1 })) "editor data colours match the phone numeral list (minus Accent)"
+}
+$script:prefix = ""
 
 # ---- Manifest -------------------------------------------------------------
 
 $app = $manifest.manifest.application
 Check ($app.type -eq 'watchface') "manifest app type is watchface"
+Check ($app.version -match '^\d+\.\d+\.\d+$') "manifest has an app version ($($app.version))"
 Check (@($app.products.product | ForEach-Object { $_.id }) -contains 'fr970') "manifest targets fr970"
 $permissions = @($app.permissions.'uses-permission' | ForEach-Object { $_.id })
-foreach ($perm in 'SensorHistory', 'ComplicationSubscriber') {
+foreach ($perm in "SensorHistory", "ComplicationSubscriber", "UserProfile") {
     Check ($permissions -contains $perm) "manifest requests $perm"
 }
 Check ([version]$app.minApiLevel -ge [version]'5.0.0') "minApiLevel is 5.0+ (the editor itself is used only where the watch has it)"
@@ -179,6 +187,56 @@ if (Test-Path $deviceDir) {
         }
         $j = Get-Content $compiler -Raw | ConvertFrom-Json
         Check ($j.deviceFamily -like 'round-*') "product $id has a round screen"
+    }
+
+    # Each product's editor config (monkey.jungle) lists only data types its firmware has
+    $jungle = Get-Content (Join-Path $root 'monkey.jungle')
+    $cfgFor = @{}
+    foreach ($line in $jungle) {
+        if ($line -match '^\s*(\w+)\.resourcePath\s*=\s*(.+)$') {
+            $dev = $Matches[1]
+            $parts = $Matches[2].Split(';') | ForEach-Object { $_.Trim() }
+            $cfgFor[$dev] = @($parts | Where-Object { $_ -like 'editor-*' })[0]
+            # An override drops the automatic screen-size folders: it must list its own
+            if ($dev -ne 'base') {
+                $fam = (Get-Content (Join-Path $deviceDir "$dev\compiler.json") -Raw | ConvertFrom-Json).deviceFamily
+                Check ($parts -contains "resources-$fam") "jungle override for $dev includes resources-$fam (fonts)"
+            }
+        }
+    }
+    # tools\run-device-tests.ps1 must cover every screen size, API version and editor
+    # config among the products
+    $runner = Get-Content -Raw (Join-Path $root 'tools\run-device-tests.ps1')
+    $tested = @([regex]::Matches($runner, "'(\w+)'\s*=\s*'\d+ (MIP|AMOLED)") | ForEach-Object { $_.Groups[1].Value })
+    $keyOf = {
+        param($id)
+        $j = Get-Content (Join-Path $deviceDir "$id\compiler.json") -Raw | ConvertFrom-Json
+        $api = ([version](($j.partNumbers | ForEach-Object { $_.connectIQVersion } | Sort-Object -Descending | Select-Object -First 1))).ToString(2)
+        @("$($j.deviceFamily)", "API $api")
+    }
+    $testedKeys = @{}
+    foreach ($id in $tested) {
+        Check ($products -contains $id) "device test $id is a product"
+        foreach ($k in (& $keyOf $id)) { $testedKeys[$k] = $true }
+    }
+    $needed = @{}
+    foreach ($id in $products) { foreach ($k in (& $keyOf $id)) { $needed[$k] = $true } }
+    foreach ($k in ($needed.Keys | Sort-Object)) {
+        Check ($testedKeys.ContainsKey($k)) "device tests cover $k"
+    }
+
+    $typesIn = @{}
+    foreach ($cfgName in 'editor-full', 'editor-basic') {
+        $text = Get-Content -Raw (Join-Path $root "$cfgName/configs/watchface.xml")
+        $typesIn[$cfgName] = @([regex]::Matches($text, 'COMPLICATION_TYPE_\w+') | ForEach-Object { $_.Value } | Sort-Object -Unique)
+    }
+    foreach ($id in $products) {
+        $cfg = if ($cfgFor.ContainsKey($id)) { $cfgFor[$id] } else { $cfgFor['base'] }
+        $api = Get-ChildItem (Join-Path $deviceDir $id) -Filter '*.api.debug.xml' -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $api) { continue }
+        $apiText = [IO.File]::ReadAllText($api.FullName)
+        $missing = @($typesIn[$cfg] | Where-Object { $apiText -notmatch "\b$_\b" })
+        Check ($missing.Count -eq 0) "product $id ($cfg) has every editor data type$(if ($missing.Count) { ': missing ' + ($missing -join ', ') })"
     }
 }
 

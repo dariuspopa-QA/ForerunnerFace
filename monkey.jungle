@@ -1,1 +1,51 @@
 project.manifest = manifest.xml
+
+# On-device editor config: the full data type list, or editor-basic (no Sleep score) for
+# watches whose firmware lacks COMPLICATION_TYPE_SLEEP_SCORE. tests\check-resources.ps1
+# checks every product against its device API.
+# A device override replaces the automatic screen-size folders, so each line lists its
+# resources-round-<W>x<W> folder (fonts) explicitly.
+base.resourcePath = resources;editor-full
+approachs50.resourcePath = resources;resources-round-390x390;editor-basic
+approachs7042mm.resourcePath = resources;resources-round-390x390;editor-basic
+approachs7047mm.resourcePath = resources;resources-round-454x454;editor-basic
+d2airx10.resourcePath = resources;resources-round-416x416;editor-basic
+d2mach1.resourcePath = resources;resources-round-416x416;editor-basic
+d2mach2.resourcePath = resources;resources-round-454x454;editor-basic
+d2mach2pro.resourcePath = resources;resources-round-454x454;editor-basic
+descentg2.resourcePath = resources;resources-round-390x390;editor-basic
+descentmk343mm.resourcePath = resources;resources-round-390x390;editor-basic
+descentmk351mm.resourcePath = resources;resources-round-454x454;editor-basic
+epix2.resourcePath = resources;resources-round-416x416;editor-basic
+epix2pro42mm.resourcePath = resources;resources-round-390x390;editor-basic
+epix2pro47mm.resourcePath = resources;resources-round-416x416;editor-basic
+epix2pro51mm.resourcePath = resources;resources-round-454x454;editor-basic
+fenix7.resourcePath = resources;resources-round-260x260;editor-basic
+fenix7pro.resourcePath = resources;resources-round-260x260;editor-basic
+fenix7pronowifi.resourcePath = resources;resources-round-260x260;editor-basic
+fenix7s.resourcePath = resources;resources-round-240x240;editor-basic
+fenix7spro.resourcePath = resources;resources-round-240x240;editor-basic
+fenix7x.resourcePath = resources;resources-round-280x280;editor-basic
+fenix7xpro.resourcePath = resources;resources-round-280x280;editor-basic
+fenix7xpronowifi.resourcePath = resources;resources-round-280x280;editor-basic
+fr165.resourcePath = resources;resources-round-390x390;editor-basic
+fr165m.resourcePath = resources;resources-round-390x390;editor-basic
+fr170.resourcePath = resources;resources-round-390x390;editor-basic
+fr170m.resourcePath = resources;resources-round-390x390;editor-basic
+fr255.resourcePath = resources;resources-round-260x260;editor-basic
+fr255m.resourcePath = resources;resources-round-260x260;editor-basic
+fr255s.resourcePath = resources;resources-round-218x218;editor-basic
+fr255sm.resourcePath = resources;resources-round-218x218;editor-basic
+fr265.resourcePath = resources;resources-round-416x416;editor-basic
+fr265s.resourcePath = resources;resources-round-360x360;editor-basic
+fr70.resourcePath = resources;resources-round-390x390;editor-basic
+fr955.resourcePath = resources;resources-round-260x260;editor-basic
+fr965.resourcePath = resources;resources-round-454x454;editor-basic
+marq2.resourcePath = resources;resources-round-390x390;editor-basic
+marq2aviator.resourcePath = resources;resources-round-390x390;editor-basic
+venu2.resourcePath = resources;resources-round-416x416;editor-basic
+venu2plus.resourcePath = resources;resources-round-416x416;editor-basic
+venu2s.resourcePath = resources;resources-round-360x360;editor-basic
+venu3.resourcePath = resources;resources-round-454x454;editor-basic
+venu3s.resourcePath = resources;resources-round-390x390;editor-basic
+vivoactive5.resourcePath = resources;resources-round-390x390;editor-basic

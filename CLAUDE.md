@@ -49,18 +49,26 @@ Products are all round watch-face devices on API 5.0+ (rectangular Venu Sq / X1 
 semi-octagon, monochrome Instinct screens are deliberately out). `tests\check-resources.ps1` checks
 every product is round. On those watches:
 
+- **Fonts per screen size**: the bitmap fonts live in `resources-round-<W>x<W>/fonts/` (9 sizes,
+  see Fonts). A device override in `monkey.jungle` drops these automatic folders, so every
+  override line must list its own `resources-round-<W>x<W>` (the resource check enforces it).
 - **No scalable fonts** (all MIP watches, and some AMOLED ones such as the Venu 2 family):
-  `Graphics.getVectorFont` is missing, so guard it with `has`. Fall back to the system font whose
-  real height is closest to the design size on that screen (`ApexLayout.pickFont`), and lay text
-  rows out from the real font heights (`ApexLayout.rowBelow` / `rowAbove`) so nothing overlaps.
+  `Graphics.getVectorFont` is missing, so it is guarded with `has`. It is only a fallback now (if the
+  bitmap fonts can't load), after which the system font closest to the design size is used
+  (`ApexLayout.pickFont`). Text rows are laid out from real font heights
+  (`ApexLayout.rowExtent` / `rowBelow` / `rowAbove`) so nothing overlaps.
 - **Pen widths** below 1 px throw on small screens: always go through `ApexLayout.penWidth`.
 - **MIP colours**: 64-colour palette (channels 00/55/AA/FF). Greys darker than ~0x2B round to black,
-  so the minor ticks and rule use `0x555555` there (`ApexLayout.ringGreys`). MIP watches have no
-  burn-in protection, so low power shows the normal face without seconds.
-- **The on-device editor** exists only on API 5.1+ watches; `ApexEditor` checks for it with `has`.
-- Check layout changes on the smallest and largest screens in the simulator (fr255s 218 px,
-  fenix7 260 px, venu2s 360 px, fenix9pro51mm 466 px), and run the unit tests on a MIP device
-  (fenix7) as well as on the fr970.
+  so the minor ticks and rule use `0x555555` there, `0x550000` at night (`ApexLayout.palette`).
+- **MIP low power**: no burn-in protection, so the normal face stays on, and `onPartialUpdate`
+  redraws the seconds comet + trail once a second, clipped to the box around the old and new comet
+  (`ApexLayout.cometBox`) to stay inside the power budget.
+- **The on-device editor**: `editor-full/configs/watchface.xml`, or `editor-basic` (no Sleep score)
+  for the watches whose firmware lacks `COMPLICATION_TYPE_SLEEP_SCORE` (listed in `monkey.jungle`;
+  the resource check verifies every product's types against its device API).
+- Check layout changes on every screen size in the simulator (fr255s 218, fenix7s 240, fenix7 260,
+  enduro3 280, venu2s 360, fr165 390, fr265 416, fr970 454, fenix9pro51mm 466 px; see
+  `store/tools/README.md`), and run the unit tests on a MIP device (fenix7) as well as on the fr970.
 
 ## Colours
 
@@ -84,14 +92,19 @@ The display may quantise to fewer colours; pick the nearest if a value renders v
 
 1. **Active** (wrist raised, high power): everything above, redraw every second.
 2. **Always-On** (`onEnterSleep`, and `System.getDeviceSettings().requiresBurnInProtection` is true):
-   only date, hours (thin), minutes (dim), and the 12 major ticks in `0x4A4A46`. No seconds,
-   no arc, no fields, no readout. Follow Garmin's AMOLED burn-in rules (limited lit pixels, shift
-   the content a few px each minute, no static bright areas) — check the current numbers in the
-   Connect IQ UX guidelines and verify with the simulator's burn-in / low-power checks.
-   `onExitSleep` returns to Active.
-3. **Night (Red Shift)**: the red palette above. First check whether the fr970's system Red Shift
-   mode tints third-party faces automatically; if it does, skip this. If not, add a `NightMode`
-   setting: Off / Auto (use `UserProfile.getProfile()` sleep and wake times) / On.
+   only date, hours (thin), minutes (dim), and the 12 major ticks in `0x4A4A46` (inset 10 px).
+   No seconds, no arc, no fields, no readout. Garmin's AMOLED rules: at most 10 % of pixels lit per
+   update, and (older models) no pixel lit for more than 3 minutes. Everything moves by
+   `ApexLayout.AOD_TIME_SHIFTS`, which spreads ≥ 14 px across and down over any 4 minutes (hour
+   strokes are ~12 px wide). Measure with `tools\aod-burnin.ps1` on 8 consecutive Always-On frames:
+   currently ~5.6 % lit, and 16 pixels (where successive minute digits overlap by chance) stay lit
+   4–5 minutes. The pattern was searched with `tools\aod-optimize.ps1` (offline render of minutes
+   00–59: ~37 px per hour over the limit, down from 275); a residual this small can't be ruled out
+   for every minute sequence. `onExitSleep` returns to Active.
+3. **Night (Red Shift)**: the red palette above, via the `NightMode` setting: Off / Auto
+   (`UserProfile.getProfile()` sleep and wake times) / On. The fr970's system Red Shift does tint
+   third-party faces (luminance-based, no API to detect it), but most of the 66 watches have no Red
+   Shift, so the setting exists for them. In Always-On at night the major ticks are `0x5C1E18`.
 
 ## Settings (replace the template's)
 
@@ -103,7 +116,7 @@ calls `WatchUi.requestUpdate()`.
 - `Arc` (default Body Battery): number enum below
 - `AccentColor`, `NumeralColor`: list of the colours above (numerals has an "Accent" entry — use a sentinel like `-1`)
 - `InkColor`, `DimColor`: optional, defaults `0xF4F4EF` / `0xB0B0AA`
-- `NightMode` if needed (see above)
+- `NightMode`: 0 Off (default), 1 Auto, 2 On (see Display modes)
 
 Accent and numeral lists were extended beyond the design's five/four colours (Amber, Mint, Cobalt,
 Violet, Scarlet; numerals also Silver and every accent hue) so the user has a range to pick from.
@@ -111,8 +124,8 @@ Violet, Scarlet; numerals also Silver and every accent hue) so the user has a ra
 
 ### On-device editor (Garmin's native watch face editor, API 5.1+)
 
-The user must be able to change data and colours on the watch itself. `resources/configs/watchface.xml`
-declares it; `source/ApexEditor.mc` holds the delegate; the view applies the editor's choices on top of
+The user must be able to change data and colours on the watch itself. `editor-full/configs/watchface.xml`
+(and `editor-basic`, the same without Sleep score; see Other watches) declares it; `source/ApexEditor.mc` holds the delegate; the view applies the editor's choices on top of
 the phone settings (editor wins when it has a value).
 
 - Data slots 1–3 = the fields (left → right), an explicit list of system data types; types the face has its own source for map to
@@ -162,25 +175,28 @@ Add the permissions the sources need (e.g. `SensorHistory`, `UserProfile`, `Posi
 
 ## Fonts
 
-The design uses Google Fonts (Barlow Condensed 800/200/600, DM Mono 400), which the watch cannot
-load. Convert them to Connect IQ custom bitmap fonts (BMFont `.fnt` + `.png`), declared in
-`resources/fonts/fonts.xml` with `filter` to include only the glyphs needed (keeps memory low):
+The design's Google Fonts (Barlow Condensed 800/200/300/600, DM Mono 400; OFL, sources and licences
+in `tools/fonts/`) are converted to Connect IQ bitmap fonts (BMFont `.fnt` + `.png`) by
+`tools\make-fonts.ps1`, one set per screen size in `resources-round-<W>x<W>/fonts/`. Regenerate after
+changing sizes or glyphs. Sizes are the 454 px design sizes × width / 454, with minimums for small
+screens; MIP screens get 1-bit hinted glyphs below 20 px. Each font's line box runs from cap top to
+the lowest descender, so `TEXT_JUSTIFY_VCENTER` centres the digits (Connect IQ clips ink outside the
+line box).
 
-| Font resource | Face | Size | Glyphs |
+| Font resource | Face | 454 px size (min) | Glyphs |
 |---|---|---|---|
 | `TimeHeavy` | Barlow Condensed 800 | 164 px | `0123456789` |
 | `TimeThin` | Barlow Condensed 200 | 164 px | `0123456789` |
 | `TimeAod` | Barlow Condensed 300 | 164 px | `0123456789` |
-| `Value` | Barlow Condensed 600 | 28 px | `0123456789,.:%°h-` |
-| `ArcValue` | Barlow Condensed 600 | 26 px | `0123456789%-` |
-| `Mono22` | DM Mono 400 | 22 px | `A–Z 0–9` space |
-| `Mono16` | DM Mono 400 | 16 px | `A–Z` space |
-| `Mono14` | DM Mono 400 | 14 px | `A–Z` space |
+| `Value` | Barlow Condensed 600 | 28 px (14) | digits, `,.:%-/+°`, space, `A–Z a–z` (system data values) |
+| `ArcValue` | Barlow Condensed 600 | 26 px (13) | `0123456789%-` |
+| `Mono22` | DM Mono 400 | 22 px (12) | `A–Z 0–9` space |
+| `Mono16` | DM Mono 400 | 16 px (10) | `A–Z 0–9 ./-%°` space |
+| `Mono14` | DM Mono 400 | 14 px (10) | `A–Z` space |
 
-Letter-spacing isn't supported by `drawText`; for the tracked mono labels either bake spacing into
-the generated font (add padding per glyph) or draw character by character. Until the fonts exist,
-use system fonts (`Graphics.FONT_NUMBER_THAI_HOT`, `FONT_XTINY`, …) as stand-ins so everything
-else can be built and tested.
+Letter-spacing isn't supported by `drawText`, so the tracked mono labels are drawn character by
+character (`drawTracked`). All eight fonts together use about 4 KB of app memory on a 218 px watch.
+If they fail to load, the view falls back to scalable then system fonts.
 
 ## Implementation notes
 
@@ -189,8 +205,9 @@ else can be built and tested.
 - Cache the static ring (minor + major ticks, arc track) in a `Graphics.BufferedBitmap` created in
   `onLayout`, and rebuild it only when settings change.
 - Read sensor data at most once per update; guard every value against `null`.
-- Seconds (comet, trail, `SEC` field) exist only in high-power mode. AMOLED faces do not get
-  `onPartialUpdate`, so in low-power mode simply omit them.
+- Seconds (comet, trail, `SEC` field) exist in high-power mode. AMOLED faces do not get
+  `onPartialUpdate` and switch to Always-On; MIP faces keep the comet and trail through
+  `onPartialUpdate` (the `SEC` field still shows `--` in low power).
 - Keep `onUpdate` cheap: no allocations of large objects per frame.
 
 ## Build order
@@ -199,9 +216,12 @@ else can be built and tested.
 2. Seconds comet + trail; Active ⇄ AOD switching via `onEnterSleep` / `onExitSleep`.
 3. Data fields with the metric table and settings.
 4. Arc + readout with the arc table and settings.
-5. Colour settings (accent, numerals, ink, dim), then Night mode if required.
-6. Custom fonts.
-7. Burn-in / memory checks in the simulator; test every field value as `null`.
+5. Colour settings (accent, numerals, ink, dim), then Night mode. Done.
+6. Custom fonts. Done (`tools\make-fonts.ps1`).
+7. Burn-in / memory checks: done with `tools\aod-burnin.ps1` and the simulator's memory readout;
+   every field value as `null` is covered by the unit tests.
+
+All seven steps are done.
 
 ## Working here
 
@@ -210,6 +230,12 @@ else can be built and tested.
   `monkeydo bin\ApexFaceTest.prg fr970 /t` with the simulator open), and
   `powershell -ExecutionPolicy Bypass -File tests\check-resources.ps1` for the resource XML. Keep pure
   logic in `ApexFormat` / `ApexLayout` / `ApexMetrics` so it stays testable.
+- Per-watch tests: `source/ApexDeviceTest.mc` checks the layout on the screen it runs on (fonts, row
+  overlap, time inside the arc, palette, low power). `tools\run-device-tests.ps1` runs the whole
+  suite on one watch per screen size, API version and editor config (16 watches, ~25 min, simulator
+  open); the resource check fails if a product's screen size or API version isn't in that matrix.
+  View tests render at the running watch's own size (`ApexTestUtil.render` / `px`); the view's
+  `testProbe` is `(:debug)` so release builds leave it out.
 - `manifest.xml` is generated — change products / permissions through the "Monkey C: …" commands.
 - Keep the look minimal: if a change adds a colour, a font or a new element, check it against the
   concept above first.

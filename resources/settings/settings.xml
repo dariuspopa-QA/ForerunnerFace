@@ -124,4 +124,12 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.NightMode" title="@Strings.NightTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.NightOff</listEntry>
+            <listEntry value="1">@Strings.NightAuto</listEntry>
+            <listEntry value="2">@Strings.NightOn</listEntry>
+        </settingConfig>
+    </setting>
+
 </settings>

@@ -3,7 +3,8 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Test;
 
-// View tests: the face is drawn into an offscreen 454 x 454 bitmap and the
+// View tests: the face is drawn into an offscreen bitmap the size of the watch the
+// tests run on (positions are 454 px design values scaled by ApexTestUtil.px), and the
 // layout it reports to the watch face editor (slot boxes, hit tests) is checked.
 
 (:test)
@@ -18,8 +19,8 @@ function activeModeRendersFieldRowInsideTheScreen(logger as Logger) as Boolean {
         if (box == null) {
             continue;
         }
-        Test.assertMessage(box[0] >= 0 && box[0] + box[2] <= 454, "field " + slot + " outside the screen");
-        Test.assertMessage(box[1] < 290 && box[1] + box[3] > 316, "field " + slot + " box misses label / value rows");
+        Test.assertMessage(box[0] >= 0 && box[0] + box[2] <= ApexTestUtil.screen(), "field " + slot + " outside the screen");
+        Test.assertMessage(box[1] < ApexTestUtil.px(290) && box[1] + box[3] > ApexTestUtil.px(316), "field " + slot + " box misses label / value rows");
         Test.assertMessage(box[0] > lastRight, "field " + slot + " overlaps the previous one");
         lastRight = box[0] + box[2];
         if (first == null) {
@@ -29,7 +30,7 @@ function activeModeRendersFieldRowInsideTheScreen(logger as Logger) as Boolean {
     }
     if (first != null && last != null) {
         var centre = (first[0] + last[0] + last[2]) / 2.0f;
-        ApexTestUtil.assertNear(centre, 227, 2, "field row centre");
+        ApexTestUtil.assertNear(centre, ApexTestUtil.screen() / 2.0f, 2, "field row centre");
     }
     return true;
 }
@@ -42,10 +43,10 @@ function arcSlotBoxIsTheRing(logger as Logger) as Boolean {
     Test.assert(box != null);
     box = box as [Number, Number, Number, Number];
     // r = 198 + 4 around the centre
-    ApexTestUtil.assertEqual(box[0], 25);
-    ApexTestUtil.assertEqual(box[1], 25);
-    ApexTestUtil.assertEqual(box[2], 404);
-    ApexTestUtil.assertEqual(box[3], 404);
+    ApexTestUtil.assertNear(box[0], ApexTestUtil.px(25), 1, "ring left");
+    ApexTestUtil.assertNear(box[1], ApexTestUtil.px(25), 1, "ring top");
+    ApexTestUtil.assertNear(box[2], ApexTestUtil.px(404), 1, "ring width");
+    ApexTestUtil.assertNear(box[3], ApexTestUtil.px(404), 1, "ring height");
     return true;
 }
 
@@ -77,9 +78,9 @@ function slotAtFindsEachSlotByItsBox(logger as Logger) as Boolean {
         var box = view.slotBox(slot) as [Number, Number, Number, Number];
         ApexTestUtil.assertEqual(view.slotAt(box[0] + box[2] / 2, box[1] + box[3] / 2), slot);
     }
-    ApexTestUtil.assertEqual(view.slotAt(227, 10), ApexEditor.SLOT_ARC);      // rim at 12
-    ApexTestUtil.assertEqual(view.slotAt(227, 395), ApexEditor.SLOT_ARC);     // readout
-    ApexTestUtil.assertEqual(view.slotAt(227, 185), null);                   // time
+    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(10)), ApexEditor.SLOT_ARC);      // rim at 12
+    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(395)), ApexEditor.SLOT_ARC);     // readout
+    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(185)), null);                   // time
     return true;
 }
 
@@ -126,7 +127,7 @@ function emptyFieldSettingRecentresTheRow(logger as Logger) as Boolean {
         var left = view.slotBox(1) as [Number, Number, Number, Number];
         var right = view.slotBox(3) as [Number, Number, Number, Number];
         ApexTestUtil.assertEqual(view.slotBox(2), null);
-        ApexTestUtil.assertNear((left[0] + right[0] + right[2]) / 2.0f, 227, 2, "row centre");
+        ApexTestUtil.assertNear((left[0] + right[0] + right[2]) / 2.0f, ApexTestUtil.screen() / 2.0f, 2, "row centre");
     } finally {
         ApexTestUtil.restoreProperties(saved);
     }
@@ -161,7 +162,7 @@ function arcOffHidesTheArcSlotOutsideTheEditor(logger as Logger) as Boolean {
         face.loadPhoneSettings();
         ApexTestUtil.render(face);
         ApexTestUtil.assertEqual(face.slotBox(ApexEditor.SLOT_ARC), null);
-        ApexTestUtil.assertEqual(face.slotAt(227, 10), null);
+        ApexTestUtil.assertEqual(face.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(10)), null);
 
         var editor = new ApexFaceView(true);
         editor.loadPhoneSettings();
@@ -187,6 +188,40 @@ function reloadingSettingsPicksUpChangedProperties(logger as Logger) as Boolean 
         view.loadPhoneSettings();
         view.onUpdate(dc);
         ApexTestUtil.assertEqual(view.slotBox(ApexEditor.SLOT_ARC), null);
+    } finally {
+        ApexTestUtil.restoreProperties(saved);
+    }
+    return true;
+}
+
+// MIP watches redraw the seconds in low power through onPartialUpdate; AMOLED
+// watches ignore it. Either way it must be safe to call at any time.
+(:test)
+function partialUpdateIsSafeAwakeAndAsleep(logger as Logger) as Boolean {
+    var view = new ApexFaceView(false);
+    var dc = ApexTestUtil.render(view);
+    view.onPartialUpdate(dc);
+    view.onEnterSleep();
+    view.onUpdate(dc);
+    view.onPartialUpdate(dc);
+    view.onPartialUpdate(dc);
+    view.onExitSleep();
+    view.onUpdate(dc);
+    return true;
+}
+
+(:test)
+function nightModeSettingsRender(logger as Logger) as Boolean {
+    var saved = ApexTestUtil.saveProperties(["NightMode"]);
+    try {
+        for (var mode = 0; mode <= 3; mode++) {      // Off, Auto, On, and an invalid value
+            Application.Properties.setValue("NightMode", mode);
+            var view = new ApexFaceView(false);
+            view.loadPhoneSettings();
+            var dc = ApexTestUtil.render(view);
+            view.onEnterSleep();
+            view.onUpdate(dc);
+        }
     } finally {
         ApexTestUtil.restoreProperties(saved);
     }

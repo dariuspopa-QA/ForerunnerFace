@@ -35,7 +35,7 @@ function DrawFace($g, $name, $cx, $cy, $d) {
     $g.FillPath([System.Drawing.Brushes]::Black, $path)
     # drop the outermost pixel of the capture (bezel bleed) by drawing 1 px inset
     $g.DrawImage($img, (New-Object System.Drawing.RectangleF ([single]($cx - $d / 2)), ([single]($cy - $d / 2)), ([single]$d), ([single]$d)),
-        (New-Object System.Drawing.RectangleF 1, 1, 452, 452), 'Pixel')
+        (New-Object System.Drawing.RectangleF 1, 1, ($img.Width - 2), ($img.Height - 2)), 'Pixel')
     $g.ResetClip()
     $img.Dispose()
 }
@@ -82,7 +82,7 @@ SaveLimited $c[0] (Join-Path $Out 'cover-500') 300
 $c[0].Dispose()
 
 # ---- Screenshots: 500 x 500, <= 150 KB -------------------------------------
-$shots = 'volt', 'aod', 'ember', 'glacier', 'signal'
+$shots = 'volt', 'aod', 'ember', 'glacier', 'signal', 'night', 'mip'
 for ($i = 0; $i -lt $shots.Count; $i++) {
     $c = NewCanvas 500 500
     DrawFace $c[1] $shots[$i] 250 250 440
@@ -91,7 +91,8 @@ for ($i = 0; $i -lt $shots.Count; $i++) {
     $c[0].Dispose()
 }
 
-# ---- Hero: 1440 x 720 ------------------------------------------------------
+# ---- Hero: 1440 x 720 (English tagline, and a language-neutral version) -----
+function Hero([string]$tagline, [string]$name) {
 $c = NewCanvas 1440 720
 $g = $c[1]
 DrawFace $g 'volt' 1030 360 560
@@ -109,16 +110,22 @@ $y = 200
 $g.DrawString('AP', $heavy, $chalkBrush, $x, $y, $fmt)
 $apWidth = $g.MeasureString('AP', $heavy, 1000, $fmt).Width
 $g.DrawString('EX', $thin, $chalkBrush, ($x + $apWidth + 6), $y, $fmt)
-$g.DrawString('Weight, not colour.', $small, $dimBrush, ($x + 4), ($y + 178), $fmt)
+if ($tagline) {
+    $g.DrawString($tagline, $small, $dimBrush, ($x + 4), ($y + 178), $fmt)
+}
+$swatchY = if ($tagline) { $y + 248 } else { $y + 196 }
 
 # Accent swatches: Volt, Ember, Glacier, Signal, Ghost
 $accents = 0xC8FF2E, 0xFF5A1F, 0x4FD1FF, 0xFF3D7F, 0xF4F4EF
 for ($i = 0; $i -lt $accents.Count; $i++) {
     $v = $accents[$i]
     $brush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(($v -shr 16) -band 0xFF, ($v -shr 8) -band 0xFF, $v -band 0xFF))
-    $g.FillEllipse($brush, [single]($x + 6 + $i * 40), [single]($y + 248), 22, 22)
+    $g.FillEllipse($brush, [single]($x + 6 + $i * 40), [single]$swatchY, 22, 22)
     $brush.Dispose()
 }
 $g.Dispose()
-SaveLimited $c[0] (Join-Path $Out 'hero-1440x720') 1024
+SaveLimited $c[0] (Join-Path $Out $name) 1024
 $c[0].Dispose()
+}
+Hero 'Weight, not colour.' 'hero-1440x720'
+Hero '' 'hero-1440x720-no-text'
