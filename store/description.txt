@@ -18,7 +18,7 @@ What's on the face
 
 Data fields
 Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
-In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score, VO2 max, Pressure or Weekly run distance.
+In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score (where your watch has it), VO2 max, Pressure or Weekly run distance.
 
 Colours
 • Accent: Volt, Ember, Glacier, Signal, Amber, Mint, Cobalt, Violet, Scarlet, Ghost
@@ -26,11 +26,14 @@ Colours
 • Data values and labels: three tones each
 
 Always-on mode
-On AMOLED watches, always-on mode shows only the date, a thin time and the 12 hour marks. It uses few lit pixels and shifts the content slightly every minute to protect the screen. On MIP watches the full face stays on, without the seconds.
+On AMOLED watches, always-on mode shows only the date, a thin time and the 12 hour marks. It lights few pixels and moves the content every minute to protect the screen. On MIP watches the full face stays on, seconds included.
+
+Night mode
+A red palette that's easy on your eyes in the dark: Off, On, or Auto (between the sleep and wake times in your user profile). Watches with Garmin's Red Shift tint the face red on their own, too.
 
 Customise
-• On the watch: edit the face from the watch face menu and change the data and colours with Garmin's watch face editor (on watches that have it).
-• On your phone: open APEX in the Connect IQ Store app and change its settings.
+• On the watch: from the watch face, hold the menu button, select Watch Face, then START > Customize to change the data and colours.
+• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode.
 
 Notes
 • Distance, altitude and temperature follow your watch's unit settings.
