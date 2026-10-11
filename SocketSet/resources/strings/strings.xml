@@ -1,0 +1,14 @@
+<strings>
+    <string id="AppName">Socket Set</string>
+    <string id="AccentTitle">Accent colour</string>
+    <string id="ColorSafetyOrange">Safety Orange</string>
+    <string id="ColorHiVisYellow">Hi-Vis Yellow</string>
+    <string id="ColorCoolantBlue">Coolant Blue</string>
+    <string id="ColorRedline">Redline</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

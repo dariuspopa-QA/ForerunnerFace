@@ -1,0 +1,5 @@
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <property id="AccentColor" type="number">0xFF6A13</property>
+    <!-- 0 watch (from distance units), 1 MON 28 SEP, 2 DD-MM-YYYY, 3 MM-DD-YYYY -->
+    <property id="DateFormat" type="number">1</property>
+</properties>
