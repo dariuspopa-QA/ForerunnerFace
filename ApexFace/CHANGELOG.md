@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fix: a crash on the fr970 (Invalid Value while drawing the arc label). The fonts are now
+  held by the face instead of as graphics pool references the watch can purge, and the
+  cached ring is drawn from `get()`, falling back to direct drawing.
+
 ## 1.0.2
 
 Store text ("What's new", also in `store/description.txt`):
