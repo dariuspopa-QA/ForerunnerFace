@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="0500759b-5023-4cc4-b318-273ee1ca4f9d" type="watchface" version="1.0.0" name="@Strings.AppName" entry="ObdScannerApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="5.0.0">
+        <iq:products>
+            <iq:product id="fr265"/>
+            <iq:product id="fr265s"/>
+            <iq:product id="fr965"/>
+            <iq:product id="fr970"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="ComplicationSubscriber"/>
+            <iq:uses-permission id="SensorHistory"/>
+            <iq:uses-permission id="UserProfile"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>

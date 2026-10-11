@@ -1,0 +1,14 @@
+<strings>
+    <string id="AppName">OBD Scanner</string>
+    <string id="AccentTitle">Screen colour</string>
+    <string id="ColorAmber">Amber</string>
+    <string id="ColorGreen">Green</string>
+    <string id="ColorCyan">Cyan</string>
+    <string id="ColorRed">Red</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>
