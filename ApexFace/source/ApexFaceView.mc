@@ -196,7 +196,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         }
 
         // The ring bitmap includes the black ground, so it replaces dc.clear()
-        var ring = mRing;
+        var ring = ringBitmap();
         if (ring != null) {
             dc.drawBitmap(0, 0, ring);
         } else {
@@ -270,7 +270,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Only the box around the previous and the new comet is redrawn (ring background,
     // arc fill, trail, comet), which keeps the update inside the power budget.
     function onPartialUpdate(dc as Dc) as Void {
-        var ring = mRing;
+        var ring = ringBitmap();
         if (!mPartialSeconds || ring == null || mLastSec < 0) {
             return;
         }
@@ -507,20 +507,45 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     private function loadFonts(dc as Dc) as Void {
         try {
-            mFontHours = WatchUi.loadResource(Rez.Fonts.TimeHeavy) as FontResource;
-            mFontMinutes = WatchUi.loadResource(Rez.Fonts.TimeThin) as FontResource;
-            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Mono22) as FontResource;
-            mFontLabel = WatchUi.loadResource(Rez.Fonts.Mono16) as FontResource;
-            mFontValue = WatchUi.loadResource(Rez.Fonts.Value) as FontResource;
-            mFontReadoutValue = WatchUi.loadResource(Rez.Fonts.ArcValue) as FontResource;
-            mFontReadoutLabel = WatchUi.loadResource(Rez.Fonts.Mono14) as FontResource;
-            mCustomFonts = true;
-            return;
+            var fonts = [Rez.Fonts.TimeHeavy, Rez.Fonts.TimeThin, Rez.Fonts.TimeAod, Rez.Fonts.Mono22,
+                Rez.Fonts.Mono16, Rez.Fonts.Value, Rez.Fonts.ArcValue, Rez.Fonts.Mono14] as Array<ResourceId>;
+            var loaded = [] as Array<FontType>;
+            for (var i = 0; i < fonts.size(); i++) {
+                var font = strongResource(fonts[i]);
+                if (font == null) {
+                    break;
+                }
+                loaded.add(font as FontResource);
+            }
+            if (loaded.size() == fonts.size()) {
+                mFontHours = loaded[0];
+                mFontMinutes = loaded[1];
+                mFontTimeAod = loaded[2];
+                mFontDate = loaded[3];
+                mFontLabel = loaded[4];
+                mFontValue = loaded[5];
+                mFontReadoutValue = loaded[6];
+                mFontReadoutLabel = loaded[7];
+                mCustomFonts = true;
+                return;
+            }
         } catch (e) {
-            mCustomFonts = false;
         }
+        mCustomFonts = false;
         loadSystemFonts(dc);
+    }
+
+    // On Connect IQ 4+ loadResource returns fonts as references into the shared
+    // graphics pool, and the watch may purge the resource behind a reference while
+    // the face holds nothing stronger. Drawing with a reference it then can't bring
+    // back is a fatal Invalid Value that try/catch can't stop (fr970 crash log,
+    // 11 Oct 2026: measuring the arc label). So the face keeps the resource itself.
+    private function strongResource(id as ResourceId) as Object or Null {
+        var resource = WatchUi.loadResource(id);
+        if (resource instanceof Graphics.ResourceReference) {
+            return resource.get();
+        }
+        return resource;
     }
 
     private function loadSystemFonts(dc as Dc) as Void {
@@ -577,6 +602,21 @@ class ApexFaceView extends WatchUi.WatchFace {
         bdc.clear();
         drawStaticRing(bdc);
         mRing = ring;
+    }
+
+    // The ring is drawn from the bitmap get() returns, never from the pool reference
+    // itself (see strongResource); if the pool can't give it back, onUpdate draws
+    // the ring directly.
+    private function ringBitmap() as BufferedBitmap or Null {
+        var ring = mRing;
+        if (ring == null) {
+            return null;
+        }
+        try {
+            return ring.get() as BufferedBitmap or Null;
+        } catch (e) {
+            return null;
+        }
     }
 
     // ---- Drawing -------------------------------------------------------
@@ -781,6 +821,8 @@ class ApexFaceView extends WatchUi.WatchFace {
     function testProbe(dc as Dc) as Dictionary<Symbol, Numeric or Boolean> {
         return {
             :scale => mScale, :customFonts => mCustomFonts, :amoled => mAmoled,
+            :fontsHeld => !((mFontHours as Object) instanceof Graphics.ResourceReference)
+                && !((mFontReadoutLabel as Object) instanceof Graphics.ResourceReference),
             :partialSeconds => mPartialSeconds, :night => mNight,
             :minor => mMinor, :rule => mRule, :accent => mAccent,
             :dateY => DATE_Y * mScale, :timeY => TIME_Y * mScale, :sepY => SEP_Y * mScale,

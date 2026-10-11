@@ -244,3 +244,13 @@ function colourSettingsIncludingAccentSentinelRender(logger as Logger) as Boolea
     }
     return true;
 }
+
+// The face keeps its fonts as resources, not as graphics pool references the
+// watch may purge (drawing with a purged one crashed on the fr970).
+(:test)
+function fontsAreHeldAsResources(logger as Logger) as Boolean {
+    var p = ApexTestUtil.probe();
+    Test.assertMessage(p[:customFonts] as Boolean, "custom fonts not loaded");
+    Test.assertMessage(p[:fontsHeld] as Boolean, "a font is still a pool reference");
+    return true;
+}

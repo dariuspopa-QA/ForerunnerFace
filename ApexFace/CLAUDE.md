@@ -201,6 +201,9 @@ line box).
 Letter-spacing isn't supported by `drawText`, so the tracked mono labels are drawn character by
 character (`drawTracked`). All eight fonts together use about 4 KB of app memory on a 218 px watch.
 If they fail to load, the view falls back to scalable then system fonts.
+On API 4+ `loadResource` hands fonts out as graphics pool references that the watch may purge;
+drawing with one it can't bring back is a fatal, uncatchable Invalid Value (fr970, 1.0.1), so
+`loadFonts` keeps the resources themselves (`strongResource`) and the ring is drawn from `get()`.
 
 ## Implementation notes
 
