@@ -74,7 +74,8 @@ class FaceView extends FaceCoreView {
         for (var k = 0; k < 5; k++) {
             var a = lug(STAR[k]);
             var b = lug(STAR[(k + 1) % 5]);
-            if (k + 1 < done) {
+            // Segment k joins the (k + 1)th and (k + 2)th nut; the last one closes the star at 5 / 5
+            if (k + 1 < done || done >= 5) {
                 dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(a[0], a[1], b[0], b[1]);
             } else {
