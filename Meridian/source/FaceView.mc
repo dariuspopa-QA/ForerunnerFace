@@ -22,6 +22,12 @@ class FaceView extends WatchUi.WatchFace {
     private const SUN = 0xF2B544;
     private const SUN_SOFT = 0x5A4520;
     private const SLEEP = 0x6F7CFF;
+    // Always-On
+    private const AOD_HOURS = 0xB9B6B0;
+    private const AOD_MINUTES = 0x8E8B85;
+    private const AOD_TICK = 0x4A4A46;
+    // Burn-in shift per minute (ApexFace's pattern: >= 14 px spread over any 4 minutes)
+    private const AOD_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
 
     // Dial
     private const RING_R = 207.0f;
@@ -107,21 +113,38 @@ class FaceView extends WatchUi.WatchFace {
         mAodRing = FaceKit.prop("AodRing", 1) == 1;
         mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_WATCH);
         var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
+        if (editor == null) {
+            return;
+        }
+        if (mEditMode) {
             applyEditor(editor);
+            return;
+        }
+        // Outside the editor, whichever of phone and editor changed the setting last wins
+        mRingMode = FaceEditor.pick("edRing", mRingMode, editorRing(editor), RING_DAY);
+        mAccent = FaceEditor.pick("edAccent", mAccent, editorAccent(editor), 0xFF6A3D);
+    }
+
+    // Watch face editor (while editing): style 1 = day timeline, 2 = activity rings; accent colour.
+    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
+        var ring = editorRing(settings);
+        if (ring != null) {
+            mRingMode = ring;
+        }
+        var accent = editorAccent(settings);
+        if (accent != null) {
+            mAccent = accent;
         }
     }
 
-    // Watch face editor: style 1 = day timeline, 2 = activity rings; accent colour.
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
+    private function editorRing(settings as Application.WatchFaceConfig.Settings) as Number or Null {
         var style = settings.styleId;
-        if (style != null && style >= 1 && style <= 2) {
-            mRingMode = style - 1;
-        }
+        return (style != null && style >= 1 && style <= 2) ? style - 1 : null;
+    }
+
+    private function editorAccent(settings as Application.WatchFaceConfig.Settings) as Number or Null {
         var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
+        return (accent != null && accent.color instanceof Number) ? accent.color as Number : null;
     }
 
     // ---- Drawing --------------------------------------------------------------
@@ -137,33 +160,54 @@ class FaceView extends WatchUi.WatchFace {
         var nowH = clock.hour + clock.min / 60.0f;
 
         if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
-            drawAlwaysOn(dc, clock, nowH);
+            drawAlwaysOn(dc, clock, now, nowH);
             return;
         }
 
         if (mRingMode == RING_ACTIVITY) {
-            drawActivityRings(dc);
+            drawActivityRings(dc, 0.0f, 0.0f, false);
         } else {
             drawDayDial(dc, nowH, 0.0f, 0.0f, false);
         }
-        drawDate(dc, now);
-        drawTime(dc, clock, mFontHours, INK, 0.0f, 0.0f, mSeconds && mAwake);
+        drawDate(dc, now, 0.0f, 0.0f, false);
+        drawTime(dc, clock, mFontHours, INK, INK, 0.0f, 0.0f, mSeconds && mAwake);
         drawFocus(dc);
         drawBars(dc);
         drawBottomLine(dc, nowH);
     }
 
-    // Always-On: the dial thinned to a hairline (or nothing) and a light time, moved a
-    // few pixels each minute against burn-in. Well under 10 % of the pixels lit.
-    private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, nowH as Float) as Void {
-        var shifts = [[0, 0], [3, 2], [-2, 3], [2, -3], [-3, -1], [1, 3], [-1, -3], [3, -1]];
-        var shift = shifts[clock.min % shifts.size()] as Array<Number>;
+    // Always-On, as ApexFace: date, light hours, dim minutes and the four major ticks, plus
+    // (AodRing) the dial or the activity rings as hairlines. Everything moves by AOD_SHIFTS
+    // each minute against burn-in; under 10 % of the pixels lit.
+    private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, now as Gregorian.Info, nowH as Float) as Void {
+        var shift = AOD_SHIFTS[clock.min % AOD_SHIFTS.size()] as Array<Number>;
         var dx = shift[0].toFloat();
         var dy = shift[1].toFloat();
-        if (mAodRing && mRingMode == RING_DAY) {
-            drawDayDial(dc, nowH, dx, dy, true);
+        drawAodTicks(dc, dx, dy);
+        if (mAodRing) {
+            if (mRingMode == RING_ACTIVITY) {
+                drawActivityRings(dc, dx, dy, true);
+            } else {
+                drawDayDial(dc, nowH, dx, dy, true);
+            }
         }
-        drawTime(dc, clock, mFontMinutes, 0xB9B6B0, dx, dy, false);
+        drawDate(dc, now, dx, dy, true);
+        drawTime(dc, clock, mFontMinutes, AOD_HOURS, AOD_MINUTES, dx, dy, false);
+    }
+
+    // 00 / 06 / 12 / 18 (or 12 / 3 / 6 / 9 inside the activity rings) ticks.
+    private function drawAodTicks(dc as Dc, dx as Float, dy as Float) as Void {
+        var cx = (C + dx) * mScale;
+        var cy = (C + dy) * mScale;
+        dc.setColor(AOD_TICK, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(FaceKit.penWidth(3.0f, mScale));
+        var r0 = mRingMode == RING_ACTIVITY ? 158 : 176;
+        for (var i = 0; i < 4; i++) {
+            var a = FaceKit.clockPoint(i * 90, r0);
+            var b = FaceKit.clockPoint(i * 90, r0 + 14);
+            dc.drawLine(cx + a[0] * mScale, cy + a[1] * mScale, cx + b[0] * mScale, cy + b[1] * mScale);
+        }
+        dc.setPenWidth(1);
     }
 
     private function drawDayDial(dc as Dc, nowH as Float, dx as Float, dy as Float, aod as Boolean) as Void {
@@ -238,9 +282,11 @@ class FaceView extends WatchUi.WatchFace {
 
     // Outer: steps / step goal (accent); middle: intensity minutes / weekly goal (sun);
     // inner: floors / floor goal (sleep blue). Each starts at 12 o'clock.
-    private function drawActivityRings(dc as Dc) as Void {
-        var cx = C * mScale;
-        var w = FaceKit.penWidth(ACT_W, mScale);
+    // Always-On: progress only, as dimmed hairlines.
+    private function drawActivityRings(dc as Dc, dx as Float, dy as Float, aod as Boolean) as Void {
+        var cx = (C + dx) * mScale;
+        var cy = (C + dy) * mScale;
+        var w = FaceKit.penWidth(aod ? 3.0f : ACT_W, mScale);
         var fractions = [
             FaceData.fraction(mData.steps, mData.stepGoal),
             FaceData.fraction(mData.intensity, mData.intensityGoal),
@@ -248,14 +294,17 @@ class FaceView extends WatchUi.WatchFace {
         ];
         var colors = [mAccent, SUN, SLEEP];
         for (var i = 0; i < 3; i++) {
-            var r = (RING_R - i * ACT_STEP) * mScale;
-            dc.setColor(TRACK, Graphics.COLOR_TRANSPARENT);
-            dc.setPenWidth(w);
-            dc.drawCircle(cx, cx, r);
+            var r = ((aod ? RING_R - 4 : RING_R) - i * ACT_STEP) * mScale;
+            if (!aod) {
+                dc.setColor(TRACK, Graphics.COLOR_TRANSPARENT);
+                dc.setPenWidth(w);
+                dc.drawCircle(cx, cy, r);
+            }
             var f = fractions[i];
             if (f != null && f > 0.0f) {
-                dc.setColor(colors[i] as Number, Graphics.COLOR_TRANSPARENT);
-                FaceKit.roundArc(dc, cx, cx, r, 0.0f, 360.0f * f, w);
+                var color = colors[i] as Number;
+                dc.setColor(aod ? FaceKit.mix(color, 0x000000, 0.5f) : color, Graphics.COLOR_TRANSPARENT);
+                FaceKit.roundArc(dc, cx, cy, r, 0.0f, 360.0f * f, w);
             }
         }
         dc.setPenWidth(1);
@@ -263,7 +312,7 @@ class FaceView extends WatchUi.WatchFace {
 
     // "SAT" in the accent, then "10 OCT" (or "10-10-2026" by the DateFormat setting),
     // letter-spaced, centred.
-    private function drawDate(dc as Dc, now as Gregorian.Info) as Void {
+    private function drawDate(dc as Dc, now as Gregorian.Info, dx as Float, dy as Float, aod as Boolean) as Void {
         var track = 3.0f * mScale;
         var day = FaceKit.dayName(now.day_of_week as Number);
         var rest = FaceKit.dateRest(now.day as Number, now.month as Number, now.year as Number,
@@ -271,18 +320,18 @@ class FaceView extends WatchUi.WatchFace {
         var wDay = FaceKit.trackedWidth(dc, mFontDateBold, day, track);
         var wRest = FaceKit.trackedWidth(dc, mFontDate, rest, track);
         var gap = 13.0f * mScale;
-        var left = C * mScale - (wDay + gap + wRest) / 2;
-        var y = DATE_Y * mScale;
-        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        var left = (C + dx) * mScale - (wDay + gap + wRest) / 2;
+        var y = (DATE_Y + dy) * mScale;
+        dc.setColor(aod ? FaceKit.mix(mAccent, 0x000000, 0.7f) : mAccent, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left, y, mFontDateBold, day, track, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(DIM, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(aod ? AOD_MINUTES : DIM, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left + wDay + gap, y, mFontDate, rest, track, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
     // Heavy hours, light minutes (tight: -5 px tracking), optional accent seconds on the
     // same baseline. The group is centred.
-    private function drawTime(dc as Dc, clock as System.ClockTime, hoursFont as FontType, color as Number,
-            dx as Float, dy as Float, seconds as Boolean) as Void {
+    private function drawTime(dc as Dc, clock as System.ClockTime, hoursFont as FontType, hoursColor as Number,
+            minutesColor as Number, dx as Float, dy as Float, seconds as Boolean) as Void {
         var track = -5.0f * mScale;
         var hours = FaceKit.hourText(clock.hour);
         var minutes = FaceKit.twoDigits(clock.min);
@@ -293,8 +342,9 @@ class FaceView extends WatchUi.WatchFace {
         var wS = seconds ? gap + dc.getTextWidthInPixels(sec, mFontSeconds) : 0.0f;
         var left = (C + dx) * mScale - (wH + gap + wM + wS) / 2;
         var y = (TIME_Y + dy) * mScale;
-        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(hoursColor, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left, y, hoursFont, hours, track, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.setColor(minutesColor, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left + wH + gap, y, mFontMinutes, minutes, track, Graphics.TEXT_JUSTIFY_LEFT);
         if (seconds) {
             dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);

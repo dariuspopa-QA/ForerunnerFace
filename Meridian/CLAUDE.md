@@ -43,8 +43,14 @@ mockup's `SAT 10 OCT` look, 2 `MON 28-09-2026`, 3 `MON 09-28-2026` (`FaceKit.dat
   lowest ink, so `TEXT_JUSTIFY_VCENTER` centres digits and capitals. Small mono text is a few px
   larger than in the mockup so it reads on the watch. Letter-spacing is drawn glyph by glyph
   (`FaceKit.drawTracked`).
-- Always-On (AMOLED): only an outline / thin version of the face, moved a few pixels every
-  minute; measured below 10 % lit pixels.
+- Always-On (AMOLED), as ApexFace: date (weekday in a dimmed accent), light hours, dim minutes,
+  four major ticks, and with AodRing the day dial or the activity rings as 3 px hairlines. Moved
+  by ApexFace's shift pattern (`AOD_SHIFTS`, up to 10 px). Measured on the fr970 simulator with
+  `ApexFace\tools\aod-burnin.ps1` over 8 minutes: 6.4-6.9 % lit (day dial), 9.0-9.5 %
+  (activity rings); 497 pixels (in the time digits) stay lit longer than 3 minutes, down from
+  2463 with the old ±3 px shift.
+- Phone settings vs the on-watch editor (ring mode, accent): the side that changed a value last
+  wins (`FaceEditor.pick`, remembered in Storage).
 
 ## Build and run
 

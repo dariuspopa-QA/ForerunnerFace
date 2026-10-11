@@ -18,6 +18,34 @@ module FaceEditor {
             return null;
         }
     }
+
+    // A setting that both the phone app and the editor can change: the side that changed it
+    // last wins. Storage remembers both values per key ([phone, editor, editor wins]). On the
+    // first run the editor wins only if it was moved off the default and the phone wasn't.
+    function pick(key as String, phone as Number, editor as Number or Null, fallback as Number) as Number {
+        if (editor == null) {
+            return phone;
+        }
+        var editorWins = false;
+        try {
+            var seen = Application.Storage.getValue(key);
+            if (seen instanceof Array && seen.size() == 3) {
+                if (phone != seen[0]) {
+                    editorWins = false;
+                } else if (editor != seen[1]) {
+                    editorWins = true;
+                } else {
+                    editorWins = seen[2] == true;
+                }
+            } else {
+                editorWins = editor != fallback && phone == fallback;
+            }
+            Application.Storage.setValue(key, [phone, editor, editorWins] as Array<Application.PropertyValueType>);
+        } catch (e) {
+            editorWins = false;
+        }
+        return editorWins ? editor : phone;
+    }
 }
 
 class FaceEditorDelegate extends WatchUi.WatchFaceDelegate {
