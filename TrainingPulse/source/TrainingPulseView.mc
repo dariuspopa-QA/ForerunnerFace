@@ -23,6 +23,9 @@ const C_DIVIDER = 0x2C2C2E;
 const C_ALARM   = 0xFFB340;
 const C_DND     = 0xA78BFA;
 const C_AOD     = 0x9A9A9F;
+const C_AOD_DIM = 0x5E5E62;
+const C_AOD_TICK = 0x4A4A46;
+const AOD_SHIFT = 0.06;  // burn-in shift per axis, fraction of radius
 const C_BG_GRAY = 0xB0B0B8;
 
 // Heart-rate zone colors, zone 1 (coolest) to zone 5 (hottest).
@@ -64,7 +67,7 @@ class TrainingPulseView extends WatchUi.WatchFace {
     private var _bgColorMode = 0;
     private var _clockMode = 0;
     private var _dateFormat = 0;
-    private var _fields = [0, 5, 9, 2, 6, 3];
+    private var _fields = [0, 5, 9, 2, 10, 3];
     private var _showNotif = true;
     private var _showAlarms = true;
     private var _showDnd = true;
@@ -85,6 +88,7 @@ class TrainingPulseView extends WatchUi.WatchFace {
     private var _editMode = false;
     private var _editingSlot = null;
     private var _fieldIds = [null, null, null, null, null, null];  // system data fields
+    private var _phone = {};  // phone app values of the settings the editor also sets
     private var _r = 0.0;
     private var _cx = 0;
     private var _cy = 0;
@@ -120,28 +124,40 @@ class TrainingPulseView extends WatchUi.WatchFace {
         _dateFormat  = prop("DateFormat", 0);
         _fields = [
             prop("Field1", 0), prop("Field2", 5), prop("Field3", 9),
-            prop("Field4", 2), prop("Field5", 6), prop("Field6", 3)
+            prop("Field4", 2), prop("Field5", 10), prop("Field6", 3)
         ];
         _showNotif   = prop("ShowNotifications", true);
         _showAlarms  = prop("ShowAlarms", true);
         _showDnd     = prop("ShowDnd", true);
         _showSun     = prop("ShowSunTimes", true);
         _aodDate     = prop("AodShowDate", true);
+        _fieldIds    = [null, null, null, null, null, null];
         _fontsReady  = false;
+        _phone = { "bg" => _bgStyle, "acc" => idx };
+        for (var i = 0; i < 6; i++) {
+            _phone["f" + (i + 1)] = _fields[i];
+        }
         applyEditor(editorSettings(null), null);
     }
 
     // ---------- Native watch face editor ----------
     // Style = background pattern, Data = the six grid fields, Accent = accent color.
+    //
+    // The face itself (not the editor preview) takes each of these from whichever
+    // side changed it last, the on-device editor or the phone app, so a change in
+    // Garmin Connect still works after the editor has been used.
 
     function applyEditor(s, editedType) as Void {
         if (s == null) {
             return;
         }
-        if (s.styleId != null && s.styleId >= 1 && s.styleId <= 7) {
+        var mem = _editMode ? null : storedSources();
+        if (s.styleId != null && s.styleId >= 1 && s.styleId <= 7
+                && editorWins(mem, "bg", s.styleId)) {
             _bgStyle = s.styleId - 1;
         }
-        if (s.accentColor != null && s.accentColor.color != null) {
+        if (s.accentColor != null && s.accentColor.color != null
+                && editorWins(mem, "acc", s.accentColor.color)) {
             _accent = s.accentColor.color;
         }
         var refs = s.complicationSettings;
@@ -151,12 +167,22 @@ class TrainingPulseView extends WatchUi.WatchFace {
                 if (slot != null && slot >= 1 && slot <= 6) {
                     var id = refs[i].complicationId;
                     var type = complicationType(id);
+                    if (type == null || !editorWins(mem, "f" + slot, type)) {
+                        continue;
+                    }
                     var kind = fieldKindFor(type);
                     if (kind != null) {
                         _fields[slot - 1] = kind;
                     }
-                    _fieldIds[slot - 1] = (type != null && kind == null) ? id : null;
+                    _fieldIds[slot - 1] = (kind == null) ? id : null;
                 }
+            }
+        }
+        if (mem != null) {
+            try {
+                Application.Storage.setValue("sources", mem);
+            } catch (e) {
+                // Not saved: the editor wins again next time, as before
             }
         }
         if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
@@ -166,6 +192,40 @@ class TrainingPulseView extends WatchUi.WatchFace {
             editorSubscribe(_fieldIds, method(:onComplicationChanged));
         }
         WatchUi.requestUpdate();
+    }
+
+    // What each setting last was on both sides: key => [editor, phone, editor wins].
+    private function storedSources() as Dictionary {
+        var mem = null;
+        try {
+            mem = Application.Storage.getValue("sources");
+        } catch (e) {
+            mem = null;
+        }
+        return (mem instanceof Dictionary) ? mem : {};
+    }
+
+    // Whether the editor's value for this setting beats the phone's: the side
+    // that changed since last time wins, otherwise the last winner stays.
+    // Seen for the first time, the editor wins (what the face showed before).
+    private function editorWins(mem, key as String, editorVal) as Boolean {
+        if (mem == null) {
+            return true;  // editor preview
+        }
+        var phoneVal = _phone[key];
+        var prev = mem[key];
+        var wins;
+        if (!(prev instanceof Array) || prev.size() != 3) {
+            wins = true;
+        } else if (editorVal != prev[0]) {
+            wins = true;
+        } else if (phoneVal != prev[1]) {
+            wins = false;
+        } else {
+            wins = prev[2];
+        }
+        mem[key] = [editorVal, phoneVal, wins];
+        return wins;
     }
 
     // Built-in field for a data type the face already draws itself.
@@ -280,7 +340,7 @@ class TrainingPulseView extends WatchUi.WatchFace {
         var settings = System.getDeviceSettings();
 
         var burnIn = (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection;
-        if (!_awake && burnIn) {
+        if (!_awake && burnIn && !_editMode) {
             drawAod(dc, cx, cy, r, clock, settings);
             return;
         }
@@ -301,15 +361,21 @@ class TrainingPulseView extends WatchUi.WatchFace {
 
     // ---------- Time and date ----------
 
-    private function timeString(clock, settings) as String {
-        var hour = clock.hour;
+    // [hours, minutes] by the Clock format setting: zero-padded 24 h, or 1-12
+    // unpadded in 12 h (no AM/PM marker, as in ApexFace)
+    private function timeParts(hour, min, settings) as Array {
         var use24 = (_clockMode == 0) ? settings.is24Hour : (_clockMode == 1);
         if (use24) {
-            return hour.format("%02d") + ":" + clock.min.format("%02d");
+            return [hour.format("%02d"), min.format("%02d")];
         }
         hour = hour % 12;
         if (hour == 0) { hour = 12; }
-        return hour.format("%d") + ":" + clock.min.format("%02d");
+        return [hour.format("%d"), min.format("%02d")];
+    }
+
+    private function timeString(clock, settings) as String {
+        var t = timeParts(clock.hour, clock.min, settings);
+        return t[0] + ":" + t[1];
     }
 
     private function drawTime(dc, cx, y, clock, settings, font, color) as Void {
@@ -402,10 +468,13 @@ class TrainingPulseView extends WatchUi.WatchFace {
         return (cm / 160934.0).format("%.1f"); // cm -> miles
     }
 
+    // Today plus the 6 days before it (the history holds previous days only, newest first)
     private function weekDistanceCm() as Number {
-        var total = 0;
+        var today = ActivityMonitor.getInfo().distance;
+        var total = (today == null) ? 0 : today;
         var hist = ActivityMonitor.getHistory();
-        for (var i = 0; i < hist.size(); i++) {
+        var n = (hist.size() < 6) ? hist.size() : 6;
+        for (var i = 0; i < n; i++) {
             var d = hist[i].distance;
             if (d != null) { total += d; }
         }
@@ -510,8 +579,10 @@ class TrainingPulseView extends WatchUi.WatchFace {
 
         var sr = Gregorian.info(sunrise, Time.FORMAT_SHORT);
         var ss = Gregorian.info(sunset, Time.FORMAT_SHORT);
-        var txt = sr.hour.format("%02d") + ":" + sr.min.format("%02d") + "  " +
-                  ss.hour.format("%02d") + ":" + ss.min.format("%02d");
+        var settings = System.getDeviceSettings();
+        var a = timeParts(sr.hour, sr.min, settings);
+        var b = timeParts(ss.hour, ss.min, settings);
+        var txt = a[0] + ":" + a[1] + "  " + b[0] + ":" + b[1];
 
         dc.setColor(C_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, cy + r * Y_SUN, _labelFont, txt,
@@ -610,17 +681,43 @@ class TrainingPulseView extends WatchUi.WatchFace {
 
     // ---------- Always-on (low power) ----------
 
+    // As in ApexFace: the 12 hour ticks, the date and a thin time with the
+    // minutes dimmed, all shifted each minute against burn-in. Nothing accent-coloured.
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
         var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
         var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * 0.06;
-        var dy = s[1] * r * 0.06;
+        var dx = s[0] * r * AOD_SHIFT;
+        var dy = s[1] * r * AOD_SHIFT;
 
-        drawTime(dc, cx + dx, cy + dy, clock, settings, _aodFont, C_AOD);
+        // Ticks inset by the largest shift so they stay on the round screen
+        var pen = (r * 0.013).toNumber();
+        dc.setPenWidth(pen < 1 ? 1 : pen);
+        dc.setColor(C_AOD_TICK, Graphics.COLOR_TRANSPARENT);
+        var rIn = r * (0.94 - AOD_SHIFT * 1.42);
+        var rOut = r * (0.99 - AOD_SHIFT * 1.42);
+        for (var i = 0; i < 12; i++) {
+            var a = Math.toRadians(i * 30);
+            var sx = Math.sin(a);
+            var cy0 = -Math.cos(a);
+            dc.drawLine(cx + dx + rIn * sx, cy + dy + rIn * cy0, cx + dx + rOut * sx, cy + dy + rOut * cy0);
+        }
+        dc.setPenWidth(1);
+
+        // Hours (with the colon) in grey, minutes dimmer
+        var t = timeParts(clock.hour, clock.min, settings);
+        var head = t[0] + ":";
+        var wHead = dc.getTextWidthInPixels(head, _aodFont);
+        var x = cx + dx - (wHead + dc.getTextWidthInPixels(t[1], _aodFont)) / 2.0;
+        var y = cy + dy;
+        var just = Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER;
+        dc.setColor(C_AOD, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y, _aodFont, head, just);
+        dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x + wHead, y, _aodFont, t[1], just);
 
         if (_aodDate && _dateFormat != DF_OFF) {
-            dc.setColor(C_OFF, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx + dx, cy + dy + r * 0.30, _labelFont, dateString(),
+            dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx + dx, cy + dy - r * 0.34, _dateFont, dateString(),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
     }
