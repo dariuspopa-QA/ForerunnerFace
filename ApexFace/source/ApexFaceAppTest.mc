@@ -40,7 +40,7 @@ function settingsChangedReloadsWithoutError(logger as Logger) as Boolean {
 
 (:test)
 function editorSettingsAreReadSafely(logger as Logger) as Boolean {
-    var settings = ApexEditor.activeSettings();
+    var settings = FaceEditor.settingsFor(null);
     if (Application has :WatchFaceConfig) {
         logger.debug("editor configuration: " + (settings != null ? "present" : "none"));
     } else {

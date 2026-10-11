@@ -32,7 +32,7 @@ const C_AOD     = 0x6E6E73;
 const C_AOD_DIM = 0x3A3A3C;
 const C_AOD_MIN = 0x4A4A4E;   // always-on minutes: gray, never the accent
 const C_AOD_TICK = 0x2C2C2E;
-const AOD_SHIFT = 0.04;       // burn-in shift, fraction of radius
+const AOD_SHIFT = 0.044;      // largest FaceKit.aodShift offset (10 of 227 design px), fraction of radius
 const AOD_TIME_K = 0.86;      // always-on time size vs awake (fewer lit pixels)
 const C_BG_GRAY = 0xB0B0B8;
 
@@ -184,7 +184,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         _aodDate     = prop("AodShowDate", true);
         _fontsReady  = false;
         var s = editorSettings(null);
-        applyEditor(s, null, phoneWins(s, fromPhone));
+        applyEditorWins(s, null, phoneWins(s, fromPhone));
     }
 
     // On watches with the on-watch editor (fr970) both it and the Connect IQ app set
@@ -222,9 +222,14 @@ class GoalBarsView extends WatchUi.WatchFace {
     // ---------- Native watch face editor ----------
     // Slots: 1-4 = the bars, 5 = the bottom data field.
 
+    // From the on-watch editor (FaceCore/slots/EditorConfig.mc): the editor's choices win.
+    function applyEditor(s, editedType) as Void {
+        applyEditorWins(s, editedType, false);
+    }
+
     // phoneWins: keep the phone's style, accent and bars; only the bottom field
     // (which has no phone setting) is taken from the editor.
-    function applyEditor(s, editedType, phoneWins as Boolean) as Void {
+    function applyEditorWins(s, editedType, phoneWins as Boolean) as Void {
         if (s == null) {
             return;
         }
@@ -574,19 +579,7 @@ class GoalBarsView extends WatchUi.WatchFace {
     // "MON 28-09-2026" / "MON 09-28-2026". Watch picks the numeric order from the
     // distance units (Connect IQ has no API for the watch's date order): miles = month first.
     private function dateString() as String {
-        var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-        var weekday = m.day_of_week.toUpper() + " ";
-        var format = _dateFormat;
-        if (format != DF_NAMED && format != DF_DMY && format != DF_MDY) {
-            format = (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? DF_MDY : DF_DMY;
-        }
-        if (format != DF_NAMED) {
-            var d = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var day = d.day.format("%02d");
-            var month = d.month.format("%02d");
-            return weekday + (format == DF_DMY ? day + "-" + month : month + "-" + day) + "-" + d.year;
-        }
-        return weekday + m.day.format("%d") + " " + m.month.toUpper();
+        return FaceKit.localDateText(_dateFormat);
     }
 
     // Letter-spaced caps (Monkey C text has no tracking option), centered on x.
@@ -918,10 +911,10 @@ class GoalBarsView extends WatchUi.WatchFace {
     // together each minute against burn-in; the ticks are inset by the largest shift.
 
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
-        var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
-        var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * AOD_SHIFT;
-        var dy = s[1] * r * AOD_SHIFT;
+        // FaceCore burn-in drift (design px of the 454 screen, scaled to this one)
+        var s = FaceKit.aodShift(clock.min);
+        var dx = s[0] * r / FaceKit.C;
+        var dy = s[1] * r / FaceKit.C;
         var card;
 
         drawAodTicks(dc, cx + dx, cy + dy, r);

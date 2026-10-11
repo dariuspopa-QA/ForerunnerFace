@@ -25,10 +25,20 @@ module FaceKitTest {
     }
 
     (:test)
+    function aodShiftMovesEveryMinute(logger as Logger) as Boolean {
+        for (var m = 0; m < 60; m++) {
+            var a = FaceKit.aodShift(m);
+            var b = FaceKit.aodShift(m + 1);
+            Test.assertMessage(a[0] != b[0] || a[1] != b[1], "no move between minute " + m + " and " + (m + 1));
+        }
+        return true;
+    }
+
+    (:test)
     function dateTexts(logger as Logger) as Boolean {
-        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceKit.DATE_NAMED), "5 SEP");
-        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceKit.DATE_DMY), "05-09-2026");
-        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceKit.DATE_MDY), "09-05-2026");
+        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceFormat.DATE_NAMED), "5 SEP");
+        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceFormat.DATE_DMY), "05-09-2026");
+        Test.assertEqual(FaceKit.dateRest(5, 9, 2026, FaceFormat.DATE_MDY), "09-05-2026");
         Test.assertEqual(FaceKit.dayName(1), "SUN");
         Test.assertEqual(FaceKit.monthName(12), "DEC");
         return true;

@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // metric (energy, steps, sleep, calm, recovery); the lowest one's value is highlighted.
 // Three nested fills, the time in the middle. Geometry follows the canvas mockup
 // (Bloom.dc.html, 454 px); every coordinate is in design pixels.
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
@@ -59,12 +59,7 @@ class FaceView extends WatchUi.WatchFace {
     private var mLow as Number = LOW;
     // Colours from the watch face editor (edited there last), else the phone settings
     private var mFromEditor as Boolean = false;
-    // DateFormat setting (FaceKit.DATE_*), resolved against the watch when drawn
-    private var mDateSetting as Number = FaceKit.DATE_WATCH;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
+    // DateFormat setting (FaceFormat.DATE_*), resolved against the watch when drawn
 
     private var mFontTime as FontType = Graphics.FONT_NUMBER_MEDIUM;
     private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_MEDIUM;
@@ -80,31 +75,18 @@ class FaceView extends WatchUi.WatchFace {
     private var mKey as String = "";
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFFFFFF, FaceFormat.DATE_WATCH);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontValue = WatchUi.loadResource(Rez.Fonts.Value) as FontResource;
-            mFontKey = WatchUi.loadResource(Rez.Fonts.Key) as FontResource;
-        } catch (e) {
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Date, Rez.Fonts.Value, Rez.Fonts.Key] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
+        mFontTime = f[0];
+        mFontTimeAod = f[1];
+        mFontDate = f[2];
+        mFontValue = f[3];
+        mFontKey = f[4];
     }
 
     // Colours come from wherever they were changed last: the phone settings or the watch
@@ -114,7 +96,7 @@ class FaceView extends WatchUi.WatchFace {
     function loadSettings() as Void {
         mPalette = FaceKit.prop("Palette", 0);
         mLow = FaceKit.prop("Highlight", LOW);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_WATCH);
+        mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
         var editor = FaceEditor.settingsFor(null);
         mFromEditor = editor != null && colorsFromEditor();
         if (mFromEditor) {
@@ -224,7 +206,7 @@ class FaceView extends WatchUi.WatchFace {
         FaceDemo.time(clock, now);
         var time = FaceKit.hourText(clock.hour) + ":" + FaceKit.twoDigits(clock.min);
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, time);
             return;
         }
@@ -412,10 +394,9 @@ class FaceView extends WatchUi.WatchFace {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
     }
 
-    // Always-On: the shape's outline and a light time, moved a few pixels a minute.
+    // Always-On: the shape's outline and a light time, moved every minute (aodShift).
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, time as String) as Void {
-        var shifts = [[0, 0], [3, 2], [-2, 3], [2, -3], [-3, -1], [1, 3], [-1, -3], [3, -1]];
-        var shift = shifts[clock.min % shifts.size()] as Array<Number>;
+        var shift = aodShift(clock.min);
         var dx = shift[0].toFloat();
         var dy = shift[1].toFloat();
         var pts = shape(1.0f, dx, dy);
@@ -524,7 +505,7 @@ class FaceView extends WatchUi.WatchFace {
     // "SAT 10" (the mockup's short date, for the named format) or "SAT 10-10-2026".
     private function dateText(now as Gregorian.Info) as String {
         var format = FaceKit.dateFormat(mDateSetting);
-        if (format == FaceKit.DATE_NAMED) {
+        if (format == FaceFormat.DATE_NAMED) {
             return FaceKit.dayName(now.day_of_week as Number) + " " + (now.day as Number).toString();
         }
         return FaceKit.dateText(now, format);

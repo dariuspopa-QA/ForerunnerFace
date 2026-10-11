@@ -41,7 +41,7 @@ module ApexMetrics {
         A_OFF = 6
     }
 
-    const NO_VALUE = "--";
+    const NO_VALUE = FaceFormat.NO_VALUE;
 
     // A field id from settings, or F_EMPTY when it is unknown or hidden (READY).
     function validField(id as Number) as Number {
@@ -159,7 +159,7 @@ module ApexMetrics {
         } else if (c.longLabel != null) {
             label = (c.longLabel as String).toUpper();
         }
-        return [ApexFormat.complicationValueText(c.value, c.unit), label];
+        return [FaceFormat.complicationValueText(c.value, c.unit), label];
     }
 }
 
@@ -208,22 +208,22 @@ class ApexData {
         var info = mInfo;
         switch (id) {
             case ApexMetrics.F_HR:
-                return ApexFormat.numberText(heartRate());
+                return FaceFormat.numberText(heartRate());
             case ApexMetrics.F_STEPS:
-                return ApexFormat.thousandsText(info != null ? info.steps : null);
+                return FaceFormat.thousandsText(info != null ? info.steps : null);
             case ApexMetrics.F_DISTANCE:
                 return distance();
             case ApexMetrics.F_CALORIES:
-                return ApexFormat.thousandsText(info != null ? info.calories : null);
+                return FaceFormat.thousandsText(info != null ? info.calories : null);
             case ApexMetrics.F_FLOORS:
-                return ApexFormat.numberText(info != null && (info has :floorsClimbed) ? info.floorsClimbed : null);
+                return FaceFormat.numberText(info != null && (info has :floorsClimbed) ? info.floorsClimbed : null);
             case ApexMetrics.F_STRESS:
-                return ApexFormat.numberText(stress());
+                return FaceFormat.numberText(stress());
             case ApexMetrics.F_BODY_BATTERY:
-                return ApexFormat.numberText(bodyBattery());
+                return FaceFormat.numberText(bodyBattery());
             case ApexMetrics.F_RECOVERY:
                 // Not every watch tracks recovery time (e.g. Venu 2, vivoactive 6): check the member exists
-                return ApexFormat.recoveryText(info != null && (info has :timeToRecovery) ? info.timeToRecovery : null);
+                return FaceFormat.recoveryText(info != null && (info has :timeToRecovery) ? info.timeToRecovery : null);
             case ApexMetrics.F_SUNRISE:
                 return sunText(false);
             case ApexMetrics.F_SUNSET:
@@ -233,11 +233,11 @@ class ApexData {
             case ApexMetrics.F_TEMP:
                 return temperature();
             case ApexMetrics.F_BATTERY:
-                return ApexFormat.percentText(System.getSystemStats().battery);
+                return FaceFormat.percentText(System.getSystemStats().battery);
             case ApexMetrics.F_NOTIFS:
-                return ApexFormat.numberText(System.getDeviceSettings().notificationCount);
+                return FaceFormat.numberText(System.getDeviceSettings().notificationCount);
             case ApexMetrics.F_SEC:
-                return awake ? ApexFormat.twoDigits(clock.sec) : ApexMetrics.NO_VALUE;
+                return awake ? FaceFormat.twoDigits(clock.sec) : ApexMetrics.NO_VALUE;
         }
         return ApexMetrics.NO_VALUE;
     }
@@ -266,16 +266,16 @@ class ApexData {
     function arcReadout(id as Number) as String {
         switch (id) {
             case ApexMetrics.A_BODY_BATTERY:
-                return ApexFormat.numberText(bodyBattery());
+                return FaceFormat.numberText(bodyBattery());
             case ApexMetrics.A_STEP_GOAL:
                 var f = arcFraction(id);
-                return ApexFormat.percentText(f != null ? f * 100 : null);
+                return FaceFormat.percentText(f != null ? f * 100 : null);
             case ApexMetrics.A_BATTERY:
-                return ApexFormat.percentText(System.getSystemStats().battery);
+                return FaceFormat.percentText(System.getSystemStats().battery);
             case ApexMetrics.A_STRESS:
-                return ApexFormat.numberText(stress());
+                return FaceFormat.numberText(stress());
             case ApexMetrics.A_INTENSITY:
-                return ApexFormat.numberText(intensityMinutes());
+                return FaceFormat.numberText(intensityMinutes());
         }
         return ApexMetrics.NO_VALUE;
     }
@@ -325,7 +325,7 @@ class ApexData {
 
     private function distance() as String {
         var info = mInfo;
-        return ApexFormat.distanceText(info != null ? info.distance : null,
+        return FaceFormat.distanceText(info != null ? info.distance : null,
             System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE);
     }
 
@@ -337,7 +337,7 @@ class ApexData {
         } else {
             metres = latest(SensorHistory.getElevationHistory({:period => 1}));
         }
-        return ApexFormat.altitudeText(metres, System.getDeviceSettings().elevationUnits == System.UNIT_STATUTE);
+        return FaceFormat.altitudeText(metres, System.getDeviceSettings().elevationUnits == System.UNIT_STATUTE);
     }
 
     private function weather() as Weather.CurrentConditions or Null {
@@ -350,7 +350,7 @@ class ApexData {
 
     private function temperature() as String {
         var conditions = weather();
-        return ApexFormat.temperatureText(conditions != null ? conditions.temperature : null,
+        return FaceFormat.temperatureText(conditions != null ? conditions.temperature : null,
             System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
     }
 
@@ -372,7 +372,7 @@ class ApexData {
             return ApexMetrics.NO_VALUE;
         }
         var t = Gregorian.info(moment, Time.FORMAT_SHORT);
-        return ApexFormat.clockText(t.hour as Number, t.min as Number, mTwelveHour);
+        return FaceFormat.clockText(t.hour as Number, t.min as Number, mTwelveHour);
     }
 
     // ---- Helpers -------------------------------------------------------

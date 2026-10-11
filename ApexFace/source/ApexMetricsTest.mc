@@ -143,10 +143,10 @@ function labelsUseOnlyMonoFontGlyphs(logger as Logger) as Boolean {
 // Mono22 only has A-Z, 0-9, space and "-".
 (:test)
 function everyDateUsesOnlyDateFontGlyphs(logger as Logger) as Boolean {
-    for (var format = ApexFormat.DATE_NAMED; format <= ApexFormat.DATE_MDY; format++) {
+    for (var format = FaceFormat.DATE_NAMED; format <= FaceFormat.DATE_MDY; format++) {
         for (var dow = 1; dow <= 7; dow++) {
             for (var month = 1; month <= 12; month++) {
-                var text = ApexFormat.dateText(dow, 31, month, 2026, format);
+                var text = FaceFormat.dateText(dow, 31, month, 2026, format);
                 Test.assertMessage(ApexTestUtil.onlyGlyphs(text, ApexTestUtil.DATE_GLYPHS), "date '" + text + "'");
             }
         }
@@ -219,6 +219,23 @@ function complicationTextAlwaysReturnsValueAndLabel(logger as Logger) as Boolean
         ApexTestUtil.assertEqual(result.size(), 2);
         Test.assert(result[0].length() > 0);
         ApexTestUtil.assertEqual(result[1], result[1].toUpper());
+    }
+    return true;
+}
+
+// Every shared FaceFormat text must be drawable with ApexFace's Value font.
+(:test)
+function formattedValuesUseOnlyValueFontGlyphs(logger as Logger) as Boolean {
+    var samples = [
+        FaceFormat.thousands(1005007), FaceFormat.thousands(-1846),
+        FaceFormat.clockText(19, 12, true), FaceFormat.recoveryText(14),
+        FaceFormat.percentText(68), FaceFormat.distanceText(640000, false),
+        FaceFormat.altitudeText(-12, false), FaceFormat.temperatureText(-5.6f, false),
+        FaceFormat.numberText(null), FaceFormat.twoDigits(7)
+    ];
+    for (var i = 0; i < samples.size(); i++) {
+        Test.assertMessage(ApexTestUtil.onlyGlyphs(samples[i], ApexTestUtil.VALUE_GLYPHS),
+            "'" + samples[i] + "' has a glyph outside the Value font");
     }
     return true;
 }

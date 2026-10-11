@@ -365,19 +365,7 @@ class FaceView extends WatchUi.WatchFace {
     // "MON 28-09-2026" / "MON 09-28-2026". Watch picks the numeric order from the
     // distance units (Connect IQ has no API for the watch's date order): miles = month first.
     private function dateString() as String {
-        var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-        var weekday = m.day_of_week.toUpper() + " ";
-        var format = _dateFormat;
-        if (format != DF_NAMED && format != DF_DMY && format != DF_MDY) {
-            format = (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? DF_MDY : DF_DMY;
-        }
-        if (format != DF_NAMED) {
-            var d = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var day = d.day.format("%02d");
-            var month = d.month.format("%02d");
-            return weekday + (format == DF_DMY ? day + "-" + month : month + "-" + day) + "-" + d.year;
-        }
-        return weekday + m.day.format("%d") + " " + m.month.toUpper();
+        return FaceKit.localDateText(_dateFormat);
     }
 
     // ---------- Progress ring ----------
@@ -619,10 +607,10 @@ class FaceView extends WatchUi.WatchFace {
     // AMOLED rules: keep lit pixels low and move content every minute.
 
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
-        var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
-        var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * 0.06;
-        var dy = s[1] * r * 0.06;
+        // FaceCore burn-in drift (design px of the 454 screen, scaled to this one)
+        var s = FaceKit.aodShift(clock.min);
+        var dx = s[0] * r / FaceKit.C;
+        var dy = s[1] * r / FaceKit.C;
 
         drawTime(dc, cx + dx, cy + dy, r, clock, settings, _aodFont, C_AOD);
 

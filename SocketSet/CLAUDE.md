@@ -11,9 +11,9 @@ Hour markers are socket ends, 8-19 mm (hour + 7); the current hour's socket is l
 
 `source/FaceView.mc` is the face (a `FaceCoreView` subclass) and `source/<Name>App.mc` a three-line
 `FaceCoreApp` subclass. Everything shared lives once in `../FaceCore` (see `FaceCore/CLAUDE.md`):
-`FaceCore/source` (FaceKit, FaceData, FaceEditor, base view and app, core tests) and `FaceCore/shop/ShopKit.mc`
-(radial bars, hexagons, dashed lines, battery as volts), both on `base.sourcePath` in `monkey.jungle` and
-`demo.jungle`. Never copy them back into `source/`. `FaceDemo.battery()` was
+`FaceCore/kit`, `FaceCore/face` (base view and app, FaceData), `FaceCore/test` and `FaceCore/shop/ShopKit.mc`
+(radial bars, hexagons, dashed lines, battery as volts; tests in ShopKitTest.mc), all on `base.sourcePath` in `monkey.jungle` and
+`demo.jungle`. Never copy them back into `source/`. Face tests (`source/<Name>Test.mc`) cover only this face: every display mode and every setting value. `FaceDemo.battery()` was
 added to both FaceDemo modules. Fonts: Barlow Condensed (stands in for the mockup's Big Shoulders
 Display) and IBM Plex Mono (for Share Tech Mono), built by `tools\make-fonts.ps1` from `tools/font-table.ps1`.
 Products fr265, fr265s, fr965, fr970; on-watch editor (accent) on fr970.

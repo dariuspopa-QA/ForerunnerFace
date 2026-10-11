@@ -10,22 +10,6 @@ module ApexEditor {
 
     const SLOT_FIELD_1 = 1;
     const SLOT_ARC = 4;
-
-    // The active configuration's settings, or null on devices without the editor.
-    function activeSettings() as Application.WatchFaceConfig.Settings or Null {
-        return settingsFor(null);
-    }
-
-    function settingsFor(configId as Application.WatchFaceConfig.Id or Null) as Application.WatchFaceConfig.Settings or Null {
-        if (!(Application has :WatchFaceConfig)) {
-            return null;
-        }
-        try {
-            return Application.WatchFaceConfig.getSettings(configId);
-        } catch (e) {
-            return null;
-        }
-    }
 }
 
 // Draws one editable slot through the view; the editor animates it while that slot is selected.
@@ -59,7 +43,7 @@ class ApexEditorDelegate extends WatchUi.WatchFaceDelegate {
             :configId as Application.WatchFaceConfig.Id,
             :type as WatchUi.WatchFaceConfigType or Null,
             :committed as Boolean }) as Void {
-        var settings = ApexEditor.settingsFor(options[:configId]);
+        var settings = FaceEditor.settingsFor(options[:configId]);
         if (settings != null) {
             mView.applyEditor(settings, options[:type]);
         }

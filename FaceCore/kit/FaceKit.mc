@@ -3,6 +3,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
 import Toybox.System;
+import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
 
@@ -13,9 +14,6 @@ module FaceKit {
     const DESIGN = 454.0f;
     const C = 227.0f;
 
-    const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"] as Array<String>;
-    const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"] as Array<String>;
-
     // [dx, dy] of a clock angle (0 = 12 o'clock, clockwise) at radius r.
     function clockPoint(deg as Numeric, r as Numeric) as [Float, Float] {
         var a = Math.toRadians(deg);
@@ -24,60 +22,59 @@ module FaceKit {
 
     // Connect IQ arc degrees (0 = 3 o'clock, counter-clockwise) of a clock angle.
     function ciqDeg(clockDeg as Numeric) as Float {
-        return 90.0f - clockDeg;
+        return (90.0f - clockDeg).toFloat();
     }
 
+    // ---- Text: the device-aware layer over FaceFormat (pure, tested) ------
+
     function twoDigits(n as Number) as String {
-        return n.format("%02d");
+        return FaceFormat.twoDigits(n);
     }
 
     // Hours as the watch is set: zero-padded 24 h, or 12 h without padding.
     function hourText(hour as Number) as String {
-        if (System.getDeviceSettings().is24Hour || FaceDemo.FORCE_24H) {
-            return twoDigits(hour);
-        }
-        var h = hour % 12;
-        return (h == 0 ? 12 : h).toString();
+        return FaceFormat.hourText(hour, !(System.getDeviceSettings().is24Hour || FaceDemo.FORCE_24H));
     }
 
     // Gregorian FORMAT_SHORT: day_of_week 1 = Sunday, month 1 = January.
     function dayName(dayOfWeek as Number) as String {
-        return DAYS[(dayOfWeek + 6) % 7];
+        return FaceFormat.DAYS[(dayOfWeek + 6) % 7] as String;
     }
 
     function monthName(month as Number) as String {
-        return MONTHS[(month + 11) % 12];
+        return FaceFormat.MONTHS[(month + 11) % 12] as String;
     }
 
-    // DateFormat setting: follow the watch, "MON 28 SEP", "MON 28-09-2026", "MON 09-28-2026"
-    enum { DATE_WATCH = 0, DATE_NAMED = 1, DATE_DMY = 2, DATE_MDY = 3 }
-
-    // The date format to draw for the DateFormat setting. Connect IQ doesn't expose the
-    // watch's date order, so "watch" infers it from the distance units: miles means
-    // US-style month first, km day first.
+    // The date format to draw for the DateFormat setting (FaceFormat.DATE_*); "watch"
+    // follows the distance units (miles: month first).
     function dateFormat(setting as Number) as Number {
-        if (setting == DATE_NAMED || setting == DATE_DMY || setting == DATE_MDY) {
-            return setting;
-        }
-        return System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE ? DATE_MDY : DATE_DMY;
+        return FaceFormat.dateFormat(setting, System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE);
     }
 
     // The date after the weekday in a resolved format: "28 SEP" (day unpadded),
     // "28-09-2026" or "09-28-2026" (day and month padded).
     function dateRest(day as Number, month as Number, year as Number, format as Number) as String {
-        if (format == DATE_DMY) {
-            return twoDigits(day) + "-" + twoDigits(month) + "-" + year;
-        }
-        if (format == DATE_MDY) {
-            return twoDigits(month) + "-" + twoDigits(day) + "-" + year;
-        }
-        return day.toString() + " " + monthName(month);
+        var text = FaceFormat.dateText(1, day, month, year, format);
+        return text.substring(4, text.length()) as String;
     }
 
     // "MON 28 SEP" / "MON 28-09-2026" / "MON 09-28-2026" for a Gregorian FORMAT_SHORT date.
     function dateText(now as Gregorian.Info, format as Number) as String {
-        return dayName(now.day_of_week as Number) + " "
-            + dateRest(now.day as Number, now.month as Number, now.year as Number, format);
+        return FaceFormat.dateText(now.day_of_week as Number, now.day as Number, now.month as Number,
+            now.year as Number, format);
+    }
+
+    // Like dateText, with the weekday and month names in the watch's language
+    // (Gregorian FORMAT_MEDIUM), for faces drawn with system fonts.
+    function localDateText(setting as Number) as String {
+        var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+        var weekday = (m.day_of_week as String).toUpper() + " ";
+        var format = dateFormat(setting);
+        if (format != FaceFormat.DATE_NAMED) {
+            var d = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+            return weekday + dateRest(d.day as Number, d.month as Number, d.year as Number, format);
+        }
+        return weekday + (m.day as Number).format("%d") + " " + (m.month as String).toUpper();
     }
 
     function clamp01(f as Float) as Float {
@@ -93,10 +90,7 @@ module FaceKit {
     }
 
     function thousands(n as Number) as String {
-        if (n < 1000) {
-            return n.toString();
-        }
-        return (n / 1000).toString() + "," + (n % 1000).format("%03d");
+        return FaceFormat.thousands(n);
     }
 
     // "2h 12m" / "45m" for a number of minutes.

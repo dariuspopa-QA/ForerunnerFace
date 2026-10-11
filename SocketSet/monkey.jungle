@@ -1,4 +1,4 @@
 project.manifest = manifest.xml
 # source-live/FaceDemo.mc is a no-op; demo.jungle swaps in tools/demo (sample readings
 # and a fixed time, for screenshots and comparing with the mockup).
-base.sourcePath = source;source-live;../FaceCore/source;../FaceCore/shop
+base.sourcePath = source;source-live;../FaceCore/kit;../FaceCore/face;../FaceCore/test;../FaceCore/shop

@@ -1,7 +1,7 @@
 # aod-optimize.ps1 [-Hours "10,23"] [-Iterations 1500] : searches Always-On shift patterns (8 steps,
 # |offset| <= 10, every 4-minute window spread >= 14 px both ways) that minimise the pixels lit
 # > 3 consecutive minutes, on an offline render of the time for minutes 00-59 (fr970, 454 px).
-# Starts from the pattern in source/ApexLayout.mc (AOD_TIME_SHIFTS); copy a better result there
+# Starts from the shared pattern in FaceCore/kit/FaceKit.mc (AOD_SHIFTS); copy a better result there
 # and confirm it with tools\aod-burnin.ps1 on real simulator frames. The hour digits never
 # score (the spread covers their strokes), so the result is the same for every hour.
 param([string]$Hours = '10', [int]$Iterations = 1500, [int]$Seed = 1)

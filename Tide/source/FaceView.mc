@@ -14,7 +14,7 @@ import Toybox.WatchUi;
 //
 // The underwater part is one textured polygon: a bitmap holding the water colour,
 // bubbles and dark digits fills the front wave's shape (Dc.setFill with a BitmapTexture).
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
@@ -35,13 +35,7 @@ class FaceView extends WatchUi.WatchFace {
     private const SPOTS = [[168, 0.30f, 5.0f], [205, 0.62f, 3.5f], [248, 0.45f, 6.5f], [292, 0.78f, 4.0f],
         [228, 0.88f, 3.0f], [318, 0.35f, 5.5f], [140, 0.70f, 3.5f], [262, 0.15f, 4.5f], [186, 0.95f, 3.0f]];
 
-    private var mAccent as Number = 0x3FD0C9;
-    // DateFormat setting (FaceKit.DATE_*), resolved against the watch when drawn
-    private var mDateSetting as Number = FaceKit.DATE_WATCH;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
+    // DateFormat setting (FaceFormat.DATE_*), resolved against the watch when drawn
 
     private var mFontTime as FontType = Graphics.FONT_NUMBER_THAI_HOT;
     private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_THAI_HOT;
@@ -56,48 +50,27 @@ class FaceView extends WatchUi.WatchFace {
     private var mDrift as Float = 0.0f;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0x3FD0C9, FaceFormat.DATE_WATCH);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontTag = WatchUi.loadResource(Rez.Fonts.Tag) as FontResource;
-        } catch (e) {
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Date, Rez.Fonts.Tag] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
+        mFontTime = f[0];
+        mFontTimeAod = f[1];
+        mFontDate = f[2];
+        mFontTag = f[3];
         mWaterKey = "";
     }
 
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mAccent = FaceKit.prop("AccentColor", 0x3FD0C9);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_WATCH);
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
+    // New colours: the cached water texture is rebuilt.
+    function loadPhoneSettings() as Void {
         mWaterKey = "";
     }
 
     function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
+        FaceCoreView.applyEditor(settings);
         mWaterKey = "";
     }
 
@@ -118,7 +91,7 @@ class FaceView extends WatchUi.WatchFace {
         var stress = mData.stress;
         var amp = 3.0f + (stress != null ? stress : 25) * 0.14f;
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, hours, minutes, surface, amp);
             return;
         }
@@ -137,7 +110,7 @@ class FaceView extends WatchUi.WatchFace {
 
         // Light digits, then the front wave filled with the underwater layer
         dc.setColor(LIGHT, Graphics.COLOR_TRANSPARENT);
-        drawTime(dc, hours, minutes, mFontTime, 0.0f);
+        drawTime(dc, hours, minutes, mFontTime, 0.0f, 0.0f);
 
         var steps = mData.steps;
         var front = wave(surface, amp, 0.0f);
@@ -179,13 +152,12 @@ class FaceView extends WatchUi.WatchFace {
         }
     }
 
-    // Always-On: only the water line and thin light digits, moved a few pixels a minute.
+    // Always-On: only the water line and thin light digits, moved every minute (aodShift).
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, hours as String, minutes as String,
             surface as Float, amp as Float) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shifts = [[0, 0], [3, 2], [-2, 3], [2, -3], [-3, -1], [1, 3], [-1, -3], [3, -1]];
-        var shift = shifts[clock.min % shifts.size()] as Array<Number>;
+        var shift = aodShift(clock.min);
         var pts = wave(surface + shift[1], amp, 0.0f);
         dc.setColor(FaceKit.mix(mAccent, 0x000000, 0.6f), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(2.0f, mScale));
@@ -196,7 +168,7 @@ class FaceView extends WatchUi.WatchFace {
         }
         dc.setPenWidth(1);
         dc.setColor(0xA9B8BC, Graphics.COLOR_TRANSPARENT);
-        drawTime(dc, hours, minutes, mFontTimeAod, shift[0].toFloat());
+        drawTime(dc, hours, minutes, mFontTimeAod, shift[0].toFloat(), shift[1].toFloat());
     }
 
     // Plain colour for fills and text (a texture fill, once set, wins over setColor).
@@ -207,10 +179,10 @@ class FaceView extends WatchUi.WatchFace {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
     }
 
-    private function drawTime(dc as Dc, hours as String, minutes as String, font as FontType, dx as Float) as Void {
+    private function drawTime(dc as Dc, hours as String, minutes as String, font as FontType, dx as Float, dy as Float) as Void {
         var track = TIME_TRACKING * mScale;
-        FaceKit.drawTracked(dc, (C + dx) * mScale, HOURS_Y * mScale, font, hours, track, Graphics.TEXT_JUSTIFY_CENTER);
-        FaceKit.drawTracked(dc, (C + dx) * mScale, MINUTES_Y * mScale, font, minutes, track, Graphics.TEXT_JUSTIFY_CENTER);
+        FaceKit.drawTracked(dc, (C + dx) * mScale, (HOURS_Y + dy) * mScale, font, hours, track, Graphics.TEXT_JUSTIFY_CENTER);
+        FaceKit.drawTracked(dc, (C + dx) * mScale, (MINUTES_Y + dy) * mScale, font, minutes, track, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     // The underwater layer at screen size: water colour, bubbles, dark digits. Cached
@@ -259,7 +231,7 @@ class FaceView extends WatchUi.WatchFace {
         }
 
         bdc.setColor(GROUND, Graphics.COLOR_TRANSPARENT);
-        drawTime(bdc, hours, minutes, mFontTime, 0.0f);
+        drawTime(bdc, hours, minutes, mFontTime, 0.0f, 0.0f);
         return mWater;
     }
 

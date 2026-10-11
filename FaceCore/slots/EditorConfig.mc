@@ -4,6 +4,9 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
+// FaceCore/slots: shared by the faces with tappable data slots (GoalBars, MinimalFace,
+// PulseRings, TrainingPulse); their monkey.jungle adds ../FaceCore/slots.
+//
 // Support for Garmin's native on-device watch face editor ("Watch Face
 // Configurations", API 5.1+; fr970 and newer - the fr265/265s have no
 // editor and use the saved default settings). The editor lets the user
@@ -11,7 +14,7 @@ import Toybox.WatchUi;
 // the view applies those choices as overrides on top of its saved settings.
 //
 // A view using this implements:
-//   applyEditor(settings, editedType, phoneWins) - apply a WatchFaceConfig.Settings
+//   applyEditor(settings, editedType)  - apply a WatchFaceConfig.Settings
 //   slotBox(slot) as [x, y, w, h]?      - screen box of an editable slot
 //   slotAt(x, y) as Number?             - slot under a tap, if any
 //   drawSlot(dc, slot)                  - draw one slot alone (editor preview)
@@ -113,7 +116,7 @@ class EditorDelegate extends WatchUi.WatchFaceDelegate {
         if (id != null) {
             var s = editorSettings(id);
             if (s != null) {
-                _view.applyEditor(s, options[:type], false);
+                _view.applyEditor(s, options[:type]);
             }
         }
     }

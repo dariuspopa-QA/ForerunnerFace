@@ -37,7 +37,7 @@ function secondsFieldOnlyWhileAwake(logger as Logger) as Boolean {
     var data = new ApexData();
     var clock = System.getClockTime();
     data.refresh(clock);
-    ApexTestUtil.assertEqual(data.fieldValue(ApexMetrics.F_SEC, clock, true), ApexFormat.twoDigits(clock.sec));
+    ApexTestUtil.assertEqual(data.fieldValue(ApexMetrics.F_SEC, clock, true), FaceFormat.twoDigits(clock.sec));
     ApexTestUtil.assertEqual(data.fieldValue(ApexMetrics.F_SEC, clock, false), "--");
     return true;
 }

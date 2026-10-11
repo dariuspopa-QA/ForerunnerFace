@@ -9,7 +9,7 @@ import Toybox.WatchUi;
 //
 //   class FaceView extends FaceCoreView {
 //       function initialize(editMode as Boolean) {
-//           FaceCoreView.initialize(editMode, 0xFF6A13);   // default accent
+//           FaceCoreView.initialize(editMode, 0xFF6A13, FaceFormat.DATE_NAMED);   // default accent, date format
 //           loadSettings();
 //       }
 //       function loadFonts() as Void { ... FaceKit.loadFonts(ids, fallbacks) ... }
@@ -21,21 +21,24 @@ import Toybox.WatchUi;
 class FaceCoreView extends WatchUi.WatchFace {
 
     protected var mAccent as Number;
-    protected var mDateSetting as Number = FaceKit.DATE_NAMED;
+    protected var mDateSetting as Number = FaceFormat.DATE_NAMED;
     protected var mScale as Float = 1.0f;
     protected var mAwake as Boolean = true;
     protected var mEditMode as Boolean;
     protected var mData as FaceData = new FaceData();
 
     private var mDefaultAccent as Number;
+    private var mDefaultDate as Number;
 
     // The subclass calls loadSettings() at the end of its own initialize, once its
     // members exist.
-    function initialize(editMode as Boolean, defaultAccent as Number) {
+    function initialize(editMode as Boolean, defaultAccent as Number, defaultDate as Number) {
         WatchFace.initialize();
         mEditMode = editMode;
         mDefaultAccent = defaultAccent;
+        mDefaultDate = defaultDate;
         mAccent = defaultAccent;
+        mDateSetting = defaultDate;
     }
 
     function onLayout(dc as Dc) as Void {
@@ -60,12 +63,17 @@ class FaceCoreView extends WatchUi.WatchFace {
     // Phone app settings first, then anything set in the watch face editor on top.
     function loadSettings() as Void {
         mAccent = FaceKit.prop("AccentColor", mDefaultAccent);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_NAMED);
+        mDateSetting = FaceKit.prop("DateFormat", mDefaultDate);
         loadPhoneSettings();
         var editor = FaceEditor.settingsFor(null);
         if (editor != null) {
             applyEditor(editor);
         }
+    }
+
+    // New settings from the Garmin Connect app (FaceCoreApp.onSettingsChanged).
+    function phoneSettingsChanged() as Void {
+        loadSettings();
     }
 
     // The face's own properties from the Garmin Connect app.

@@ -101,10 +101,10 @@ class BasicWatchFaceView extends WatchUi.WatchFace {
         var w = dc.getWidth();
         var h = dc.getHeight();
         var r = w / 2.0;
-        var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
-        var s = shifts[System.getClockTime().min % shifts.size()];
-        var dx = s[0] * r * 0.05;
-        var dy = s[1] * r * 0.05;
+        // FaceCore burn-in drift (design px of the 454 screen, scaled to this one)
+        var s = FaceKit.aodShift(System.getClockTime().min);
+        var dx = s[0] * r / FaceKit.C;
+        var dy = s[1] * r / FaceKit.C;
 
         if (_aodFont == null) {
             // Same height as the awake time, but a lighter weight where the device has one

@@ -216,58 +216,6 @@ function rowAbovePullsUpWhenFontsAreTall(logger as Logger) as Boolean {
     return true;
 }
 
-// ---- Always-On burn-in shift -------------------------------------------
-
-(:test)
-function aodShiftMovesEveryMinute(logger as Logger) as Boolean {
-    for (var m = 0; m < 60; m++) {
-        var a = ApexLayout.aodTimeShift(m);
-        var b = ApexLayout.aodTimeShift(m + 1);
-        Test.assertMessage(a[0] != b[0] || a[1] != b[1], "no move between minute " + m + " and " + (m + 1));
-    }
-    return true;
-}
-
-(:test)
-function aodTicksStayOnScreenWhenShifted(logger as Logger) as Boolean {
-    // outer tick end r 225 - inset, moved by up to AOD_SHIFT_MAX in x and y
-    for (var m = 0; m < ApexLayout.AOD_TIME_SHIFTS.size(); m++) {
-        var s = ApexLayout.aodTimeShift(m);
-        Test.assert(s[0].abs() <= ApexLayout.AOD_SHIFT_MAX && s[1].abs() <= ApexLayout.AOD_SHIFT_MAX);
-    }
-    return true;
-}
-
-// No pixel may stay lit for more than 3 minutes: over any 4 consecutive minutes
-// everything must move further than its strokes are wide (Always-On hours ~12 px
-// at 454 px; ticks 3 px, date ~2 px).
-(:test)
-function aodTimeShiftMovesBeyondTheHourStrokes(logger as Logger) as Boolean {
-    var span = ApexLayout.minShiftSpan(ApexLayout.AOD_TIME_SHIFTS, 4);
-    Test.assertMessage(span[0] >= 14 && span[1] >= 14, "time span " + span[0] + "x" + span[1]);
-    return true;
-}
-
-(:test)
-function aodTimeShiftCycles(logger as Logger) as Boolean {
-    var n = ApexLayout.AOD_TIME_SHIFTS.size();
-    for (var m = 0; m < 60; m++) {
-        var a = ApexLayout.aodTimeShift(m);
-        var b = ApexLayout.aodTimeShift(m + n);
-        ApexTestUtil.assertEqual(a[0], b[0]);
-        ApexTestUtil.assertEqual(a[1], b[1]);
-        Test.assert(a[0].abs() <= ApexLayout.AOD_SHIFT_MAX && a[1].abs() <= ApexLayout.AOD_SHIFT_MAX);
-    }
-    return true;
-}
-
-(:test)
-function minShiftSpanMeasuresTheTightestWindow(logger as Logger) as Boolean {
-    var span = ApexLayout.minShiftSpan([[0, 0], [5, 1], [5, 9], [0, 9]], 2);
-    ApexTestUtil.assertEqual(span[0], 0);   // [5,1] -> [5,9] doesn't move across
-    ApexTestUtil.assertEqual(span[1], 0);   // [5,9] -> [0,9] doesn't move down
-    return true;
-}
 
 // ---- Seconds ----------------------------------------------------------
 

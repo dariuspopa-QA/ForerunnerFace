@@ -92,10 +92,10 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mNight as Boolean = false;
     private var mNightMinute as Number = -1;
 
-    // DateFormat setting (ApexFormat enum), the date format drawn, and whether the
+    // DateFormat setting (FaceFormat enum), the date format drawn, and whether the
     // watch shows 12 h time
-    private var mDateSetting as Number = ApexFormat.DATE_WATCH;
-    private var mDateFormat as Number = ApexFormat.DATE_DMY;
+    private var mDateSetting as Number = FaceFormat.DATE_WATCH;
+    private var mDateFormat as Number = FaceFormat.DATE_DMY;
     private var mTwelveHour as Boolean = false;
 
     // Colours in use (ApexLayout.palette of the above)
@@ -149,7 +149,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     function initialize(editMode as Boolean) {
         WatchFace.initialize();
         mEditMode = editMode;
-        mAmoled = burnInProtection();
+        mAmoled = FaceKit.burnInProtection();
         mPartialSeconds = !mAmoled && !editMode;
         loadSettings();
     }
@@ -184,7 +184,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         updateNight(clock);
 
-        if (!mAwake && !mEditMode && burnInProtection()) {
+        if (!mAwake && !mEditMode && FaceKit.burnInProtection()) {
             drawAlwaysOn(dc, clock, now);
             return;
         }
@@ -234,19 +234,14 @@ class ApexFaceView extends WatchUi.WatchFace {
         WatchUi.requestUpdate();
     }
 
-    private function burnInProtection() as Boolean {
-        var settings = System.getDeviceSettings();
-        return (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection;
-    }
-
     // ---- Always-On -----------------------------------------------------
 
     // Only the date, a thin time (minutes dim) and the 12 major ticks, shifted
     // each minute. Nothing accent-coloured, no seconds, arc or fields.
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, now as Gregorian.Info) as Void {
-        // Everything moves with ApexLayout.AOD_TIME_SHIFTS; the ticks are inset by the
+        // Everything moves with FaceKit.AOD_SHIFTS; the ticks are inset by the
         // largest shift so they stay on the round screen.
-        var shift = ApexLayout.aodTimeShift(clock.min);
+        var shift = FaceKit.aodShift(clock.min);
         mShiftX = shift[0].toFloat();
         mShiftY = shift[1].toFloat();
 
@@ -254,7 +249,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         dc.clear();
         dc.setPenWidth(ApexLayout.penWidth(MAJOR_W, mScale, mAmoled));
         dc.setColor(mAodMajor, Graphics.COLOR_TRANSPARENT);
-        var inset = ApexLayout.AOD_SHIFT_MAX;
+        var inset = FaceKit.AOD_SHIFT_MAX;
         for (var i = 0; i < 60; i += 5) {
             drawRadial(dc, i * 6, MAJOR_R_IN - inset, MAJOR_R_OUT - inset);
         }
@@ -315,7 +310,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Phone app settings first, then anything set in the watch face editor on top.
     function loadSettings() as Void {
         loadPhoneSettings();
-        var editor = ApexEditor.activeSettings();
+        var editor = FaceEditor.settingsFor(null);
         if (editor != null) {
             applyEditor(editor, null);
         }
@@ -323,24 +318,24 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     // Settings from the Garmin Connect app only.
     function loadPhoneSettings() as Void {
-        mDayAccent = prop("AccentColor", 0xC8FF2E);
-        var numerals = prop("NumeralColor", 0xF4F4EF);
+        mDayAccent = FaceKit.prop("AccentColor", 0xC8FF2E);
+        var numerals = FaceKit.prop("NumeralColor", 0xF4F4EF);
         mDayNumerals = ApexLayout.numeralColor(numerals, mDayAccent);
-        mDayInk = prop("InkColor", 0xF4F4EF);
-        mDayDim = prop("DimColor", 0xB0B0AA);
-        mDateSetting = prop("DateFormat", ApexFormat.DATE_WATCH);
+        mDayInk = FaceKit.prop("InkColor", 0xF4F4EF);
+        mDayDim = FaceKit.prop("DimColor", 0xB0B0AA);
+        mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
         updateFormats();
-        var night = prop("NightMode", ApexLayout.NIGHT_OFF);
+        var night = FaceKit.prop("NightMode", ApexLayout.NIGHT_OFF);
         mNightMode = (night >= ApexLayout.NIGHT_OFF && night <= ApexLayout.NIGHT_ON) ? night : ApexLayout.NIGHT_OFF;
         mNightMinute = -1;
         mNight = nightNow(System.getClockTime());
         mFieldIds = [
-            ApexMetrics.validField(prop("Field1", ApexMetrics.F_HR)),
-            ApexMetrics.validField(prop("Field2", ApexMetrics.F_STEPS)),
-            ApexMetrics.validField(prop("Field3", ApexMetrics.F_SUNSET))
+            ApexMetrics.validField(FaceKit.prop("Field1", ApexMetrics.F_HR)),
+            ApexMetrics.validField(FaceKit.prop("Field2", ApexMetrics.F_STEPS)),
+            ApexMetrics.validField(FaceKit.prop("Field3", ApexMetrics.F_SUNSET))
         ];
         mFieldComplications = [null, null, null];
-        mArcId = ApexMetrics.validArc(prop("Arc", ApexMetrics.A_BODY_BATTERY));
+        mArcId = ApexMetrics.validArc(FaceKit.prop("Arc", ApexMetrics.A_BODY_BATTERY));
         applyPalette();
     }
 
@@ -363,12 +358,12 @@ class ApexFaceView extends WatchUi.WatchFace {
     }
 
     // 12 / 24 h time from the watch's own setting; the date format from the DateFormat
-    // setting (or the watch's distance units, see ApexFormat.dateFormat).
+    // setting (or the watch's distance units, see FaceFormat.dateFormat).
     private function updateFormats() as Void {
         var settings = System.getDeviceSettings();
         mTwelveHour = !settings.is24Hour;
         mData.setTwelveHour(mTwelveHour);
-        mDateFormat = ApexFormat.dateFormat(mDateSetting, settings.distanceUnits == System.UNIT_STATUTE);
+        mDateFormat = FaceFormat.dateFormat(mDateSetting, settings.distanceUnits == System.UNIT_STATUTE);
     }
 
     // On: always. Auto: between the sleep and wake times of the user profile.
@@ -399,16 +394,6 @@ class ApexFaceView extends WatchUi.WatchFace {
         mRule = p[ApexLayout.P_RULE];
         mAodMajor = p[ApexLayout.P_AOD_MAJOR];
         mRingDirty = true;
-    }
-
-    private function prop(key as String, fallback as Number) as Number {
-        var value = null;
-        try {
-            value = Application.Properties.getValue(key);
-        } catch (e) {
-            value = null;
-        }
-        return (value instanceof Number) ? value : fallback;
     }
 
     // ---- Watch face editor ---------------------------------------------
@@ -511,7 +496,7 @@ class ApexFaceView extends WatchUi.WatchFace {
                 Rez.Fonts.Mono16, Rez.Fonts.Value, Rez.Fonts.ArcValue, Rez.Fonts.Mono14] as Array<ResourceId>;
             var loaded = [] as Array<FontType>;
             for (var i = 0; i < fonts.size(); i++) {
-                var font = strongResource(fonts[i]);
+                var font = FaceKit.strongResource(fonts[i]);
                 if (font == null) {
                     break;
                 }
@@ -533,19 +518,6 @@ class ApexFaceView extends WatchUi.WatchFace {
         }
         mCustomFonts = false;
         loadSystemFonts(dc);
-    }
-
-    // On Connect IQ 4+ loadResource returns fonts as references into the shared
-    // graphics pool, and the watch may purge the resource behind a reference while
-    // the face holds nothing stronger. Drawing with a reference it then can't bring
-    // back is a fatal Invalid Value that try/catch can't stop (fr970 crash log,
-    // 11 Oct 2026: measuring the arc label). So the face keeps the resource itself.
-    private function strongResource(id as ResourceId) as Object or Null {
-        var resource = WatchUi.loadResource(id);
-        if (resource instanceof Graphics.ResourceReference) {
-            return resource.get();
-        }
-        return resource;
     }
 
     private function loadSystemFonts(dc as Dc) as Void {
@@ -607,7 +579,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     }
 
     // The ring is drawn from the bitmap get() returns, never from the pool reference
-    // itself (see strongResource); if the pool can't give it back, onUpdate draws
+    // itself (see FaceKit.strongResource); if the pool can't give it back, onUpdate draws
     // the ring directly.
     private function ringBitmap() as BufferedBitmap or Null {
         var ring = mRing;
@@ -657,7 +629,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     }
 
     private function drawDate(dc as Dc, now as Gregorian.Info) as Void {
-        var text = ApexFormat.dateText(now.day_of_week as Number, now.day as Number, now.month as Number,
+        var text = FaceFormat.dateText(now.day_of_week as Number, now.day as Number, now.month as Number,
             now.year as Number, mDateFormat);
         drawTracked(dc, text, C, DATE_Y, mFontDate, DATE_TRACKING, mDim);
     }
@@ -666,10 +638,10 @@ class ApexFaceView extends WatchUi.WatchFace {
             hoursColor as Number, minutesColor as Number) as Void {
         var y = (TIME_Y + mShiftY) * mScale;
         dc.setColor(hoursColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText((HOURS_RIGHT_X + mShiftX) * mScale, y, hoursFont, ApexFormat.hourText(now.hour as Number, mTwelveHour),
+        dc.drawText((HOURS_RIGHT_X + mShiftX) * mScale, y, hoursFont, FaceFormat.hourText(now.hour as Number, mTwelveHour),
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(minutesColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText((MINUTES_LEFT_X + mShiftX) * mScale, y, minutesFont, ApexFormat.twoDigits(now.min as Number),
+        dc.drawText((MINUTES_LEFT_X + mShiftX) * mScale, y, minutesFont, FaceFormat.twoDigits(now.min as Number),
             Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 

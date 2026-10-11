@@ -3,8 +3,9 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 // Garmin's native on-device watch face editor (Watch Face Configurations, API 5.1+;
-// resources-fr970/configs/watchface.xml). The face offers a style and an accent
-// colour there; the view applies them on top of the phone settings.
+// each face's resources-fr970/configs/watchface.xml). FaceCoreView applies the editor's
+// choices on top of the phone settings: the editor wins when it has a value. Faces that
+// want "whichever side changed it last wins" instead use pick() (Meridian).
 module FaceEditor {
 
     // The active configuration's settings, or null on watches without the editor.
@@ -30,41 +31,20 @@ module FaceEditor {
         try {
             var seen = Application.Storage.getValue(key);
             if (seen instanceof Array && seen.size() == 3) {
-                if (phone != seen[0]) {
+                if (!phone.equals(seen[0])) {
                     editorWins = false;
-                } else if (editor != seen[1]) {
+                } else if (!editor.equals(seen[1])) {
                     editorWins = true;
                 } else {
-                    editorWins = seen[2] == true;
+                    editorWins = seen[2] instanceof Boolean && seen[2] as Boolean;
                 }
             } else {
                 editorWins = editor != fallback && phone == fallback;
             }
-            Application.Storage.setValue(key, [phone, editor, editorWins] as Array<Application.PropertyValueType>);
+            Application.Storage.setValue(key, [phone, editor, editorWins] as Array<Application.Storage.ValueType>);
         } catch (e) {
             editorWins = false;
         }
         return editorWins ? editor : phone;
-    }
-}
-
-class FaceEditorDelegate extends WatchUi.WatchFaceDelegate {
-
-    private var mView as FaceView;
-
-    function initialize(view as FaceView) {
-        WatchFaceDelegate.initialize();
-        mView = view;
-    }
-
-    function onWatchFaceConfigEdited(options as {
-            :configId as Application.WatchFaceConfig.Id,
-            :type as WatchUi.WatchFaceConfigType or Null,
-            :committed as Boolean }) as Void {
-        var settings = FaceEditor.settingsFor(options[:configId]);
-        if (settings != null) {
-            mView.applyEditor(settings);
-            WatchUi.requestUpdate();
-        }
     }
 }

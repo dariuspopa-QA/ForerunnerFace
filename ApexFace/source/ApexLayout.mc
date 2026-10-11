@@ -138,41 +138,6 @@ module ApexLayout {
         return designY < maxY ? designY : maxY;
     }
 
-    // The Always-On time and date move further: the hour strokes are ~12 design px
-    // wide, and no pixel may stay lit for more than 3 minutes, so every 4 consecutive
-    // minutes must move them more than a stroke width both across and down (>= 14 px).
-    // The eight positions were searched (offline render of minutes 00-59) to keep changing
-    // minute digits from lining up: ~37 px of the time stay lit > 3 min per hour, down from 275.
-    const AOD_TIME_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
-    // Largest offset in AOD_TIME_SHIFTS (the Always-On ticks are inset by it)
-    const AOD_SHIFT_MAX = 10.0f;
-
-    function aodTimeShift(minute as Number) as Array<Number> {
-        return AOD_TIME_SHIFTS[minute % AOD_TIME_SHIFTS.size()] as Array<Number>;
-    }
-
-    // Smallest horizontal and vertical spread [dx, dy] of a shift pattern over any
-    // window of consecutive minutes: a stroke thinner than this can't stay lit
-    // for the whole window.
-    function minShiftSpan(shifts as Array, window as Number) as [Number, Number] {
-        var minX = 1000;
-        var minY = 1000;
-        var n = shifts.size();
-        for (var start = 0; start < n; start++) {
-            var loX = 1000; var hiX = -1000; var loY = 1000; var hiY = -1000;
-            for (var k = 0; k < window; k++) {
-                var s = shifts[(start + k) % n] as Array<Number>;
-                if (s[0] < loX) { loX = s[0]; }
-                if (s[0] > hiX) { hiX = s[0]; }
-                if (s[1] < loY) { loY = s[1]; }
-                if (s[1] > hiY) { hiY = s[1]; }
-            }
-            if (hiX - loX < minX) { minX = hiX - loX; }
-            if (hiY - loY < minY) { minY = hiY - loY; }
-        }
-        return [minX, minY];
-    }
-
     // CIQ end angle of the seconds trail, drawn clockwise from 12 o'clock (CIQ 90).
     function trailEnd(sec as Number) as Number {
         return 90 - sec * 6;

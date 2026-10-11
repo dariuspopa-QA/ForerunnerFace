@@ -1,1 +1,4 @@
 project.manifest = manifest.xml
+
+# Shared code: FaceCore/kit (text, burn-in shift), FaceCore/slots (editor data slots), core tests.
+base.sourcePath = source;source-live;../FaceCore/kit;../FaceCore/slots;../FaceCore/test

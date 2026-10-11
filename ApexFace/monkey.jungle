@@ -1,5 +1,8 @@
 project.manifest = manifest.xml
 
+# Shared code: FaceCore/kit (text, fonts, burn-in shift, settings, editor lookup) and its tests.
+base.sourcePath = source;source-live;../FaceCore/kit;../FaceCore/test
+
 # On-device editor config: the full data type list, or editor-basic (no Sleep score) for
 # watches whose firmware lacks COMPLICATION_TYPE_SLEEP_SCORE. tests\check-resources.ps1
 # checks every product against its device API.

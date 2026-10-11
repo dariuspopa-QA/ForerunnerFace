@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // now-marker, or three activity rings; heavy/light time, one focus metric with four
 // mini bars, and a bottom line (sunset, weather, next event). Geometry follows the
 // canvas mockup (Main.dc.html, 454 px); every coordinate is in design pixels.
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
@@ -47,19 +47,13 @@ class FaceView extends WatchUi.WatchFace {
     enum { FOCUS_BATTERY = 0, FOCUS_STEPS = 1, FOCUS_HEART = 2, FOCUS_STRESS = 3 }
     enum { LINE_SMART = 0, LINE_SUNSET = 1, LINE_WEATHER = 2, LINE_EVENT = 3 }
 
-    private var mAccent as Number = 0xFF6A3D;
     private var mRingMode as Number = RING_DAY;
     private var mFocus as Number = FOCUS_BATTERY;
     private var mLine as Number = LINE_SMART;
     private var mSeconds as Boolean = false;
     private var mAodRing as Boolean = true;
-    // DateFormat setting (FaceKit.DATE_*), resolved against the watch when drawn
-    private var mDateSetting as Number = FaceKit.DATE_WATCH;
+    // DateFormat setting (FaceFormat.DATE_*), resolved against the watch when drawn
 
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
 
     private var mFontHours as FontType = Graphics.FONT_NUMBER_THAI_HOT;
     private var mFontMinutes as FontType = Graphics.FONT_NUMBER_THAI_HOT;
@@ -71,35 +65,21 @@ class FaceView extends WatchUi.WatchFace {
     private var mFontSeconds as FontType = Graphics.FONT_TINY;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFF6A3D, FaceFormat.DATE_WATCH);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontHours = WatchUi.loadResource(Rez.Fonts.Hours) as FontResource;
-            mFontMinutes = WatchUi.loadResource(Rez.Fonts.Minutes) as FontResource;
-            mFontValue = WatchUi.loadResource(Rez.Fonts.Value) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontDateBold = WatchUi.loadResource(Rez.Fonts.DateBold) as FontResource;
-            mFontLabel = WatchUi.loadResource(Rez.Fonts.Label) as FontResource;
-            mFontLine = WatchUi.loadResource(Rez.Fonts.Line) as FontResource;
-            mFontSeconds = WatchUi.loadResource(Rez.Fonts.Seconds) as FontResource;
-        } catch (e) {
-            // System fonts stay in place
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Hours, Rez.Fonts.Minutes, Rez.Fonts.Value, Rez.Fonts.Date, Rez.Fonts.DateBold, Rez.Fonts.Label, Rez.Fonts.Line, Rez.Fonts.Seconds] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_SMALL, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_TINY] as Array<FontType>);
+        mFontHours = f[0];
+        mFontMinutes = f[1];
+        mFontValue = f[2];
+        mFontDate = f[3];
+        mFontDateBold = f[4];
+        mFontLabel = f[5];
+        mFontLine = f[6];
+        mFontSeconds = f[7];
     }
 
     // ---- Settings -----------------------------------------------------------
@@ -111,7 +91,7 @@ class FaceView extends WatchUi.WatchFace {
         mLine = FaceKit.prop("BottomLine", LINE_SMART);
         mSeconds = FaceKit.prop("ShowSeconds", 0) == 1;
         mAodRing = FaceKit.prop("AodRing", 1) == 1;
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_WATCH);
+        mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
         var editor = FaceEditor.settingsFor(null);
         if (editor == null) {
             return;
@@ -159,7 +139,7 @@ class FaceView extends WatchUi.WatchFace {
         FaceDemo.time(clock, now);
         var nowH = clock.hour + clock.min / 60.0f;
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, now, nowH);
             return;
         }

@@ -95,7 +95,7 @@ The display may quantise to fewer colours; pick the nearest if a value renders v
    only date, hours (thin), minutes (dim), and the 12 major ticks in `0x4A4A46` (inset 10 px).
    No seconds, no arc, no fields, no readout. Garmin's AMOLED rules: at most 10 % of pixels lit per
    update, and (older models) no pixel lit for more than 3 minutes. Everything moves by
-   `ApexLayout.AOD_TIME_SHIFTS`, which spreads ≥ 14 px across and down over any 4 minutes (hour
+   `FaceKit.AOD_SHIFTS` (shared core, `FaceCore/kit`), which spreads ≥ 14 px across and down over any 4 minutes (hour
    strokes are ~12 px wide). Measure with `tools\aod-burnin.ps1` on 8 consecutive Always-On frames:
    currently ~5.6 % lit, and 16 pixels (where successive minute digits overlap by chance) stay lit
    4–5 minutes. The pattern was searched with `tools\aod-optimize.ps1` (offline render of minutes
@@ -203,7 +203,7 @@ character (`drawTracked`). All eight fonts together use about 4 KB of app memory
 If they fail to load, the view falls back to scalable then system fonts.
 On API 4+ `loadResource` hands fonts out as graphics pool references that the watch may purge;
 drawing with one it can't bring back is a fatal, uncatchable Invalid Value (fr970, 1.0.1), so
-`loadFonts` keeps the resources themselves (`strongResource`) and the ring is drawn from `get()`.
+`loadFonts` keeps the resources themselves (`FaceKit.strongResource`) and the ring is drawn from `get()`.
 
 ## Implementation notes
 
@@ -236,7 +236,7 @@ All seven steps are done.
 - Tests: `(:test)` functions in `source/*Test.mc` ("Monkey C: Run Tests", or `monkeyc --unit-test` then
   `monkeydo bin\ApexFaceTest.prg fr970 /t` with the simulator open), and
   `powershell -ExecutionPolicy Bypass -File tests\check-resources.ps1` for the resource XML. Keep pure
-  logic in `ApexFormat` / `ApexLayout` / `ApexMetrics` so it stays testable.
+  logic in `ApexLayout` / `ApexMetrics` (and the shared `FaceCore/kit`: FaceFormat, FaceKit) so it stays testable.
 - Per-watch tests: `source/ApexDeviceTest.mc` checks the layout on the screen it runs on (fonts, row
   overlap, time inside the arc, palette, low power). `tools\run-device-tests.ps1` runs the whole
   suite on one watch per screen size, API version and editor config (16 watches, ~25 min, simulator

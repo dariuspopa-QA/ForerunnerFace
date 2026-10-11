@@ -26,9 +26,6 @@ const C_AOD     = 0x9A9A9F;
 const C_AOD_DIM = 0x6E6E73;   // low-power minutes and date
 const C_AOD_TICK = 0x4A4A46;  // low-power hour ticks (ApexFace's AOD_MAJOR)
 
-// Low-power shift per minute, in 454 px units (from ApexFace), and its largest offset
-const AOD_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
-const AOD_SHIFT_MAX = 10.0;
 const C_BG_GRAY = 0xB0B0B8;
 
 // Body Battery ring color bands, matching Garmin's own convention.
@@ -425,19 +422,7 @@ class PulseRingsView extends WatchUi.WatchFace {
     // "MON 28-09-2026" / "MON 09-28-2026". Watch picks the numeric order from the
     // distance units (Connect IQ has no API for the watch's date order): miles = month first.
     private function dateString() as String {
-        var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-        var weekday = m.day_of_week.toUpper() + " ";
-        var format = _dateFormat;
-        if (format != DF_NAMED && format != DF_DMY && format != DF_MDY) {
-            format = (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? DF_MDY : DF_DMY;
-        }
-        if (format != DF_NAMED) {
-            var d = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var day = d.day.format("%02d");
-            var month = d.month.format("%02d");
-            return weekday + (format == DF_DMY ? day + "-" + month : month + "-" + day) + "-" + d.year;
-        }
-        return weekday + m.day.format("%d") + " " + m.month.toUpper();
+        return FaceKit.localDateText(_dateFormat);
     }
 
     // ---------- Rings ----------
@@ -745,11 +730,11 @@ class PulseRingsView extends WatchUi.WatchFace {
     // As in ApexFace: the date, a thin time with dim minutes and the 12 hour ticks,
     // all shifted together each minute. Nothing accent-colored, no rings or fields.
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
-        var scale = r / 227.0;   // AOD_SHIFTS are in 454 px units
-        var s = AOD_SHIFTS[clock.min % AOD_SHIFTS.size()];
+        var scale = r / 227.0;   // FaceKit.aodShift is in 454 px units
+        var s = FaceKit.aodShift(clock.min);
         var dx = s[0] * scale;
         var dy = s[1] * scale;
-        var inset = AOD_SHIFT_MAX * scale;
+        var inset = FaceKit.AOD_SHIFT_MAX * scale;
 
         var pen = (r * 0.013).toNumber();
         dc.setPenWidth(pen < 2 ? 2 : pen);

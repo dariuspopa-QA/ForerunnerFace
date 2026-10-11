@@ -35,7 +35,7 @@ class FaceView extends FaceCoreView {
     private var mFontBottom as FontType = Graphics.FONT_XTINY;
 
     function initialize(editMode as Boolean) {
-        FaceCoreView.initialize(editMode, 0xD7FF1F);
+        FaceCoreView.initialize(editMode, 0xD7FF1F, FaceFormat.DATE_NAMED);
         loadSettings();
     }
 

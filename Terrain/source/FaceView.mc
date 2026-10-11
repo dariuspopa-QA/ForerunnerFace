@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // snow down to a line set by stress, a flag on the ridge at step-goal progress, and the
 // sun crossing the sky from sunrise to sunset (a moon at night). Geometry follows the
 // canvas mockup (Terrain.dc.html, 454 px); every coordinate is in design pixels.
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
@@ -43,13 +43,7 @@ class FaceView extends WatchUi.WatchFace {
     private const FAR = [[0, 338], [58, 306], [112, 322], [172, 284], [232, 310], [292, 270], [350, 300],
         [402, 284], [454, 304], [454, 454], [0, 454]];
 
-    private var mAccent as Number = 0xFF6A3D;
-    // DateFormat setting (FaceKit.DATE_*), resolved against the watch when drawn
-    private var mDateSetting as Number = FaceKit.DATE_WATCH;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
+    // DateFormat setting (FaceFormat.DATE_*), resolved against the watch when drawn
 
     private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
     private var mFontDate as FontType = Graphics.FONT_XTINY;
@@ -62,46 +56,17 @@ class FaceView extends WatchUi.WatchFace {
     private var mRidgeKey as String = "";
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFF6A3D, FaceFormat.DATE_WATCH);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontSmall = WatchUi.loadResource(Rez.Fonts.Small) as FontResource;
-            mFontFlag = WatchUi.loadResource(Rez.Fonts.Flag) as FontResource;
-        } catch (e) {
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mAccent = FaceKit.prop("AccentColor", 0xFF6A3D);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_WATCH);
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
-    }
-
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.Date, Rez.Fonts.Small, Rez.Fonts.Flag] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_HOT, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
+        mFontTime = f[0];
+        mFontDate = f[1];
+        mFontSmall = f[2];
+        mFontFlag = f[3];
     }
 
     // ---- Drawing --------------------------------------------------------------
@@ -115,7 +80,7 @@ class FaceView extends WatchUi.WatchFace {
         var nowH = clock.hour + clock.min / 60.0f;
         buildRidge();
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock);
             return;
         }
@@ -140,12 +105,11 @@ class FaceView extends WatchUi.WatchFace {
         drawText(dc, now, nowH, INK, DIM, 0.0f, 0.0f, true);
     }
 
-    // Always-On: the ridge outline and the time, dimmed and moved a few pixels a minute.
+    // Always-On: the ridge outline and the time, dimmed and moved every minute (aodShift).
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shifts = [[0, 0], [3, 2], [-2, 3], [2, -3], [-3, -1], [1, 3], [-1, -3], [3, -1]];
-        var shift = shifts[clock.min % shifts.size()] as Array<Number>;
+        var shift = aodShift(clock.min);
         var dx = shift[0].toFloat();
         var dy = shift[1].toFloat();
         dc.setColor(0x4A5872, Graphics.COLOR_TRANSPARENT);

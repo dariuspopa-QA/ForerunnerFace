@@ -31,9 +31,9 @@ mockup's `SAT 10 OCT` look, 2 `MON 28-09-2026`, 3 `MON 09-28-2026` (`FaceKit.dat
 ## Project layout (shared by Meridian, Tide, Terrain, Bloom)
 
 - `source/FaceView.mc`: the whole face, drawn procedurally in design pixels (454 x 454) times
-  `width / 454`. `source/FaceKit.mc` (geometry, text, colours, settings), `source/FaceData.mc`
-  (sensor readings, read once a minute) and `source/FaceEditor.mc` (Garmin's on-watch editor) are
-  copied unchanged between the four projects: change them in one and copy to the others.
+  `width / 454`. `FaceView` extends `FaceCoreView`. The shared code (FaceKit, FaceFormat, FaceData, FaceEditor,
+  base view and app) lives once in `../FaceCore` (see `FaceCore/CLAUDE.md`), on `base.sourcePath` in
+  both jungles. `source/<Name>Test.mc` tests only this face: every display mode and setting value.
 - Products: fr265 (416 px), fr265s (360), fr965 and fr970 (454), all AMOLED, API 5.0+.
   The on-watch editor config is in `resources-fr970/configs/watchface.xml` (fr970 only).
 - Fonts: Google Fonts (OFL) turned into Connect IQ bitmap fonts per screen size by
@@ -42,8 +42,8 @@ mockup's `SAT 10 OCT` look, 2 `MON 28-09-2026`, 3 `MON 09-28-2026` (`FaceKit.dat
   lowest ink, so `TEXT_JUSTIFY_VCENTER` centres digits and capitals. Small mono text is a few px
   larger than in the mockup so it reads on the watch. Letter-spacing is drawn glyph by glyph
   (`FaceKit.drawTracked`).
-- Always-On (AMOLED): only an outline / thin version of the face, moved a few pixels every
-  minute; measured below 10 % lit pixels.
+- Always-On (AMOLED): only an outline / thin version of the face, moved every minute by
+  `FaceKit.aodShift` (Meridian: its own searched pattern; both >= 14 px in any 4 minutes); measured below 10 % lit pixels.
 
 ## Build and run
 

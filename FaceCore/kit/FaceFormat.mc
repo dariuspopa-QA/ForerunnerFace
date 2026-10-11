@@ -1,8 +1,12 @@
 import Toybox.Lang;
 import Toybox.Math;
 
-// Pure text formatting for the face, kept free of Dc/sensor access so it can be unit tested.
-module ApexFormat {
+// Pure text formatting shared by every face (from ApexFace), kept free of Dc/sensor access so
+// it can be unit tested (FaceCore/test/FaceFormatTest.mc).
+module FaceFormat {
+
+    // Shown for a value the watch has no reading for
+    const NO_VALUE = "--";
 
     const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -67,28 +71,28 @@ module ApexFormat {
 
     // "58", or "--" without a reading.
     function numberText(value as Number or Null) as String {
-        return value != null ? value.toString() : ApexMetrics.NO_VALUE;
+        return value != null ? value.toString() : NO_VALUE;
     }
 
     // "8,214", or "--" without a reading.
     function thousandsText(value as Number or Null) as String {
-        return value != null ? thousands(value) : ApexMetrics.NO_VALUE;
+        return value != null ? thousands(value) : NO_VALUE;
     }
 
     // "14h"
     function recoveryText(hours as Number or Null) as String {
-        return hours != null ? hours + "h" : ApexMetrics.NO_VALUE;
+        return hours != null ? hours + "h" : NO_VALUE;
     }
 
     // "68%"; fractional percentages are truncated.
     function percentText(value as Numeric or Null) as String {
-        return value != null ? value.toNumber() + "%" : ApexMetrics.NO_VALUE;
+        return value != null ? value.toNumber() + "%" : NO_VALUE;
     }
 
     // Distance in cm as km (or miles when statute), one decimal: "6.4".
     function distanceText(cm as Number or Null, statute as Boolean) as String {
         if (cm == null) {
-            return ApexMetrics.NO_VALUE;
+            return NO_VALUE;
         }
         return (cm.toFloat() / (statute ? 160934.4f : 100000.0f)).format("%.1f");
     }
@@ -96,7 +100,7 @@ module ApexFormat {
     // Altitude in metres as whole metres (or feet when statute): "312".
     function altitudeText(metres as Numeric or Null, statute as Boolean) as String {
         if (metres == null) {
-            return ApexMetrics.NO_VALUE;
+            return NO_VALUE;
         }
         var value = statute ? metres * 3.28084f : metres;
         return value.toNumber().toString();
@@ -105,7 +109,7 @@ module ApexFormat {
     // Temperature in °C, rounded, converted to °F when statute: "17°".
     function temperatureText(celsius as Numeric or Null, statute as Boolean) as String {
         if (celsius == null) {
-            return ApexMetrics.NO_VALUE;
+            return NO_VALUE;
         }
         var c = celsius.toFloat();
         var value = statute ? c * 9 / 5 + 32 : c;
@@ -116,7 +120,7 @@ module ApexFormat {
     // keep one; a String unit is appended.
     function complicationValueText(value as Numeric or String or Null, unit as Object or Null) as String {
         if (value == null) {
-            return ApexMetrics.NO_VALUE;
+            return NO_VALUE;
         }
         var text;
         if (value instanceof Float || value instanceof Double) {

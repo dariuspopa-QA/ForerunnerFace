@@ -27,7 +27,7 @@ class FaceCoreApp extends Application.AppBase {
     }
 
     function createView(editMode as Boolean) as FaceCoreView {
-        return new FaceCoreView(editMode, 0xFFFFFF);
+        return new FaceCoreView(editMode, 0xFFFFFF, FaceFormat.DATE_WATCH);
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
@@ -40,7 +40,7 @@ class FaceCoreApp extends Application.AppBase {
     function onSettingsChanged() as Void {
         var view = mView;
         if (view != null) {
-            view.loadSettings();
+            view.phoneSettingsChanged();
         }
         WatchUi.requestUpdate();
     }

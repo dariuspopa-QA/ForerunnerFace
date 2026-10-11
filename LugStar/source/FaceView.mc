@@ -26,7 +26,7 @@ class FaceView extends FaceCoreView {
     private var mFontCount as FontType = Graphics.FONT_SMALL;
 
     function initialize(editMode as Boolean) {
-        FaceCoreView.initialize(editMode, 0xFFD400);
+        FaceCoreView.initialize(editMode, 0xFFD400, FaceFormat.DATE_NAMED);
         loadSettings();
     }
 

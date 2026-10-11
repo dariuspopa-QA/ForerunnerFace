@@ -25,7 +25,7 @@ const C_DND     = 0xA78BFA;
 const C_AOD     = 0x9A9A9F;
 const C_AOD_DIM = 0x5E5E62;
 const C_AOD_TICK = 0x4A4A46;
-const AOD_SHIFT = 0.06;  // burn-in shift per axis, fraction of radius
+const AOD_SHIFT = 0.044;  // largest FaceKit.aodShift offset (10 of 227 design px), fraction of radius
 const C_BG_GRAY = 0xB0B0B8;
 
 // Heart-rate zone colors, zone 1 (coolest) to zone 5 (hottest).
@@ -388,19 +388,7 @@ class TrainingPulseView extends WatchUi.WatchFace {
     // "MON 28-09-2026" / "MON 09-28-2026". Watch picks the numeric order from the
     // distance units (Connect IQ has no API for the watch's date order): miles = month first.
     private function dateString() as String {
-        var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-        var weekday = m.day_of_week.toUpper() + " ";
-        var format = _dateFormat;
-        if (format != DF_NAMED && format != DF_DMY && format != DF_MDY) {
-            format = (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? DF_MDY : DF_DMY;
-        }
-        if (format != DF_NAMED) {
-            var d = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var day = d.day.format("%02d");
-            var month = d.month.format("%02d");
-            return weekday + (format == DF_DMY ? day + "-" + month : month + "-" + day) + "-" + d.year;
-        }
-        return weekday + m.day.format("%d") + " " + m.month.toUpper();
+        return FaceKit.localDateText(_dateFormat);
     }
 
     // ---------- Data grid ----------
@@ -684,10 +672,10 @@ class TrainingPulseView extends WatchUi.WatchFace {
     // As in ApexFace: the 12 hour ticks, the date and a thin time with the
     // minutes dimmed, all shifted each minute against burn-in. Nothing accent-coloured.
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
-        var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
-        var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * AOD_SHIFT;
-        var dy = s[1] * r * AOD_SHIFT;
+        // FaceCore burn-in drift (design px of the 454 screen, scaled to this one)
+        var s = FaceKit.aodShift(clock.min);
+        var dx = s[0] * r / FaceKit.C;
+        var dy = s[1] * r / FaceKit.C;
 
         // Ticks inset by the largest shift so they stay on the round screen
         var pen = (r * 0.013).toNumber();
