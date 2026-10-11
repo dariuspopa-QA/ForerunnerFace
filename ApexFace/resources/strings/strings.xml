@@ -1,0 +1,72 @@
+<strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <string id="AppName">APEX</string>
+    <string id="StyleApex">APEX</string>
+
+    <!-- Setting titles -->
+    <string id="Field1Title">Field 1 (left)</string>
+    <string id="Field2Title">Field 2 (middle)</string>
+    <string id="Field3Title">Field 3 (right)</string>
+    <string id="ArcTitle">Arc</string>
+    <string id="AccentTitle">Accent color</string>
+    <string id="NumeralTitle">Time color</string>
+    <string id="InkTitle">Data value color</string>
+    <string id="DimTitle">Label color</string>
+    <string id="NightTitle">Night mode (red)</string>
+    <string id="DateFormatTitle">Date format</string>
+
+    <!-- Field metrics -->
+    <string id="MetricHr">Heart rate</string>
+    <string id="MetricSteps">Steps</string>
+    <string id="MetricDistance">Distance</string>
+    <string id="MetricCalories">Calories</string>
+    <string id="MetricFloors">Floors</string>
+    <string id="MetricStress">Stress</string>
+    <string id="MetricBodyBattery">Body Battery</string>
+    <string id="MetricRecovery">Recovery time</string>
+    <string id="MetricSunrise">Sunrise</string>
+    <string id="MetricSunset">Sunset</string>
+    <string id="MetricAltitude">Altitude</string>
+    <string id="MetricTemp">Temperature</string>
+    <string id="MetricBattery">Battery</string>
+    <string id="MetricNotifs">Notifications</string>
+    <string id="MetricSeconds">Seconds</string>
+    <string id="MetricEmpty">Empty</string>
+
+    <!-- Arc metrics -->
+    <string id="ArcStepGoal">Step goal</string>
+    <string id="ArcIntensity">Intensity minutes</string>
+    <string id="ArcOff">Off</string>
+
+    <!-- Colors -->
+    <string id="ColorVolt">Volt</string>
+    <string id="ColorEmber">Ember</string>
+    <string id="ColorGlacier">Glacier</string>
+    <string id="ColorSignal">Signal</string>
+    <string id="ColorGhost">Ghost</string>
+    <string id="ColorAmber">Amber</string>
+    <string id="ColorMint">Mint</string>
+    <string id="ColorCobalt">Cobalt</string>
+    <string id="ColorViolet">Violet</string>
+    <string id="ColorScarlet">Scarlet</string>
+    <string id="ColorChalk">Chalk</string>
+    <string id="ColorBone">Bone</string>
+    <string id="ColorIce">Ice</string>
+    <string id="ColorSilver">Silver</string>
+    <string id="ColorAccent">Same as accent</string>
+    <string id="ColorStone">Stone</string>
+    <string id="ColorSlate">Slate</string>
+    <string id="ColorSand">Sand</string>
+
+    <!-- Date formats -->
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+
+    <!-- Night mode -->
+    <string id="NightOff">Off</string>
+    <string id="NightAuto">Auto (sleep hours)</string>
+    <string id="NightOn">On</string>
+
+</strings>

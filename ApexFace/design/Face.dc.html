@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APEX watch face</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;600;800&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 454px; height: 454px; position: relative; overflow: hidden; border-radius: 50%; background: #000000; font-family: 'DM Mono', monospace; color: {{ink}}">
+<svg width="454" height="454" viewBox="0 0 454 454" style="position: absolute; left: 0; top: 0">
+<circle cx="227" cy="227" r="219" fill="none" stroke="{{minor}}" style="stroke-width: 6px; stroke-dasharray: 1.4px 21.5336px; stroke-dashoffset: 0.7px; transform: rotate(-90deg); transform-origin: 227px 227px"></circle>
+<circle cx="227" cy="227" r="219" fill="none" stroke="{{major}}" style="stroke-width: 12px; stroke-dasharray: 3px 111.668px; stroke-dashoffset: 1.5px; transform: rotate(-90deg); transform-origin: 227px 227px"></circle>
+<circle cx="227" cy="227" r="226" fill="none" stroke="{{accent}}" style="stroke-width: 1px; stroke-dasharray: {{secLen}}px 1420px; transform: rotate(-90deg); transform-origin: 227px 227px; opacity: {{trailOpacity}}"></circle>
+<circle cx="227" cy="227" r="198" fill="none" stroke="{{rule}}" style="stroke-width: 4px; stroke-dasharray: 933.05px 1244.07px; transform: rotate(135deg); transform-origin: 227px 227px; opacity: {{arcOpacity}}"></circle>
+<circle cx="227" cy="227" r="198" fill="none" stroke="{{accent}}" style="stroke-width: 4px; stroke-linecap: round; stroke-dasharray: {{arcLen}}px 1244.07px; transform: rotate(135deg); transform-origin: 227px 227px; opacity: {{arcOpacity}}"></circle>
+<line x1="227" y1="3" x2="227" y2="25" stroke="{{accent}}" style="stroke-width: 4px; stroke-linecap: round; transform: rotate({{secDeg}}deg); transform-origin: 227px 227px; opacity: {{fullOpacity}}"></line>
+</svg>
+<div style="position: absolute; left: 0; top: 78px; width: 454px; text-align: center; font-size: 13px; letter-spacing: 0.26em; color: {{dim}}">{{date}}</div>
+<div style="position: absolute; left: 0; top: 104px; width: 454px; display: flex; justify-content: center; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 164px; line-height: 1; letter-spacing: -2px; font-variant-numeric: tabular-nums">
+<span style="font-weight: {{hoursWeight}}; color: {{hoursColor}}">{{hh}}</span>
+<span style="font-weight: 200; color: {{minColor}}">{{mm}}</span>
+</div>
+<sc-if value="{{showFields}}" hint-placeholder-val="{{true}}">
+<div style="position: absolute; left: 197px; top: 266px; width: 60px; height: 1px; background: {{rule}}"></div>
+<div style="position: absolute; left: 0; top: 284px; width: 454px; display: flex; justify-content: center; gap: 36px">
+<sc-for list="{{fields}}" as="f" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 5px">
+<span style="font-size: 10px; letter-spacing: 0.18em; color: {{f.dim}}">{{f.label}}</span>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 600; line-height: 1; color: {{f.ink}}">{{f.value}}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{showArc}}" hint-placeholder-val="{{true}}">
+<div style="position: absolute; left: 0; top: 376px; width: 454px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 600; line-height: 1; color: {{accent}}">{{arcValue}}</span>
+<span style="font-size: 9px; letter-spacing: 0.2em; color: {{dim}}">{{arcLabel}}</span>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"variant":{"editor":"enum","options":["active","aod","night"],"default":"active","section":"Mode"},"live":{"editor":"boolean","default":true,"section":"Mode"},"field1":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"hr","section":"Data"},"field2":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"steps","section":"Data"},"field3":{"editor":"enum","options":["hr","steps","distance","calories","floors","stress","bodybattery","readiness","recovery","sunrise","sunset","altitude","temp","battery","notifications","seconds","none"],"default":"sunset","section":"Data"},"arc":{"editor":"enum","options":["bodybattery","steps","battery","stress","readiness","intensity","none"],"default":"bodybattery","section":"Data"},"accent":{"editor":"color","options":["#C8FF2E","#FF5A1F","#4FD1FF","#FF3D7F","#F4F4EF"],"default":"#C8FF2E","section":"Colour"},"numerals":{"editor":"color","options":["#F4F4EF","#E9DFC9","#CFE3FF","#C8FF2E"],"default":"#F4F4EF","section":"Colour"},"ink":{"editor":"color","options":["#F4F4EF","#E9DFC9","#CFE3FF"],"default":"#F4F4EF","section":"Colour"},"dim":{"editor":"color","options":["#8C8C86","#6E7A86","#8A7F6C"],"default":"#8C8C86","section":"Colour"},"$preview":{"width":454,"height":454}}'>
+class Component extends DCLogic {
+  state = { now: Date.now() };
+  componentDidMount() {
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  renderVals() {
+    const p = this.props;
+    const variant = p.variant ?? 'active';
+    const live = p.live ?? true;
+    const d = live ? new Date(this.state.now) : new Date(2026, 8, 28, 10, 8, 36);
+    const pad = (n) => String(n).padStart(2, '0');
+    const s = d.getSeconds();
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const metrics = {
+      hr: ['HR', '58'],
+      steps: ['STEPS', '8,214'],
+      distance: ['KM', '6.4'],
+      calories: ['KCAL', '1,846'],
+      floors: ['FLOORS', '12'],
+      stress: ['STRESS', '24'],
+      bodybattery: ['BODY BATT', '72'],
+      readiness: ['READY', '81'],
+      recovery: ['RECOVERY', '14h'],
+      sunrise: ['SUNRISE', '07:04'],
+      sunset: ['SUNSET', '19:12'],
+      altitude: ['ALT M', '312'],
+      temp: ['TEMP', '17°'],
+      battery: ['BATTERY', '68%'],
+      notifications: ['NOTIFS', '3'],
+      seconds: ['SEC', pad(s)]
+    };
+    const arcs = {
+      bodybattery: ['BODY BATT', 72, '72'],
+      steps: ['STEP GOAL', 82, '82%'],
+      battery: ['BATTERY', 68, '68%'],
+      stress: ['STRESS', 24, '24'],
+      readiness: ['READINESS', 81, '81'],
+      intensity: ['INTENSITY MIN', 65, '97']
+    };
+    const accentIn = p.accent ?? '#C8FF2E';
+    const numerals = p.numerals ?? '#F4F4EF';
+    const inkIn = p.ink ?? '#F4F4EF';
+    const dimIn = p.dim ?? '#8C8C86';
+    const red = '#FF4A3D';
+    const themes = {
+      active: { ink: inkIn, dim: dimIn, minor: '#34342F', major: dimIn, rule: '#2A2A28', hoursWeight: 800, hoursColor: numerals, minColor: numerals, accent: accentIn },
+      aod: { ink: inkIn, dim: dimIn, minor: '#000000', major: '#4A4A46', rule: '#000000', hoursWeight: 300, hoursColor: numerals, minColor: dimIn, accent: accentIn },
+      night: { ink: red, dim: '#B3392E', minor: '#3A120E', major: '#B3392E', rule: '#3A120E', hoursWeight: 800, hoursColor: red, minColor: red, accent: red }
+    };
+    const t = themes[variant] || themes.active;
+    const full = variant !== 'aod';
+    const fields = [p.field1 ?? 'hr', p.field2 ?? 'steps', p.field3 ?? 'sunset']
+      .filter((k) => metrics[k])
+      .map((k) => ({ label: metrics[k][0], value: metrics[k][1], ink: t.ink, dim: t.dim }));
+    const arc = arcs[p.arc ?? 'bodybattery'];
+    const showArc = full && !!arc;
+    return {
+      ...t,
+      hh: pad(d.getHours()),
+      mm: pad(d.getMinutes()),
+      date: days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()],
+      secDeg: s * 6,
+      secLen: (1420 * s / 60).toFixed(2),
+      fields,
+      showFields: full && fields.length > 0,
+      showArc,
+      arcOpacity: showArc ? 1 : 0,
+      arcLen: arc ? (933.05 * arc[1] / 100).toFixed(2) : '0',
+      arcLabel: arc ? arc[0] : '',
+      arcValue: arc ? arc[2] : '',
+      fullOpacity: full ? 1 : 0,
+      trailOpacity: full ? 0.55 : 0
+    };
+  }
+}
+</script>
+</body>
+</html>

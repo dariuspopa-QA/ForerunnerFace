@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APEX — anatomy</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;600;800&amp;family=DM+Mono:wght@400;500&amp;family=DM+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E0C}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; background: #0E0E0C; color: #F4F4EF; font-family: 'DM Sans', sans-serif">
+<div style="position: absolute; left: 160px; top: 223px; width: 454px; height: 454px; border-radius: 50%; box-shadow: 0 0 0 1px #262624">
+<dc-import name="Face" live="{{no}}" accent="{{accent}}" hint-size="454px,454px"></dc-import>
+</div>
+<svg width="1440" height="900" viewBox="0 0 1440 900" style="position: absolute; left: 0; top: 0; pointer-events: none">
+<line x1="720" y1="240" x2="541.9" y2="295.1" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<line x1="720" y1="309" x2="446" y2="309" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<line x1="60" y1="401" x2="255" y2="401" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<line x1="720" y1="401" x2="520" y2="401" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<line x1="720" y1="523" x2="490" y2="523" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<line x1="60" y1="549" x2="215.5" y2="549" stroke="#F4F4EF" style="stroke-width: 1px; opacity: 0.45"></line>
+<circle cx="541.9" cy="295.1" r="3" fill="{{accent}}"></circle>
+<circle cx="446" cy="309" r="3" fill="{{accent}}"></circle>
+<circle cx="255" cy="401" r="3" fill="{{accent}}"></circle>
+<circle cx="520" cy="401" r="3" fill="{{accent}}"></circle>
+<circle cx="490" cy="523" r="3" fill="{{accent}}"></circle>
+<circle cx="215.5" cy="549" r="3" fill="{{accent}}"></circle>
+</svg>
+<div style="position: absolute; left: 706px; top: 226px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">1</div>
+<div style="position: absolute; left: 706px; top: 295px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">2</div>
+<div style="position: absolute; left: 46px; top: 387px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">3</div>
+<div style="position: absolute; left: 706px; top: 387px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">4</div>
+<div style="position: absolute; left: 706px; top: 509px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">5</div>
+<div style="position: absolute; left: 46px; top: 535px; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 1px solid {{accent}}; background: #0E0E0C; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}">6</div>
+<div style="position: absolute; left: 820px; top: 96px; width: 540px; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.24em; color: #8C8C86">ANATOMY</div>
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 72px; line-height: 0.9; letter-spacing: -1px">APEX, taken apart.</h2>
+</div>
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 0 12px; padding-bottom: 18px; border-bottom: 1px solid #262624">
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}; padding-top: 5px">01</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.1">Minute ring &amp; seconds</span><span style="font-size: 15px; line-height: 1.45; color: #B5B5AE">Sixty ticks, heavier every five. One accent tick sweeps the rim and leaves a hairline trail.</span></div>
+</div>
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 0 12px; padding-bottom: 18px; border-bottom: 1px solid #262624">
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}; padding-top: 5px">02</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.1">Date</span><span style="font-size: 15px; line-height: 1.45; color: #B5B5AE">DM Mono, tracked wide, in the dim grey. Read it only when you look for it.</span></div>
+</div>
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 0 12px; padding-bottom: 18px; border-bottom: 1px solid #262624">
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}; padding-top: 5px">03 / 04</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.1">Hours heavy, minutes light</span><span style="font-size: 15px; line-height: 1.45; color: #B5B5AE">Barlow Condensed at 800 and 200, 164 px. Weight tells them apart; the colour is yours.</span></div>
+</div>
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 0 12px; padding-bottom: 18px; border-bottom: 1px solid #262624">
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}; padding-top: 5px">05</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.1">Data fields</span><span style="font-size: 15px; line-height: 1.45; color: #B5B5AE">Three slots — pick from 16 metrics or leave one empty. Values carry the weight; labels whisper.</span></div>
+</div>
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 0 12px">
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{accent}}; padding-top: 5px">06</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.1">Arc</span><span style="font-size: 15px; line-height: 1.45; color: #B5B5AE">A 270° arc for Body Battery, step goal, stress and more. The gap at six o'clock holds the number.</span></div>
+</div>
+</div>
+<div style="display: flex; gap: 28px">
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 18px; height: 18px; border-radius: 50%; background: #F4F4EF; display: block"></span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">INK #F4F4EF</span></div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 18px; height: 18px; border-radius: 50%; background: #8C8C86; display: block"></span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">DIM #8C8C86</span></div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; background: #000000; border: 1px solid #3A3A37; display: block"></span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">GROUND #000</span></div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 18px; height: 18px; border-radius: 50%; background: {{accent}}; display: block"></span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #B5B5AE">ACCENT</span></div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","options":["#C8FF2E","#FF5A1F","#4FD1FF","#F4F4EF"],"default":"#C8FF2E"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#C8FF2E', no: false };
+  }
+}
+</script>
+</body>
+</html>

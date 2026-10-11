@@ -1,0 +1,10 @@
+<fonts>
+    <font id="TimeHeavy" filename="time_heavy.fnt" antialias="true"/>
+    <font id="TimeThin" filename="time_thin.fnt" antialias="true"/>
+    <font id="TimeAod" filename="time_aod.fnt" antialias="true"/>
+    <font id="Value" filename="value.fnt" antialias="true"/>
+    <font id="ArcValue" filename="arc_value.fnt" antialias="true"/>
+    <font id="Mono22" filename="mono22.fnt" antialias="true"/>
+    <font id="Mono16" filename="mono16.fnt" antialias="true"/>
+    <font id="Mono14" filename="mono14.fnt" antialias="true"/>
+</fonts>

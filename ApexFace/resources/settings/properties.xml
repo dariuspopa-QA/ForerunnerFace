@@ -1,0 +1,22 @@
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <!-- Metric ids: see the field / arc tables in CLAUDE.md -->
+    <property id="Field1" type="number">0</property>
+    <property id="Field2" type="number">1</property>
+    <property id="Field3" type="number">10</property>
+    <property id="Arc" type="number">0</property>
+
+    <!-- Colors as 0xRRGGBB; NumeralColor -1 = same as the accent -->
+    <property id="AccentColor" type="number">0xC8FF2E</property>
+    <property id="NumeralColor" type="number">0xF4F4EF</property>
+    <property id="InkColor" type="number">0xF4F4EF</property>
+    <property id="DimColor" type="number">0xB0B0AA</property>
+
+    <!-- Date: 0 watch (from its distance units), 1 "MON 28 SEP", 2 DD-MM-YYYY, 3 MM-DD-YYYY.
+         The time always follows the watch's 12 / 24 h setting. -->
+    <property id="DateFormat" type="number">0</property>
+
+    <!-- Red night palette: 0 Off, 1 Auto (profile sleep / wake times), 2 On -->
+    <property id="NightMode" type="number">0</property>
+
+</properties>

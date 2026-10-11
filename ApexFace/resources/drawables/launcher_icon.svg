@@ -1,0 +1,8 @@
+<svg width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- APEX launcher icon: the 270-degree arc (72 % Volt fill) around a peak with a heavy and a thin leg (hours / minutes: weight, not colour) -->
+<rect width="65" height="65" fill="#000000"/>
+<path d="M14.115 50.885 A26 26 0 1 1 50.885 50.885" stroke="#34342F" stroke-width="4" stroke-linecap="round"/>
+<path d="M14.115 50.885 A26 26 0 1 1 54.880 19.270" stroke="#C8FF2E" stroke-width="4" stroke-linecap="round"/>
+<path d="M19 45 L30 18 H35.5 L24.5 45 Z" fill="#F4F4EF"/>
+<path d="M32.75 18 H35.25 L46 45 H43.5 Z" fill="#F4F4EF"/>
+</svg>

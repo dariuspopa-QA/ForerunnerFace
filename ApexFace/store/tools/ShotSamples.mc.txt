@@ -1,0 +1,66 @@
+import Toybox.Lang;
+import Toybox.System;
+import Toybox.Time;
+import Toybox.Time.Gregorian;
+
+// Fixed time and representative readings for store screenshots.
+module ShotSamples {
+
+    function clock() as System.ClockTime {
+        var c = System.getClockTime();
+        c.hour = ShotConfig.HOUR;
+        c.min = ShotConfig.MIN;
+        c.sec = ShotConfig.SEC;
+        return c;
+    }
+
+    // Monday 28 September 2026 at the configured local time.
+    function now() as Gregorian.Info {
+        var utc = Gregorian.moment({:year => 2026, :month => 9, :day => 28,
+            :hour => ShotConfig.HOUR, :minute => ShotConfig.MIN, :second => ShotConfig.SEC});
+        var local = new Time.Moment(utc.value() - System.getClockTime().timeZoneOffset);
+        return Gregorian.info(local, Time.FORMAT_SHORT);
+    }
+
+    function field(id as Number) as String {
+        switch (id) {
+            case ApexMetrics.F_HR: return "58";
+            case ApexMetrics.F_STEPS: return "8,214";
+            case ApexMetrics.F_DISTANCE: return "6.4";
+            case ApexMetrics.F_CALORIES: return "1,846";
+            case ApexMetrics.F_FLOORS: return "12";
+            case ApexMetrics.F_STRESS: return "24";
+            case ApexMetrics.F_BODY_BATTERY: return "72";
+            case ApexMetrics.F_RECOVERY: return "14h";
+            case ApexMetrics.F_SUNRISE: return "07:04";
+            case ApexMetrics.F_SUNSET: return "19:12";
+            case ApexMetrics.F_ALTITUDE: return "312";
+            case ApexMetrics.F_TEMP: return "17°";
+            case ApexMetrics.F_BATTERY: return "68%";
+            case ApexMetrics.F_NOTIFS: return "3";
+        }
+        return "--";
+    }
+
+    function arcFraction(id as Number) as Float or Null {
+        switch (id) {
+            case ApexMetrics.A_BODY_BATTERY: return 0.72f;
+            case ApexMetrics.A_STEP_GOAL: return 0.82f;
+            case ApexMetrics.A_BATTERY: return 0.68f;
+            case ApexMetrics.A_STRESS: return 0.24f;
+            case ApexMetrics.A_INTENSITY: return 0.65f;
+        }
+        return null;
+    }
+
+    function arcReadout(id as Number) as String {
+        switch (id) {
+            case ApexMetrics.A_BODY_BATTERY: return "72";
+            case ApexMetrics.A_STEP_GOAL: return "82%";
+            case ApexMetrics.A_BATTERY: return "68%";
+            case ApexMetrics.A_STRESS: return "24";
+            case ApexMetrics.A_INTENSITY: return "97";
+        }
+        return "--";
+    }
+}
