@@ -1,0 +1,30 @@
+<strings>
+    <string id="AppName">Bloom</string>
+    <string id="PaletteTitle">Bloom colour</string>
+    <string id="PaletteRose">Rose</string>
+    <string id="PaletteSage">Sage</string>
+    <string id="PaletteSky">Sky</string>
+    <string id="PaletteCoral">Coral</string>
+    <string id="PaletteGold">Gold</string>
+    <string id="PaletteLilac">Lilac</string>
+    <string id="PaletteAqua">Aqua</string>
+    <string id="PalettePearl">Pearl</string>
+
+    <string id="CustomColorTitle">Custom bloom colour (hex, overrides the list)</string>
+    <string id="CustomColorPrompt">e.g. E86A8A, empty for the list</string>
+
+    <string id="HighlightTitle">Lowest value colour</string>
+    <string id="ColorOrange">Orange</string>
+    <string id="ColorRed">Red</string>
+    <string id="ColorYellow">Yellow</string>
+    <string id="ColorLime">Lime</string>
+    <string id="ColorCyan">Cyan</string>
+    <string id="ColorMagenta">Magenta</string>
+    <string id="ColorWhite">White</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

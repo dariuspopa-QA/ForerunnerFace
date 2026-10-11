@@ -1,0 +1,18 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0xFF6A3D">@Strings.ColorEmber</listEntry>
+            <listEntry value="0x3DDC97">@Strings.ColorMint</listEntry>
+            <listEntry value="0x4DA3FF">@Strings.ColorSky</listEntry>
+            <listEntry value="0xF2B544">@Strings.ColorAmber</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

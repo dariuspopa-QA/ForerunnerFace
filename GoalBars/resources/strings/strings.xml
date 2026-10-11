@@ -1,0 +1,68 @@
+<strings>
+    <string id="AppName">Goal Bars</string>
+
+    <string id="StyleStacked">Stacked</string>
+    <string id="StyleClassic">Classic</string>
+    <string id="LayoutTitle">Layout</string>
+    <string id="LayoutStacked">Stacked (big time, tall bars)</string>
+    <string id="LayoutClassic">Classic (centered, with labels)</string>
+    <string id="PaceTitle">Pace markers (where you should be by now)</string>
+
+    <string id="AccentTitle">Accent color</string>
+    <string id="Lime">Lime</string>
+    <string id="IceBlue">Ice blue</string>
+    <string id="Orange">Orange</string>
+    <string id="Pink">Pink</string>
+    <string id="White">White</string>
+
+    <string id="BgTitle">Background</string>
+    <string id="None">None</string>
+    <string id="Orbits">Orbits</string>
+    <string id="Waves">Waves</string>
+    <string id="Dots">Halftone dots</string>
+    <string id="Blobs">Blobs</string>
+    <string id="Topo">Topographic</string>
+    <string id="Rays">Rays</string>
+    <string id="Aurora">Aurora (image)</string>
+    <string id="DeepSpace">Deep Space (image)</string>
+    <string id="BgIntensityTitle">Background intensity</string>
+    <string id="Subtle">Subtle</string>
+    <string id="Medium">Medium</string>
+    <string id="BoldBg">Bold</string>
+    <string id="BgColorTitle">Background color</string>
+    <string id="MatchAccent">Match accent</string>
+    <string id="Gray">Gray</string>
+
+    <string id="ClockTitle">Clock format</string>
+    <string id="System">Follow watch setting</string>
+    <string id="H24">24-hour</string>
+    <string id="H12">12-hour</string>
+
+    <string id="WeightTitle">Time weight</string>
+    <string id="Regular">Regular</string>
+    <string id="Bold">Bold</string>
+    <string id="Off">Off</string>
+
+    <string id="Bar1Title">Bar 1</string>
+    <string id="Bar2Title">Bar 2</string>
+    <string id="Bar3Title">Bar 3</string>
+    <string id="Bar4Title">Bar 4</string>
+    <string id="Steps">Steps</string>
+    <string id="Floors">Floors climbed</string>
+    <string id="ActiveMin">Active minutes (week)</string>
+    <string id="Move">Move alert</string>
+    <string id="BodyBattery">Body Battery</string>
+    <string id="Stress">Stress (inverted)</string>
+    <string id="Calories">Active calories (goal 500)</string>
+
+    <string id="NotifTitle">Show notification count</string>
+    <string id="AlarmsTitle">Show alarm count</string>
+    <string id="DndTitle">Show do not disturb icon</string>
+    <string id="AodDateTitle">Show date in always-on mode</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

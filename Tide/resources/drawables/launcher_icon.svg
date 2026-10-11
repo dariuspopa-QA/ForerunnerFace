@@ -1,0 +1,8 @@
+<svg width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Tide: water level with a wave -->
+<rect width="65" height="65" fill="#06121A"/>
+<path d="M0 34 Q8 29 16 34 T32 34 T48 34 T65 34 V65 H0 Z" fill="#3FD0C9"/>
+<path d="M0 30 Q8 25 16 30 T32 30 T48 30 T65 30" stroke="#3FD0C9" stroke-opacity="0.45" stroke-width="2"/>
+<circle cx="24" cy="47" r="2.5" stroke="#EAFBFA" stroke-width="1.2"/>
+<circle cx="38" cy="53" r="1.8" stroke="#EAFBFA" stroke-width="1.2"/>
+</svg>

@@ -1,0 +1,59 @@
+<strings>
+    <string id="AppName">Pulse Rings</string>
+
+    <string id="AccentTitle">Accent color</string>
+    <string id="Lime">Lime</string>
+    <string id="IceBlue">Ice blue</string>
+    <string id="Orange">Orange</string>
+    <string id="Pink">Pink</string>
+    <string id="White">White</string>
+
+    <string id="BgTitle">Background</string>
+    <string id="None">None</string>
+    <string id="Orbits">Orbits</string>
+    <string id="Waves">Waves</string>
+    <string id="Dots">Halftone dots</string>
+    <string id="Blobs">Blobs</string>
+    <string id="Topo">Topographic</string>
+    <string id="Rays">Rays</string>
+    <string id="BgIntensityTitle">Background intensity</string>
+    <string id="Subtle">Subtle</string>
+    <string id="Medium">Medium</string>
+    <string id="BoldBg">Bold</string>
+    <string id="BgColorTitle">Background color</string>
+    <string id="MatchAccent">Match accent</string>
+    <string id="Gray">Gray</string>
+
+    <string id="ClockTitle">Clock format</string>
+    <string id="System">Follow watch setting</string>
+    <string id="H24">24-hour</string>
+    <string id="H12">12-hour</string>
+
+    <string id="WeightTitle">Time weight</string>
+    <string id="Light">Light</string>
+    <string id="Regular">Regular</string>
+    <string id="Bold">Bold</string>
+    <string id="Off">Off</string>
+
+    <string id="Field1Title">Field 1</string>
+    <string id="Field2Title">Field 2</string>
+    <string id="HeartRate">Heart rate</string>
+    <string id="Stress">Stress</string>
+    <string id="Recovery">Recovery time</string>
+    <string id="Calories">Calories</string>
+    <string id="BatteryPct">Watch battery</string>
+    <string id="BodyBatteryNum">Body Battery</string>
+    <string id="Steps">Steps</string>
+
+    <string id="NotifTitle">Show notification count</string>
+    <string id="AlarmsTitle">Show alarm count</string>
+    <string id="DndTitle">Show do not disturb icon</string>
+    <string id="SunTitle">Show sunrise / sunset</string>
+    <string id="AodDateTitle">Show date in always-on mode</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

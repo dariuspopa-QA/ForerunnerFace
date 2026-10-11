@@ -1,0 +1,4 @@
+<drawables>
+    <bitmap id="BgAurora" filename="bg_aurora.png"/>
+    <bitmap id="BgSpace" filename="bg_space.png"/>
+</drawables>

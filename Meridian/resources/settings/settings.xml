@@ -1,0 +1,48 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0xFF6A3D">@Strings.ColorEmber</listEntry>
+            <listEntry value="0x3DDC97">@Strings.ColorMint</listEntry>
+            <listEntry value="0x4DA3FF">@Strings.ColorSky</listEntry>
+            <listEntry value="0xF2F0EA">@Strings.ColorBone</listEntry>
+            <listEntry value="0xF2B544">@Strings.ColorAmber</listEntry>
+            <listEntry value="0xFF5C8A">@Strings.ColorRose</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.RingMode" title="@Strings.RingTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.RingDay</listEntry>
+            <listEntry value="1">@Strings.RingActivity</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Focus" title="@Strings.FocusTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.FocusBattery</listEntry>
+            <listEntry value="1">@Strings.FocusSteps</listEntry>
+            <listEntry value="2">@Strings.FocusHeart</listEntry>
+            <listEntry value="3">@Strings.FocusStress</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BottomLine" title="@Strings.LineTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.LineSmart</listEntry>
+            <listEntry value="1">@Strings.LineSunset</listEntry>
+            <listEntry value="2">@Strings.LineWeather</listEntry>
+            <listEntry value="3">@Strings.LineEvent</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ShowSeconds" title="@Strings.SecondsTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.AodRing" title="@Strings.AodRingTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

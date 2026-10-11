@@ -1,0 +1,18 @@
+# Connect IQ build output
+bin/
+dist/
+*.iq
+*.prg
+*.prg.debug.xml
+*.mir
+
+# Signing keys are never committed
+developer_key*
+*.der
+*.pem
+
+# Local tool and OS files
+.claude/settings.local.json
+Thumbs.db
+desktop.ini
+.DS_Store

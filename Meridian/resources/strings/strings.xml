@@ -1,0 +1,36 @@
+<strings>
+    <string id="AppName">Meridian</string>
+
+    <string id="AccentTitle">Accent</string>
+    <string id="ColorEmber">Ember</string>
+    <string id="ColorMint">Mint</string>
+    <string id="ColorSky">Sky</string>
+    <string id="ColorBone">Bone</string>
+    <string id="ColorAmber">Amber</string>
+    <string id="ColorRose">Rose</string>
+
+    <string id="RingTitle">Outer ring</string>
+    <string id="RingDay">24 h day timeline</string>
+    <string id="RingActivity">Activity rings</string>
+
+    <string id="FocusTitle">Focus metric</string>
+    <string id="FocusBattery">Body Battery</string>
+    <string id="FocusSteps">Steps</string>
+    <string id="FocusHeart">Heart rate</string>
+    <string id="FocusStress">Stress</string>
+
+    <string id="LineTitle">Bottom line</string>
+    <string id="LineSmart">Smart (sunset, weather, next event)</string>
+    <string id="LineSunset">Sunset countdown</string>
+    <string id="LineWeather">Weather</string>
+    <string id="LineEvent">Next calendar event</string>
+
+    <string id="SecondsTitle">Seconds on wrist-raise</string>
+    <string id="AodRingTitle">Always-on: keep the day ring</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

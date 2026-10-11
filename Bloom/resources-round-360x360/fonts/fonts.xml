@@ -1,0 +1,7 @@
+<fonts>
+    <font id="Time" filename="time.fnt" antialias="true"/>
+    <font id="TimeAod" filename="time_aod.fnt" antialias="true"/>
+    <font id="Date" filename="date.fnt" antialias="true"/>
+    <font id="Value" filename="value.fnt" antialias="true"/>
+    <font id="Key" filename="key.fnt" antialias="true"/>
+</fonts>

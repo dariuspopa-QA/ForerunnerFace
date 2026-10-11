@@ -1,0 +1,36 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.Palette" title="@Strings.PaletteTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.PaletteRose</listEntry>
+            <listEntry value="1">@Strings.PaletteSage</listEntry>
+            <listEntry value="2">@Strings.PaletteSky</listEntry>
+            <listEntry value="3">@Strings.PaletteCoral</listEntry>
+            <listEntry value="4">@Strings.PaletteGold</listEntry>
+            <listEntry value="5">@Strings.PaletteLilac</listEntry>
+            <listEntry value="6">@Strings.PaletteAqua</listEntry>
+            <listEntry value="7">@Strings.PalettePearl</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.CustomColor" title="@Strings.CustomColorTitle" prompt="@Strings.CustomColorPrompt">
+        <settingConfig type="alphaNumeric" maxLength="8"/>
+    </setting>
+    <setting propertyKey="@Properties.Highlight" title="@Strings.HighlightTitle">
+        <settingConfig type="list">
+            <listEntry value="0xFF8A3D">@Strings.ColorOrange</listEntry>
+            <listEntry value="0xFF4A4A">@Strings.ColorRed</listEntry>
+            <listEntry value="0xFFD23D">@Strings.ColorYellow</listEntry>
+            <listEntry value="0xC8FF2E">@Strings.ColorLime</listEntry>
+            <listEntry value="0x4FD1FF">@Strings.ColorCyan</listEntry>
+            <listEntry value="0xFF5AC8">@Strings.ColorMagenta</listEntry>
+            <listEntry value="0xF3F1EC">@Strings.ColorWhite</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

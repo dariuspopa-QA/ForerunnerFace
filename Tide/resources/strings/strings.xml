@@ -1,0 +1,14 @@
+﻿<strings>
+    <string id="AppName">Tide</string>
+    <string id="AccentTitle">Water colour</string>
+    <string id="ColorLagoon">Lagoon</string>
+    <string id="ColorCoral">Coral</string>
+    <string id="ColorLime">Lime</string>
+    <string id="ColorIris">Iris</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

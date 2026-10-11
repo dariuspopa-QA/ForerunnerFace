@@ -1,0 +1,8 @@
+<layout id="WatchFace">
+    <!-- Text Layers -->
+    <label id="DateLabel" x="center" y="22%" font="Graphics.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xAAAAAA" />
+    
+    <label id="TimeLabel" x="center" y="center" font="Graphics.FONT_NUMBER_HOT" justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xFF5500" />
+    
+    <label id="StatsLabel" x="center" y="75%" font="Graphics.FONT_TINY" justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xAAAAAA" />
+</layout>

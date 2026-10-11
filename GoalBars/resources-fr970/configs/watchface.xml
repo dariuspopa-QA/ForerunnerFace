@@ -1,0 +1,46 @@
+<resources>
+    <!-- Native on-device watch face editor (fr970 and newer). Complication ids
+         are the view's slots: 1-4 = bars left to right, 5 = bottom field. -->
+    <watchface-config>
+        <styles>
+            <style id="1" label="@Strings.StyleStacked" default="true"/>
+            <style id="2" label="@Strings.StyleClassic"/>
+        </styles>
+        <data>
+            <complication id="1">
+                <type default="true">Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+            </complication>
+            <complication id="2">
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type default="true">Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+            </complication>
+            <complication id="3">
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type default="true">Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+            </complication>
+            <complication id="4">
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type default="true">Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+            </complication>
+            <complication id="5" allowAny="true"/>
+        </data>
+        <accentColors allowAny="true"/>
+    </watchface-config>
+</resources>

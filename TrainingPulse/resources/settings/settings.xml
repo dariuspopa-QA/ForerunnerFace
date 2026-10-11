@@ -1,0 +1,156 @@
+<settings>
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Lime</listEntry>
+            <listEntry value="1">@Strings.IceBlue</listEntry>
+            <listEntry value="2">@Strings.Orange</listEntry>
+            <listEntry value="3">@Strings.Pink</listEntry>
+            <listEntry value="4">@Strings.White</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgStyle" title="@Strings.BgTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.None</listEntry>
+            <listEntry value="1">@Strings.Orbits</listEntry>
+            <listEntry value="2">@Strings.Waves</listEntry>
+            <listEntry value="3">@Strings.Dots</listEntry>
+            <listEntry value="4">@Strings.Blobs</listEntry>
+            <listEntry value="5">@Strings.Topo</listEntry>
+            <listEntry value="6">@Strings.Rays</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgIntensity" title="@Strings.BgIntensityTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Subtle</listEntry>
+            <listEntry value="1">@Strings.Medium</listEntry>
+            <listEntry value="2">@Strings.BoldBg</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgColor" title="@Strings.BgColorTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MatchAccent</listEntry>
+            <listEntry value="1">@Strings.Gray</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ClockMode" title="@Strings.ClockTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.System</listEntry>
+            <listEntry value="1">@Strings.H24</listEntry>
+            <listEntry value="2">@Strings.H12</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+            <listEntry value="4">@Strings.Off</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field1" title="@Strings.Field1Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field2" title="@Strings.Field2Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field3" title="@Strings.Field3Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field4" title="@Strings.Field4Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field5" title="@Strings.Field5Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Field6" title="@Strings.Field6Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HeartRate</listEntry>
+            <listEntry value="1">@Strings.Stress</listEntry>
+            <listEntry value="2">@Strings.Recovery</listEntry>
+            <listEntry value="3">@Strings.Calories</listEntry>
+            <listEntry value="4">@Strings.BatteryPct</listEntry>
+            <listEntry value="5">@Strings.BodyBatteryNum</listEntry>
+            <listEntry value="6">@Strings.Steps</listEntry>
+            <listEntry value="7">@Strings.Floors</listEntry>
+            <listEntry value="8">@Strings.TodayDistance</listEntry>
+            <listEntry value="9">@Strings.WeekDistance</listEntry>
+            <listEntry value="10">@Strings.WeatherTemp</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ShowNotifications" title="@Strings.NotifTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowAlarms" title="@Strings.AlarmsTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowDnd" title="@Strings.DndTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowSunTimes" title="@Strings.SunTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.AodShowDate" title="@Strings.AodDateTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+</settings>

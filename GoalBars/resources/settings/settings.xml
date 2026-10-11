@@ -1,0 +1,124 @@
+<settings>
+    <setting propertyKey="@Properties.Layout" title="@Strings.LayoutTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.LayoutStacked</listEntry>
+            <listEntry value="1">@Strings.LayoutClassic</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Lime</listEntry>
+            <listEntry value="1">@Strings.IceBlue</listEntry>
+            <listEntry value="2">@Strings.Orange</listEntry>
+            <listEntry value="3">@Strings.Pink</listEntry>
+            <listEntry value="4">@Strings.White</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgStyle" title="@Strings.BgTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.None</listEntry>
+            <listEntry value="1">@Strings.Orbits</listEntry>
+            <listEntry value="2">@Strings.Waves</listEntry>
+            <listEntry value="3">@Strings.Dots</listEntry>
+            <listEntry value="4">@Strings.Blobs</listEntry>
+            <listEntry value="5">@Strings.Topo</listEntry>
+            <listEntry value="6">@Strings.Rays</listEntry>
+            <listEntry value="7">@Strings.Aurora</listEntry>
+            <listEntry value="8">@Strings.DeepSpace</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgIntensity" title="@Strings.BgIntensityTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Subtle</listEntry>
+            <listEntry value="1">@Strings.Medium</listEntry>
+            <listEntry value="2">@Strings.BoldBg</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BgColor" title="@Strings.BgColorTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MatchAccent</listEntry>
+            <listEntry value="1">@Strings.Gray</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ClockMode" title="@Strings.ClockTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.System</listEntry>
+            <listEntry value="1">@Strings.H24</listEntry>
+            <listEntry value="2">@Strings.H12</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.TimeWeight" title="@Strings.WeightTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Bold</listEntry>
+            <listEntry value="1">@Strings.Regular</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+            <listEntry value="4">@Strings.Off</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Bar1" title="@Strings.Bar1Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Steps</listEntry>
+            <listEntry value="1">@Strings.Floors</listEntry>
+            <listEntry value="2">@Strings.ActiveMin</listEntry>
+            <listEntry value="3">@Strings.Move</listEntry>
+            <listEntry value="4">@Strings.BodyBattery</listEntry>
+            <listEntry value="5">@Strings.Stress</listEntry>
+            <listEntry value="6">@Strings.Calories</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Bar2" title="@Strings.Bar2Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Steps</listEntry>
+            <listEntry value="1">@Strings.Floors</listEntry>
+            <listEntry value="2">@Strings.ActiveMin</listEntry>
+            <listEntry value="3">@Strings.Move</listEntry>
+            <listEntry value="4">@Strings.BodyBattery</listEntry>
+            <listEntry value="5">@Strings.Stress</listEntry>
+            <listEntry value="6">@Strings.Calories</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Bar3" title="@Strings.Bar3Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Steps</listEntry>
+            <listEntry value="1">@Strings.Floors</listEntry>
+            <listEntry value="2">@Strings.ActiveMin</listEntry>
+            <listEntry value="3">@Strings.Move</listEntry>
+            <listEntry value="4">@Strings.BodyBattery</listEntry>
+            <listEntry value="5">@Strings.Stress</listEntry>
+            <listEntry value="6">@Strings.Calories</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Bar4" title="@Strings.Bar4Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Steps</listEntry>
+            <listEntry value="1">@Strings.Floors</listEntry>
+            <listEntry value="2">@Strings.ActiveMin</listEntry>
+            <listEntry value="3">@Strings.Move</listEntry>
+            <listEntry value="4">@Strings.BodyBattery</listEntry>
+            <listEntry value="5">@Strings.Stress</listEntry>
+            <listEntry value="6">@Strings.Calories</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ShowPace" title="@Strings.PaceTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowNotifications" title="@Strings.NotifTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowAlarms" title="@Strings.AlarmsTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.ShowDnd" title="@Strings.DndTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.AodShowDate" title="@Strings.AodDateTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+</settings>

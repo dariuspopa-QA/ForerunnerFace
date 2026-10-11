@@ -1,0 +1,21 @@
+<resources>
+    <!-- Native on-device watch face editor (fr970 and newer).
+         Style = background pattern. Complication ids are the view's slots:
+         1 = left field, 2 = right field. -->
+    <watchface-config>
+        <styles>
+            <style id="1" label="@Strings.None" default="true"/>
+            <style id="2" label="@Strings.Orbits"/>
+            <style id="3" label="@Strings.Waves"/>
+            <style id="4" label="@Strings.Dots"/>
+            <style id="5" label="@Strings.Blobs"/>
+            <style id="6" label="@Strings.Topo"/>
+            <style id="7" label="@Strings.Rays"/>
+        </styles>
+        <data>
+            <complication id="1" allowAny="true"/>
+            <complication id="2" allowAny="true"/>
+        </data>
+        <accentColors allowAny="true"/>
+    </watchface-config>
+</resources>

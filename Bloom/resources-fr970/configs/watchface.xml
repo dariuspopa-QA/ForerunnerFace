@@ -1,0 +1,25 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (fr970): style = bloom palette,
+         accent colour = the lowest value's highlight. -->
+    <watchface-config>
+        <styles>
+            <style id="1" label="@Strings.PaletteRose" default="true"/>
+            <style id="2" label="@Strings.PaletteSage"/>
+            <style id="3" label="@Strings.PaletteSky"/>
+            <style id="4" label="@Strings.PaletteCoral"/>
+            <style id="5" label="@Strings.PaletteGold"/>
+            <style id="6" label="@Strings.PaletteLilac"/>
+            <style id="7" label="@Strings.PaletteAqua"/>
+            <style id="8" label="@Strings.PalettePearl"/>
+        </styles>
+        <accentColors>
+            <color label="@Strings.ColorOrange" default="true">0xFF8A3D</color>
+            <color label="@Strings.ColorRed">0xFF4A4A</color>
+            <color label="@Strings.ColorYellow">0xFFD23D</color>
+            <color label="@Strings.ColorLime">0xC8FF2E</color>
+            <color label="@Strings.ColorCyan">0x4FD1FF</color>
+            <color label="@Strings.ColorMagenta">0xFF5AC8</color>
+            <color label="@Strings.ColorWhite">0xF3F1EC</color>
+        </accentColors>
+    </watchface-config>
+</resources>

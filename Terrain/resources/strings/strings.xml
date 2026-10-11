@@ -1,0 +1,14 @@
+<strings>
+    <string id="AppName">Terrain</string>
+    <string id="AccentTitle">Flag colour</string>
+    <string id="ColorEmber">Ember</string>
+    <string id="ColorMint">Mint</string>
+    <string id="ColorSky">Sky</string>
+    <string id="ColorAmber">Amber</string>
+
+    <string id="DateFormatTitle">Date format</string>
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
+</strings>

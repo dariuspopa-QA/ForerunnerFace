@@ -1,0 +1,47 @@
+APP NAME
+Bloom
+
+SHORT DESCRIPTION
+Your day in one soft shape: energy, steps, sleep, calm and recovery around the time.
+
+DESCRIPTION
+Bloom turns your day's balance into a single five-lobed shape for AMOLED Forerunner watches. Each lobe swells with one of five readings, so a full, round bloom means a good day. A thin, dented one shows at a glance what needs attention. The time sits in the middle of the shape.
+
+The five lobes (clockwise from the top)
+• ENERGY: Body Battery
+• STEPS: steps towards your daily goal
+• SLEEP: last night's sleep score
+• CALM: the opposite of your stress level
+• RECOVERY: how far you are through your recovery time (fully recovered = full lobe)
+
+Each value is printed next to its lobe. The lowest one is highlighted, so you know what to work on.
+
+What's on the face
+• The bloom: three nested layers of one colour, redrawn as your readings change
+• Large time and the date in the core
+• Weekday and date in your watch's style (DD-MM-YYYY or MM-DD-YYYY), or the short SAT 10
+• 12-hour or 24-hour time, as set on your watch
+
+Colours
+• Bloom colour: Rose, Sage, Sky, Coral, Gold, Lilac, Aqua or Pearl
+• Or your own: enter any hex colour (for example 7A5CFF) and Bloom works out the lighter layers for you
+• Lowest value colour: Orange, Red, Yellow, Lime, Cyan, Magenta or White
+
+Always-on mode
+In always-on mode the face shows only the outline of the bloom and a thin time. It lights very few pixels and shifts slightly every minute to protect the screen.
+
+Customise
+• On your phone: open Bloom in the Connect IQ Store app and change its settings: bloom colour, custom colour, lowest value colour and date format.
+• On the watch (Forerunner 970): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the bloom colour (Style) and the highlight colour (Accent).
+• Whatever you changed last, on the phone or on the watch, is what the face shows.
+
+Supported watches (AMOLED)
+• Forerunner 265, 265S, 965, 970
+
+Notes
+• Sleep score needs a watch that publishes it to watch faces. Anywhere a value isn't available, it shows "--" and its lobe sits at half size.
+• Recovery counts down from 72 hours: 0 h left is a full lobe, 72 h or more is empty.
+• Your data stays on the watch. Bloom doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release: the five-lobed bloom, eight colours plus your own hex colour, a choice of highlight colour for the lowest value, and an always-on mode.
