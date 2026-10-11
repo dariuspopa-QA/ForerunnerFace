@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="2ba3ad9c-67c8-4b3a-950c-e9980c2dfd22" type="watchface" version="1.0.0" name="@Strings.AppName" entry="LugStarApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="5.0.0">
+        <iq:products>
+            <iq:product id="fr265"/>
+            <iq:product id="fr265s"/>
+            <iq:product id="fr965"/>
+            <iq:product id="fr970"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="ComplicationSubscriber"/>
+            <iq:uses-permission id="SensorHistory"/>
+            <iq:uses-permission id="UserProfile"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>

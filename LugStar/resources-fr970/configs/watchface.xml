@@ -1,0 +1,11 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (fr970): the accent colour. -->
+    <watchface-config>
+        <accentColors>
+            <color label="@Strings.ColorHiVisYellow" default="true">0xFFD400</color>
+            <color label="@Strings.ColorSafetyOrange">0xFF6A13</color>
+            <color label="@Strings.ColorCoolantBlue">0x3AD0FF</color>
+            <color label="@Strings.ColorRedline">0xE83A3A</color>
+        </accentColors>
+    </watchface-config>
+</resources>
