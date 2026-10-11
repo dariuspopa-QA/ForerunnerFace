@@ -23,6 +23,12 @@ const C_TRACK   = 0x1F1F21;
 const C_ALARM   = 0xFFB340;
 const C_DND     = 0xA78BFA;
 const C_AOD     = 0x9A9A9F;
+const C_AOD_DIM = 0x6E6E73;   // low-power minutes and date
+const C_AOD_TICK = 0x4A4A46;  // low-power hour ticks (ApexFace's AOD_MAJOR)
+
+// Low-power shift per minute, in 454 px units (from ApexFace), and its largest offset
+const AOD_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
+const AOD_SHIFT_MAX = 10.0;
 const C_BG_GRAY = 0xB0B0B8;
 
 // Body Battery ring color bands, matching Garmin's own convention.
@@ -63,7 +69,7 @@ class PulseRingsView extends WatchUi.WatchFace {
     private var _bgStyle = 0;
     private var _bgIntensity = 0;
     private var _bgColorMode = 0;
-    private var _clockMode = 0;
+    private var _accentIdx = 0;
     private var _timeWeight = 0;
     private var _dateFormat = 0;
     private var _field1 = 0;
@@ -88,6 +94,7 @@ class PulseRingsView extends WatchUi.WatchFace {
     private var _editMode = false;
     private var _editingSlot = null;
     private var _fieldIds = [null, null];  // system data field shown instead of a built-in one
+    private var _sunDeg = null;            // [lat, lon] of the sun times
     private var _r = 0.0;
     private var _cx = 0;
     private var _cy = 0;
@@ -110,16 +117,16 @@ class PulseRingsView extends WatchUi.WatchFace {
         return (v == null) ? def : v;
     }
 
-    function loadSettings() as Void {
-        var idx = prop("AccentColor", 0);
-        if (idx < 0 || idx >= ACCENTS.size()) { idx = 0; }
-        _accent      = ACCENTS[idx];
+    // Settings from the Garmin Connect app only.
+    private function loadPhoneSettings() as Void {
+        _accentIdx   = prop("AccentColor", 0);
+        if (_accentIdx < 0 || _accentIdx >= ACCENTS.size()) { _accentIdx = 0; }
+        _accent      = ACCENTS[_accentIdx];
         _bgStyle     = prop("BgStyle", 0);
         if (_bgStyle < 0 || _bgStyle > 6) { _bgStyle = 0; }
         _bgIntensity = prop("BgIntensity", 0);
         if (_bgIntensity < 0 || _bgIntensity >= BG_LEVELS.size()) { _bgIntensity = 0; }
         _bgColorMode = prop("BgColor", 0);
-        _clockMode   = prop("ClockMode", 0);
         _timeWeight  = prop("TimeWeight", 0);
         _dateFormat  = prop("DateFormat", 0);
         _field1      = prop("Field1", 0);
@@ -129,37 +136,23 @@ class PulseRingsView extends WatchUi.WatchFace {
         _showDnd     = prop("ShowDnd", true);
         _showSun     = prop("ShowSunTimes", true);
         _aodDate     = prop("AodShowDate", true);
+        _fieldIds    = [null, null];
         _fontsReady  = false;
+    }
+
+    function loadSettings() as Void {
         applyEditor(editorSettings(null), null);
     }
 
     // ---------- Native watch face editor ----------
     // Style = background pattern, Data = the two fields, Accent = accent color.
+    // The phone app sets these four too, so for each one the side that changed
+    // it last wins (remembered in Storage).
 
     function applyEditor(s, editedType) as Void {
-        if (s == null) {
-            return;
-        }
-        if (s.styleId != null && s.styleId >= 1 && s.styleId <= 7) {
-            _bgStyle = s.styleId - 1;
-        }
-        if (s.accentColor != null && s.accentColor.color != null) {
-            _accent = s.accentColor.color;
-        }
-        var refs = s.complicationSettings;
-        if (refs != null) {
-            for (var i = 0; i < refs.size(); i++) {
-                var slot = refs[i].uniqueIdentifier;
-                if (slot == 1 || slot == 2) {
-                    var id = refs[i].complicationId;
-                    var type = complicationType(id);
-                    var kind = fieldKindFor(type);
-                    if (kind != null) {
-                        if (slot == 1) { _field1 = kind; } else { _field2 = kind; }
-                    }
-                    _fieldIds[slot - 1] = (type != null && kind == null) ? id : null;
-                }
-            }
+        loadPhoneSettings();
+        if (s != null) {
+            mergeEditor(s);
         }
         if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
             _editingSlot = null;
@@ -168,6 +161,92 @@ class PulseRingsView extends WatchUi.WatchFace {
             editorSubscribe(_fieldIds, method(:onComplicationChanged));
         }
         WatchUi.requestUpdate();
+    }
+
+    // Applies each editor choice that is newer than the phone setting for it.
+    private function mergeEditor(s) as Void {
+        // Editor values: [style, accent, field 1, field 2]; fields as
+        // [kind, or 100 + type for other system data] with fields[] = [kind, id]
+        var ed = [null, null, null, null];
+        var fields = [null, null];
+        if (s.styleId != null && s.styleId >= 1 && s.styleId <= 7) {
+            ed[0] = s.styleId - 1;
+        }
+        if (s.accentColor != null && s.accentColor.color != null) {
+            ed[1] = s.accentColor.color;
+        }
+        var refs = s.complicationSettings;
+        if (refs != null) {
+            for (var i = 0; i < refs.size(); i++) {
+                var slot = refs[i].uniqueIdentifier;
+                if (slot == 1 || slot == 2) {
+                    var id = refs[i].complicationId;
+                    var type = complicationType(id);
+                    if (type != null) {
+                        var kind = fieldKindFor(type);
+                        fields[slot - 1] = [kind, id];
+                        ed[slot + 1] = (kind != null) ? kind : 100 + type;
+                    }
+                }
+            }
+        }
+        var phone = [_bgStyle, _accentIdx, _field1, _field2];
+
+        for (var i = 0; i < 4; i++) {
+            if (ed[i] == null) {
+                continue;
+            }
+            var lastPhone = storageGet("PHONE_" + i);
+            var lastEditor = storageGet("EDITOR_" + i);
+            var fromEditor = storageGet("FROM_EDITOR_" + i);
+            if (lastEditor == null || ed[i] != lastEditor) {
+                fromEditor = true;     // first run, or changed in the editor
+            } else if (lastPhone != null && phone[i] != lastPhone) {
+                fromEditor = false;    // changed in the phone app
+            } else if (fromEditor == null) {
+                fromEditor = true;
+            }
+            // The editor preview runs as its own app: it leaves the record alone, so
+            // the face sees the edit as new when it starts again.
+            if (!_editMode) {
+                storageSet("PHONE_" + i, phone[i]);
+                storageSet("EDITOR_" + i, ed[i]);
+                storageSet("FROM_EDITOR_" + i, fromEditor);
+            }
+            if (!fromEditor) {
+                continue;
+            }
+            if (i == 0) {
+                _bgStyle = ed[0];
+            } else if (i == 1) {
+                _accent = ed[1];
+            } else {
+                var f = fields[i - 2];
+                if (f[0] == null) {
+                    _fieldIds[i - 2] = f[1];
+                } else if (i == 2) {
+                    _field1 = f[0];
+                } else {
+                    _field2 = f[0];
+                }
+            }
+        }
+    }
+
+    private function storageGet(key as String) {
+        try {
+            return Application.Storage.getValue(key);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    private function storageSet(key as String, value) as Void {
+        try {
+            Application.Storage.setValue(key, value);
+        } catch (e) {
+            // Not remembered: the editor keeps winning, as before.
+        }
     }
 
     // Built-in field for a data type the face already draws itself.
@@ -286,7 +365,7 @@ class PulseRingsView extends WatchUi.WatchFace {
         var settings = System.getDeviceSettings();
 
         var burnIn = (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection;
-        if (!_awake && burnIn) {
+        if (!_awake && burnIn && !_editMode) {
             drawAod(dc, cx, cy, r, clock, settings);
             return;
         }
@@ -299,45 +378,46 @@ class PulseRingsView extends WatchUi.WatchFace {
             dc.drawText(cx, cy + r * Y_DATE, _dateFont, dateString(),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
-        drawTime(dc, cx, cy + r * Y_TIME, r, clock, settings, _timeFont, C_WHITE);
+        drawTime(dc, cx, cy + r * Y_TIME, r, clock, settings, _timeFont, C_WHITE, C_WHITE);
         drawFields(dc, cx, cy, r);
         if (_showSun) {
-            drawSunTimes(dc, cx, cy, r);
+            drawSunTimes(dc, cx, cy, r, settings);
         }
     }
 
     // ---------- Time and date ----------
 
-    private function timeParts(clock, settings) as Array {
-        var hour = clock.hour;
-        var use24 = (_clockMode == 0) ? settings.is24Hour : (_clockMode == 1);
-        if (use24) {
-            return [hour.format("%02d") + ":" + clock.min.format("%02d"), ""];
+    // Hour by the watch's own 12 / 24 h setting: zero-padded 24 h, or 1-12 unpadded.
+    private function hourText(hour as Number, settings) as String {
+        if (settings.is24Hour) {
+            return hour.format("%02d");
         }
-        var suffix = (hour < 12) ? "AM" : "PM";
         hour = hour % 12;
-        if (hour == 0) { hour = 12; }
-        return [hour.format("%d") + ":" + clock.min.format("%02d"), suffix];
+        return (hour == 0 ? 12 : hour).format("%d");
     }
 
-    private function drawTime(dc, cx, y, r, clock, settings, font, color) as Void {
-        var parts = timeParts(clock, settings);
-        var t = parts[0];
-        var suffix = parts[1];
+    // "HH:" and the minutes (in minColor, dimmer in low power), plus AM / PM in 12 h.
+    private function drawTime(dc, cx, y, r, clock, settings, font, color, minColor) as Void {
+        var head = hourText(clock.hour, settings) + ":";
+        var mins = clock.min.format("%02d");
+        var suffix = settings.is24Hour ? "" : ((clock.hour < 12) ? "AM" : "PM");
         var small = _labelFont;
         var gap = r * 0.03;
-        var tw = dc.getTextWidthInPixels(t, font);
+        var hw = dc.getTextWidthInPixels(head, font);
+        var mw = dc.getTextWidthInPixels(mins, font);
         var sw = (suffix.length() > 0) ? dc.getTextWidthInPixels(suffix, small) + gap : 0;
-        var x = cx - sw / 2.0;
+        var x = cx - (hw + mw + sw) / 2.0;
+        var just = Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER;
 
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, y, font, t, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(x, y, font, head, just);
+        dc.setColor(minColor, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x + hw, y, font, mins, just);
 
         if (suffix.length() > 0) {
             var fh = dc.getFontHeight(font);
             dc.setColor(C_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(x + tw / 2.0 + gap, y + fh * 0.22, small, suffix,
-                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+            dc.drawText(x + hw + mw + gap, y + fh * 0.22, small, suffix, just);
         }
     }
 
@@ -505,13 +585,55 @@ class PulseRingsView extends WatchUi.WatchFace {
 
     // ---------- Sunrise / sunset ----------
 
-    private function drawSunTimes(dc, cx, cy, r) as Void {
-        if (!(Toybox has :Weather) || !(Weather has :getSunrise)) { return; }
-        var loc = null;
+    // [lat, lon] in degrees, or null for a missing / placeholder position.
+    private function validDegrees(loc) as Array or Null {
+        if (loc == null) { return null; }
+        var d = loc.toDegrees();
+        var lat = d[0].toFloat();
+        var lon = d[1].toFloat();
+        if (lat.abs() > 90 || lon.abs() > 180 || (lat == 0.0 && lon == 0.0)) {
+            return null;
+        }
+        return [lat, lon];
+    }
+
+    // Where the sun times are for: the watch's last position, else the place of the
+    // last weather report from the phone, else the last place that worked (kept in
+    // Storage, so a watch without a recent GPS fix still shows them).
+    private function sunLocation() as Position.Location or Null {
+        var deg = null;
         if (Toybox has :Position) {
             var posInfo = Position.getInfo();
-            if (posInfo != null) { loc = posInfo.position; }
+            if (posInfo != null) { deg = validDegrees(posInfo.position); }
         }
+        if (deg == null && (Weather has :getCurrentConditions)) {
+            var cc = Weather.getCurrentConditions();
+            if (cc != null) { deg = validDegrees(cc.observationLocationPosition); }
+        }
+        if (_sunDeg == null) {
+            var saved = storageGet("SUN_LOC");
+            if (saved instanceof Array && saved.size() == 2) { _sunDeg = saved; }
+        }
+        if (deg != null) {
+            // Saved only when it moves (about 1 km), not every minute
+            if (_sunDeg == null || (deg[0] - _sunDeg[0]).abs() > 0.01 || (deg[1] - _sunDeg[1]).abs() > 0.01) {
+                _sunDeg = deg;
+                storageSet("SUN_LOC", deg);
+            }
+        }
+        deg = _sunDeg;
+        if (deg == null) { return null; }
+        return new Position.Location({ :latitude => deg[0], :longitude => deg[1], :format => :degrees });
+    }
+
+    private function sunText(moment, settings) as String {
+        var t = Gregorian.info(moment, Time.FORMAT_SHORT);
+        return hourText(t.hour, settings) + ":" + t.min.format("%02d");
+    }
+
+    private function drawSunTimes(dc, cx, cy, r, settings) as Void {
+        if (!(Toybox has :Weather) || !(Weather has :getSunrise)) { return; }
+        var loc = sunLocation();
         if (loc == null) { return; }
 
         var today = Time.today();
@@ -519,10 +641,7 @@ class PulseRingsView extends WatchUi.WatchFace {
         var sunset = Weather.getSunset(loc, today);
         if (sunrise == null || sunset == null) { return; }
 
-        var sr = Gregorian.info(sunrise, Time.FORMAT_SHORT);
-        var ss = Gregorian.info(sunset, Time.FORMAT_SHORT);
-        var txt = sr.hour.format("%02d") + ":" + sr.min.format("%02d") + "  " +
-                  ss.hour.format("%02d") + ":" + ss.min.format("%02d");
+        var txt = sunText(sunrise, settings) + "  " + sunText(sunset, settings);
 
         dc.setColor(C_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, cy + r * Y_SUN, _labelFont, txt,
@@ -623,17 +742,33 @@ class PulseRingsView extends WatchUi.WatchFace {
 
     // ---------- Always-on (low power) ----------
 
+    // As in ApexFace: the date, a thin time with dim minutes and the 12 hour ticks,
+    // all shifted together each minute. Nothing accent-colored, no rings or fields.
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
-        var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
-        var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * 0.06;
-        var dy = s[1] * r * 0.06;
+        var scale = r / 227.0;   // AOD_SHIFTS are in 454 px units
+        var s = AOD_SHIFTS[clock.min % AOD_SHIFTS.size()];
+        var dx = s[0] * scale;
+        var dy = s[1] * scale;
+        var inset = AOD_SHIFT_MAX * scale;
 
-        drawTime(dc, cx + dx, cy + dy, r, clock, settings, _aodFont, C_AOD);
+        var pen = (r * 0.013).toNumber();
+        dc.setPenWidth(pen < 2 ? 2 : pen);
+        dc.setColor(C_AOD_TICK, Graphics.COLOR_TRANSPARENT);
+        var rIn = r * (RING_OUT_R - 0.06) - inset;
+        var rOut = r * RING_OUT_R - inset;
+        for (var i = 0; i < 12; i++) {
+            var a = Math.toRadians(i * 30);
+            var sn = Math.sin(a);
+            var cs = Math.cos(a);
+            dc.drawLine(cx + dx + rIn * sn, cy + dy - rIn * cs, cx + dx + rOut * sn, cy + dy - rOut * cs);
+        }
+        dc.setPenWidth(1);
+
+        drawTime(dc, cx + dx, cy + dy, r, clock, settings, _aodFont, C_AOD, C_AOD_DIM);
 
         if (_aodDate && _dateFormat != DF_OFF) {
-            dc.setColor(C_OFF, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx + dx, cy + dy - r * 0.34, _labelFont, dateString(),
+            dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx + dx, cy + dy - r * 0.34, _dateFont, dateString(),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
     }

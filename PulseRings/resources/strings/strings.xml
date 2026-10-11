@@ -24,10 +24,6 @@
     <string id="MatchAccent">Match accent</string>
     <string id="Gray">Gray</string>
 
-    <string id="ClockTitle">Clock format</string>
-    <string id="System">Follow watch setting</string>
-    <string id="H24">24-hour</string>
-    <string id="H12">12-hour</string>
 
     <string id="WeightTitle">Time weight</string>
     <string id="Light">Light</string>

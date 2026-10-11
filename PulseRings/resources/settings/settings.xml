@@ -32,13 +32,6 @@
             <listEntry value="1">@Strings.Gray</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.ClockMode" title="@Strings.ClockTitle">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.System</listEntry>
-            <listEntry value="1">@Strings.H24</listEntry>
-            <listEntry value="2">@Strings.H12</listEntry>
-        </settingConfig>
-    </setting>
     <setting propertyKey="@Properties.TimeWeight" title="@Strings.WeightTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.Light</listEntry>
