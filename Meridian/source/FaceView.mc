@@ -26,8 +26,8 @@ class FaceView extends WatchUi.WatchFace {
     private const AOD_HOURS = 0xB9B6B0;
     private const AOD_MINUTES = 0x8E8B85;
     private const AOD_TICK = 0x4A4A46;
-    // Burn-in shift per minute (ApexFace's pattern: >= 14 px spread over any 4 minutes)
-    private const AOD_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
+    // Burn-in shift per minute: >= 14 px spread over any 4 minutes, searched with tools/aod-optimize.ps1
+    private const AOD_SHIFTS = [[0, -10], [9, -3], [-10, 4], [3, 10], [0, -10], [10, -3], [-10, 4], [4, 10]];
 
     // Dial
     private const RING_R = 207.0f;

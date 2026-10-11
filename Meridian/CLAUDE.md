@@ -45,10 +45,11 @@ mockup's `SAT 10 OCT` look, 2 `MON 28-09-2026`, 3 `MON 09-28-2026` (`FaceKit.dat
   (`FaceKit.drawTracked`).
 - Always-On (AMOLED), as ApexFace: date (weekday in a dimmed accent), light hours, dim minutes,
   four major ticks, and with AodRing the day dial or the activity rings as 3 px hairlines. Moved
-  by ApexFace's shift pattern (`AOD_SHIFTS`, up to 10 px). Measured on the fr970 simulator with
-  `ApexFace\tools\aod-burnin.ps1` over 8 minutes: 6.4-6.9 % lit (day dial), 9.0-9.5 %
-  (activity rings); 497 pixels (in the time digits) stay lit longer than 3 minutes, down from
-  2463 with the old ±3 px shift.
+  by `AOD_SHIFTS` (up to 10 px), searched for Meridian's digits with `tools\aod-optimize.ps1`
+  (offline score 4040 with ApexFace's pattern, 1151 now). Measured on the fr970 simulator with
+  `ApexFace\tools\aod-burnin.ps1` over 8 minutes (16:00-16:07): 6.4-6.9 % lit (day dial),
+  9.0-9.5 % (activity rings); 140 pixels (in the time digits) stay lit longer than 3 minutes,
+  down from 497 with ApexFace's pattern and 2463 with the original ±3 px shift.
 - Phone settings vs the on-watch editor (ring mode, accent): the side that changed a value last
   wins (`FaceEditor.pick`, remembered in Storage).
 
