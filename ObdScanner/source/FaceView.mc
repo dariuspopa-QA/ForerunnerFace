@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // "PIDs" (heart rate, steps, battery as volts, stress), the day's heart rate as a bar
 // graph and a fault code: real ones for a low battery or high stress, else a rotating
 // shop joke. Geometry follows the canvas mockup (Scanner.dc.html, 454 px).
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
     private const GROUND = 0x0B0802;
@@ -22,13 +22,6 @@ class FaceView extends WatchUi.WatchFace {
     private const JOKES = [["P1010", "10MM SOCKET NOT FOUND"], ["P0420", "COFFEE BELOW THRESHOLD"],
         ["U0100", "LOST COMM WITH CUSTOMER"], ["B1200", "LUNCH BREAK OVERDUE"]];
 
-    private var mLcd as Number = 0xFFB000;
-    private var mDateSetting as Number = FaceKit.DATE_NAMED;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
-
     private var mFontHead as FontType = Graphics.FONT_XTINY;
     private var mFontTime as FontType = Graphics.FONT_NUMBER_MEDIUM;
     private var mFontDate as FontType = Graphics.FONT_XTINY;
@@ -37,48 +30,19 @@ class FaceView extends WatchUi.WatchFace {
     private var mFontCode as FontType = Graphics.FONT_TINY;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFFB000);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontHead = WatchUi.loadResource(Rez.Fonts.Head) as FontResource;
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontRow = WatchUi.loadResource(Rez.Fonts.Row) as FontResource;
-            mFontSmall = WatchUi.loadResource(Rez.Fonts.Small) as FontResource;
-            mFontCode = WatchUi.loadResource(Rez.Fonts.Code) as FontResource;
-        } catch (e) {
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mLcd = FaceKit.prop("AccentColor", 0xFFB000);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_NAMED);
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
-    }
-
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mLcd = accent.color as Number;
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Head, Rez.Fonts.Time, Rez.Fonts.Date, Rez.Fonts.Row, Rez.Fonts.Small, Rez.Fonts.Code] as Array<ResourceId>,
+            [Graphics.FONT_XTINY, Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_XTINY, Graphics.FONT_TINY] as Array<FontType>);
+        mFontHead = f[0];
+        mFontTime = f[1];
+        mFontDate = f[2];
+        mFontRow = f[3];
+        mFontSmall = f[4];
+        mFontCode = f[5];
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -91,18 +55,18 @@ class FaceView extends WatchUi.WatchFace {
         var batt = ShopKit.battery();
         var code = faultCode(clock, batt);
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, hm, code);
             return;
         }
         dc.setColor(GROUND, GROUND);
         dc.clear();
-        var dim = FaceKit.mix(mLcd, GROUND, 0.27f);
-        var faded = FaceKit.mix(mLcd, GROUND, 0.6f);
+        var dim = FaceKit.mix(mAccent, GROUND, 0.27f);
+        var faded = FaceKit.mix(mAccent, GROUND, 0.6f);
         var mid = Graphics.TEXT_JUSTIFY_VCENTER;
 
-        drawHeader(dc, 0, 0, mLcd);
-        dc.setColor(mLcd, Graphics.COLOR_TRANSPARENT);
+        drawHeader(dc, 0, 0, mAccent);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         dc.drawText(C * mScale, 108 * mScale, mFontTime, hm + ":" + FaceKit.twoDigits(clock.sec),
             Graphics.TEXT_JUSTIFY_CENTER | mid);
         dc.setColor(faded, Graphics.COLOR_TRANSPARENT);
@@ -126,7 +90,7 @@ class FaceView extends WatchUi.WatchFace {
             ["STEP.COUNT", steps != null ? steps.format("%05d") : "-----"],
             ["BATT.VOLT", ShopKit.volts(batt) + " V"],
             ["STRESS.LOAD", (stress != null ? stress.toString() : "--") + " %"]];
-        dc.setColor(mLcd, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         for (var i = 0; i < rows.size(); i++) {
             var row = rows[i] as Array<String>;
             dc.drawText(87 * mScale, ROWS_Y[i] * mScale, mFontRow, row[0], Graphics.TEXT_JUSTIFY_LEFT | mid);
@@ -136,13 +100,13 @@ class FaceView extends WatchUi.WatchFace {
         drawHeartGraph(dc);
 
         // Fault code box
-        dc.setColor(mLcd, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         ShopKit.box(dc, 104, 360, 246, 50, 6, mScale);
         dc.setColor(GROUND, Graphics.COLOR_TRANSPARENT);
         ShopKit.box(dc, 106, 362, 242, 46, 4, mScale);
-        dc.setColor(mLcd, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, C * mScale, 377 * mScale, mFontCode, "DTC " + code[0], 2 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(FaceKit.mix(mLcd, GROUND, 0.75f), Graphics.COLOR_TRANSPARENT);
+        dc.setColor(FaceKit.mix(mAccent, GROUND, 0.75f), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, C * mScale, 397 * mScale, mFontSmall, code[1], 1 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
@@ -193,7 +157,7 @@ class FaceView extends WatchUi.WatchFace {
         }
         var span = hi > lo ? (hi - lo).toFloat() : 1.0f;
         var w = (240.0f - 23 * 3) / 24;
-        dc.setColor(mLcd, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
         for (var i = 0; i < 24 && i < hours.size(); i++) {
             var v = hours[i];
             var h = v != null ? 2 + (v - lo) / span * 24 : 2.0f;
@@ -205,8 +169,8 @@ class FaceView extends WatchUi.WatchFace {
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, hm as String, code as Array<String>) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shift = ShopKit.shift(clock.min);
-        var color = FaceKit.mix(mLcd, 0x000000, 0.6f);
+        var shift = aodShift(clock.min);
+        var color = FaceKit.mix(mAccent, 0x000000, 0.6f);
         drawHeader(dc, shift[0], 60 + shift[1], color);
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.drawText((C + shift[0]) * mScale, (C + shift[1]) * mScale, mFontTime, hm,

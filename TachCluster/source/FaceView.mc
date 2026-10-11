@@ -12,18 +12,12 @@ import Toybox.WatchUi;
 // Sunday, 1-6 Monday to Saturday), the LCD shows the time and steps as ODO, the fuel bar is
 // the watch battery and the temperature bar the heart rate. Geometry follows the canvas
 // mockup (Tach.dc.html, 454 px).
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
     private const TICK_OUT = 211.0f;
     private const NUM_R = 166.0f;
     private const GEARS = ["P", "1", "2", "3", "4", "5", "6"] as Array<String>;
-
-    private var mAccent as Number = 0xFF6A13;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
 
     private var mFontNum as FontType = Graphics.FONT_SMALL;
     private var mFontLabel as FontType = Graphics.FONT_XTINY;
@@ -33,47 +27,19 @@ class FaceView extends WatchUi.WatchFace {
     private var mFontBar as FontType = Graphics.FONT_XTINY;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFF6A13);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontNum = WatchUi.loadResource(Rez.Fonts.Num) as FontResource;
-            mFontLabel = WatchUi.loadResource(Rez.Fonts.Label) as FontResource;
-            mFontGear = WatchUi.loadResource(Rez.Fonts.Gear) as FontResource;
-            mFontLcd = WatchUi.loadResource(Rez.Fonts.Lcd) as FontResource;
-            mFontMono = WatchUi.loadResource(Rez.Fonts.Mono) as FontResource;
-            mFontBar = WatchUi.loadResource(Rez.Fonts.Bar) as FontResource;
-        } catch (e) {
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mAccent = FaceKit.prop("AccentColor", 0xFF6A13);
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
-    }
-
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Num, Rez.Fonts.Label, Rez.Fonts.Gear, Rez.Fonts.Lcd, Rez.Fonts.Mono, Rez.Fonts.Bar] as Array<ResourceId>,
+            [Graphics.FONT_SMALL, Graphics.FONT_XTINY, Graphics.FONT_MEDIUM, Graphics.FONT_SMALL, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
+        mFontNum = f[0];
+        mFontLabel = f[1];
+        mFontGear = f[2];
+        mFontLcd = f[3];
+        mFontMono = f[4];
+        mFontBar = f[5];
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -85,7 +51,7 @@ class FaceView extends WatchUi.WatchFace {
         var value = (clock.hour % 12) + (clock.min + clock.sec / 60.0f) / 60.0f;
         var hm = FaceKit.hourText(clock.hour) + ":" + FaceKit.twoDigits(clock.min);
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, value, hm);
             return;
         }
@@ -185,7 +151,7 @@ class FaceView extends WatchUi.WatchFace {
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, value as Float, hm as String) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shift = ShopKit.shift(clock.min);
+        var shift = aodShift(clock.min);
         var cx = C + shift[0];
         var cy = C + shift[1];
         for (var n = 0; n <= 12; n++) {

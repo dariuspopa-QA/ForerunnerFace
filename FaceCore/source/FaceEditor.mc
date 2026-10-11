@@ -3,8 +3,8 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 // Garmin's native on-device watch face editor (Watch Face Configurations, API 5.1+;
-// resources-fr970/configs/watchface.xml). The face offers a style and an accent
-// colour there; the view applies them on top of the phone settings.
+// each face's resources-fr970/configs/watchface.xml). FaceCoreView applies the editor's
+// choices on top of the phone settings: the editor wins when it has a value.
 module FaceEditor {
 
     // The active configuration's settings, or null on watches without the editor.
@@ -22,9 +22,9 @@ module FaceEditor {
 
 class FaceEditorDelegate extends WatchUi.WatchFaceDelegate {
 
-    private var mView as FaceView;
+    private var mView as FaceCoreView;
 
-    function initialize(view as FaceView) {
+    function initialize(view as FaceCoreView) {
         WatchFaceDelegate.initialize();
         mView = view;
     }

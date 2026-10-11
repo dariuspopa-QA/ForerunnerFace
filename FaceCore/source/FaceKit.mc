@@ -4,8 +4,9 @@ import Toybox.Lang;
 import Toybox.Math;
 import Toybox.System;
 import Toybox.Time.Gregorian;
+import Toybox.WatchUi;
 
-// Helpers shared by the faces of this family (copied per project). Geometry is in
+// Helpers shared by every face built on FaceCore (one copy, FaceCore/source). Geometry is in
 // design pixels of the 454 x 454 canvas; views multiply by width / 454.
 module FaceKit {
 
@@ -128,6 +129,75 @@ module FaceKit {
     function burnInProtection() as Boolean {
         var settings = System.getDeviceSettings();
         return (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection;
+    }
+
+    // ---- Always-On drift (from ApexFace) ---------------------------------
+
+    // No pixel may stay lit for more than 3 minutes, so every 4 consecutive minutes must
+    // move the Always-On drawing more than a stroke width both across and down (>= 14
+    // design px; checked by FaceKitTest). The eight positions were searched for ApexFace
+    // (offline render of minutes 00-59) to keep changing minute digits from lining up.
+    const AOD_SHIFTS = [[-5, -10], [9, -10], [-10, 3], [9, 10], [-6, -6], [8, -10], [-10, 3], [9, 10]];
+    // Largest offset in AOD_SHIFTS: keep Always-On drawing this far inside the rim
+    const AOD_SHIFT_MAX = 10;
+    const AOD_MIN_SPAN = 14;
+
+    // [dx, dy] in design px for the minute of the hour.
+    function aodShift(minute as Number) as Array<Number> {
+        return AOD_SHIFTS[minute % AOD_SHIFTS.size()] as Array<Number>;
+    }
+
+    // Smallest horizontal and vertical spread [dx, dy] of a shift pattern over any
+    // window of consecutive minutes: a stroke thinner than this can't stay lit
+    // for the whole window.
+    function minShiftSpan(shifts as Array, window as Number) as [Number, Number] {
+        var minX = 1000;
+        var minY = 1000;
+        var n = shifts.size();
+        for (var start = 0; start < n; start++) {
+            var loX = 1000; var hiX = -1000; var loY = 1000; var hiY = -1000;
+            for (var k = 0; k < window; k++) {
+                var s = shifts[(start + k) % n] as Array<Number>;
+                if (s[0] < loX) { loX = s[0]; }
+                if (s[0] > hiX) { hiX = s[0]; }
+                if (s[1] < loY) { loY = s[1]; }
+                if (s[1] > hiY) { hiY = s[1]; }
+            }
+            if (hiX - loX < minX) { minX = hiX - loX; }
+            if (hiY - loY < minY) { minY = hiY - loY; }
+        }
+        return [minX, minY];
+    }
+
+    // ---- Fonts (from ApexFace) -------------------------------------------
+
+    // On Connect IQ 4+ loadResource returns fonts as references into the shared
+    // graphics pool, and the watch may purge the resource behind a reference while
+    // the face holds nothing stronger. Drawing with a reference it then can't bring
+    // back is a fatal Invalid Value that try/catch can't stop (ApexFace on the fr970,
+    // 11 Oct 2026). So faces keep the resource itself.
+    function strongResource(id as ResourceId) as Object or Null {
+        var resource = WatchUi.loadResource(id);
+        if (resource instanceof Graphics.ResourceReference) {
+            return resource.get();
+        }
+        return resource;
+    }
+
+    // Each font in ids held strongly, or the system font at the same index when it
+    // can't be loaded.
+    function loadFonts(ids as Array<ResourceId>, fallbacks as Array<FontType>) as Array<FontType> {
+        var fonts = new Array<FontType>[ids.size()];
+        for (var i = 0; i < ids.size(); i++) {
+            var font = null;
+            try {
+                font = strongResource(ids[i]);
+            } catch (e) {
+                font = null;
+            }
+            fonts[i] = font != null ? font as FontResource : fallbacks[i];
+        }
+        return fonts;
     }
 
     function penWidth(w as Float, scale as Float) as Number {

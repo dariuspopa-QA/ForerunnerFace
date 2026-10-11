@@ -12,7 +12,7 @@ import Toybox.Time.Gregorian;
 import Toybox.UserProfile;
 import Toybox.Weather;
 
-// Sensor readings for the face (copied per project). Slow-changing values are
+// Sensor readings for the face (shared core, FaceCore/source). Slow-changing values are
 // read once a minute in refresh(); heart rate is read on every call. Every value
 // may be null when the watch has no reading.
 class FaceData {

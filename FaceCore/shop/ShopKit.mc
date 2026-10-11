@@ -4,7 +4,7 @@ import Toybox.Math;
 import Toybox.System;
 
 // Shared by the Shop Floor faces for mechanics (SocketSet, TachCluster, ObdScanner, LugStar,
-// FlatRate; copied unchanged per project). Geometry is in design pixels of the 454 x 454
+// FlatRate) on top of FaceCore; their monkey.jungle adds ../FaceCore/shop). Geometry is in design pixels of the 454 x 454
 // canvas; s = width / 454.
 module ShopKit {
 
@@ -17,13 +17,6 @@ module ShopKit {
     const DARK_STEEL = 0x3A3D41;
     const RED = 0xE83A3A;
     const AOD_TEXT = 0xA9AEB4;
-
-    // Always-On drift against burn-in: a few px, a new spot every minute
-    const SHIFTS = [[0, 0], [3, 2], [-2, 3], [2, -3], [-3, -1], [1, 3], [-1, -3], [3, -1]];
-
-    function shift(minute as Number) as Array<Number> {
-        return SHIFTS[minute % SHIFTS.size()] as Array<Number>;
-    }
 
     // Screen point (px) at clock angle deg (0 = 12 o'clock, clockwise), radius r from
     // (cx, cy) and x along the tangent (clockwise positive); all in design px.

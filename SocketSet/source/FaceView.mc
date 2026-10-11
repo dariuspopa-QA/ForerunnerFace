@@ -11,19 +11,12 @@ import Toybox.WatchUi;
 // socket is lit; the 10 mm one is missing, as always. A 72-tooth ratchet ring fills with
 // the minutes. Time, date, heart rate, battery (as a car battery's volts) and steps (ODO)
 // in the middle. Geometry follows the canvas mockup (Main.dc.html, 454 px).
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
     private const SOCKET_R = 166.0f;
     private const MISSING = 10;
     private const TIME_TOP = 140.0f;
-
-    private var mAccent as Number = 0xFF6A13;
-    private var mDateSetting as Number = FaceKit.DATE_NAMED;
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
 
     private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
     private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_HOT;
@@ -34,49 +27,20 @@ class FaceView extends WatchUi.WatchFace {
     private var mFontValue as FontType = Graphics.FONT_SMALL;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xFF6A13);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
-            mFontSec = WatchUi.loadResource(Rez.Fonts.Sec) as FontResource;
-            mFontSocket = WatchUi.loadResource(Rez.Fonts.Socket) as FontResource;
-            mFontDate = WatchUi.loadResource(Rez.Fonts.Date) as FontResource;
-            mFontLabel = WatchUi.loadResource(Rez.Fonts.Label) as FontResource;
-            mFontValue = WatchUi.loadResource(Rez.Fonts.Value) as FontResource;
-        } catch (e) {
-        }
-    }
-
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mAccent = FaceKit.prop("AccentColor", 0xFF6A13);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_NAMED);
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
-    }
-
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Sec, Rez.Fonts.Socket, Rez.Fonts.Date, Rez.Fonts.Label, Rez.Fonts.Value] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_HOT, Graphics.FONT_NUMBER_HOT, Graphics.FONT_SMALL, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_SMALL] as Array<FontType>);
+        mFontTime = f[0];
+        mFontTimeAod = f[1];
+        mFontSec = f[2];
+        mFontSocket = f[3];
+        mFontDate = f[4];
+        mFontLabel = f[5];
+        mFontValue = f[6];
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -90,7 +54,7 @@ class FaceView extends WatchUi.WatchFace {
 
         dc.setColor(ShopKit.GROUND, ShopKit.GROUND);
         dc.clear();
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, hour12, hm);
             return;
         }
@@ -178,7 +142,7 @@ class FaceView extends WatchUi.WatchFace {
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, hour12 as Number, hm as String) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shift = ShopKit.shift(clock.min);
+        var shift = aodShift(clock.min);
         dc.setPenWidth(FaceKit.penWidth(2.0f, mScale));
         for (var h = 1; h <= 12; h++) {
             if (h + 7 == MISSING) {

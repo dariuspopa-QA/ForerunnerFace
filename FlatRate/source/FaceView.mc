@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // red); ON CLOCK, BOOK (the shift length) and LEFT under the time; a hazard-stripe band
 // names the next stop (break or shift end). Shift start, length, break, bay and the job
 // line are phone settings. Geometry follows the canvas mockup (FlatRate.dc.html, 454 px).
-class FaceView extends WatchUi.WatchFace {
+class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
     private const TIME_Y = 165.0f;
@@ -19,17 +19,11 @@ class FaceView extends WatchUi.WatchFace {
     private const BAND_H = 40.0f;
     private const LATE = 0xFF5A3C;
 
-    private var mAccent as Number = 0xD7FF1F;
-    private var mDateSetting as Number = FaceKit.DATE_NAMED;
     private var mStart as Number = 420;       // minutes after midnight
     private var mLength as Number = 480;      // minutes
     private var mBreak as Number = 720;       // minutes after midnight, -1 = none
     private var mBay as Number = 3;           // 0 = not shown
     private var mJob as String = "ON THE CLOCK";
-    private var mScale as Float = 1.0f;
-    private var mAwake as Boolean = true;
-    private var mEditMode as Boolean;
-    private var mData as FaceData = new FaceData();
 
     private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
     private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_HOT;
@@ -41,39 +35,25 @@ class FaceView extends WatchUi.WatchFace {
     private var mFontBottom as FontType = Graphics.FONT_XTINY;
 
     function initialize(editMode as Boolean) {
-        WatchFace.initialize();
-        mEditMode = editMode;
+        FaceCoreView.initialize(editMode, 0xD7FF1F);
         loadSettings();
     }
 
-    function onLayout(dc as Dc) as Void {
-        mScale = dc.getWidth() / FaceKit.DESIGN;
-        try {
-            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
-            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
-            mFontTop = WatchUi.loadResource(Rez.Fonts.Top) as FontResource;
-            mFontJob = WatchUi.loadResource(Rez.Fonts.Job) as FontResource;
-            mFontBoxLabel = WatchUi.loadResource(Rez.Fonts.BoxLabel) as FontResource;
-            mFontBoxValue = WatchUi.loadResource(Rez.Fonts.BoxValue) as FontResource;
-            mFontBand = WatchUi.loadResource(Rez.Fonts.Band) as FontResource;
-            mFontBottom = WatchUi.loadResource(Rez.Fonts.Bottom) as FontResource;
-        } catch (e) {
-        }
+    function loadFonts() as Void {
+        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Top, Rez.Fonts.Job, Rez.Fonts.BoxLabel, Rez.Fonts.BoxValue, Rez.Fonts.Band, Rez.Fonts.Bottom] as Array<ResourceId>,
+            [Graphics.FONT_NUMBER_HOT, Graphics.FONT_NUMBER_HOT, Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
+        mFontTime = f[0];
+        mFontTimeAod = f[1];
+        mFontTop = f[2];
+        mFontJob = f[3];
+        mFontBoxLabel = f[4];
+        mFontBoxValue = f[5];
+        mFontBand = f[6];
+        mFontBottom = f[7];
     }
 
-    function onExitSleep() as Void {
-        mAwake = true;
-        WatchUi.requestUpdate();
-    }
-
-    function onEnterSleep() as Void {
-        mAwake = false;
-        WatchUi.requestUpdate();
-    }
-
-    function loadSettings() as Void {
-        mAccent = FaceKit.prop("AccentColor", 0xD7FF1F);
-        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_NAMED);
+    // Shift times, bay and job name; accent and date format come from FaceCoreView.
+    function loadPhoneSettings() as Void {
         mStart = FaceKit.prop("ShiftStart", 420);
         mLength = FaceKit.prop("ShiftLength", 480);
         mBreak = FaceKit.prop("BreakTime", 720);
@@ -89,17 +69,6 @@ class FaceView extends WatchUi.WatchFace {
         if (mLength < 30) {
             mLength = 30;
         }
-        var editor = FaceEditor.settingsFor(null);
-        if (editor != null) {
-            applyEditor(editor);
-        }
-    }
-
-    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
-        var accent = settings.accentColor;
-        if (accent != null && accent.color instanceof Number) {
-            mAccent = accent.color as Number;
-        }
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -114,7 +83,7 @@ class FaceView extends WatchUi.WatchFace {
         elapsed = elapsed < 0 ? 0.0f : (elapsed > mLength ? mLength.toFloat() : elapsed);
         var progress = elapsed / mLength;
 
-        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+        if (alwaysOn()) {
             drawAlwaysOn(dc, clock, hm, progress, nowMin);
             return;
         }
@@ -215,7 +184,7 @@ class FaceView extends WatchUi.WatchFace {
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, hm as String, progress as Float, nowMin as Float) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
-        var shift = ShopKit.shift(clock.min);
+        var shift = aodShift(clock.min);
         var cx = (C + shift[0]) * mScale;
         var dy = shift[1] * mScale;
         var dim = FaceKit.mix(mAccent, 0x000000, 0.55f);

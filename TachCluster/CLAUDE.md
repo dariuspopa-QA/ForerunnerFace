@@ -9,10 +9,11 @@ Rev counter 0-12: the needle is the hour (10-12 red zone), ticks light up to it.
 
 ## Project layout
 
-Same as Tide/Meridian: `source/FaceView.mc` is the face; `FaceKit.mc`, `FaceData.mc`, `FaceEditor.mc`
-are copied unchanged from Tide. `source/ShopKit.mc` (radial bars, hexagons, dashed lines, battery as
-volts, Always-On shifts) is shared unchanged by the five Shop Floor faces (SocketSet, TachCluster,
-ObdScanner, LugStar, FlatRate): change it in one and copy to the others. `FaceDemo.battery()` was
+`source/FaceView.mc` is the face (a `FaceCoreView` subclass) and `source/<Name>App.mc` a three-line
+`FaceCoreApp` subclass. Everything shared lives once in `../FaceCore` (see `FaceCore/CLAUDE.md`):
+`FaceCore/source` (FaceKit, FaceData, FaceEditor, base view and app, core tests) and `FaceCore/shop/ShopKit.mc`
+(radial bars, hexagons, dashed lines, battery as volts), both on `base.sourcePath` in `monkey.jungle` and
+`demo.jungle`. Never copy them back into `source/`. `FaceDemo.battery()` was
 added to both FaceDemo modules. Fonts: Barlow Condensed (stands in for the mockup's Big Shoulders
 Display) and IBM Plex Mono (for Share Tech Mono), built by `tools\make-fonts.ps1` from `tools/font-table.ps1`.
 Products fr265, fr265s, fr965, fr970; on-watch editor (accent) on fr970.

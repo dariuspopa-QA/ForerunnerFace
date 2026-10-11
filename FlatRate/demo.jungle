@@ -1,2 +1,2 @@
 project.manifest = manifest.xml
-base.sourcePath = source;tools/demo
+base.sourcePath = source;tools/demo;../FaceCore/source;../FaceCore/shop
