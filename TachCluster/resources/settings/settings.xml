@@ -1,0 +1,10 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0xFF6A13">@Strings.ColorSafetyOrange</listEntry>
+            <listEntry value="0xFFD400">@Strings.ColorHiVisYellow</listEntry>
+            <listEntry value="0x3AD0FF">@Strings.ColorCoolantBlue</listEntry>
+            <listEntry value="0xE83A3A">@Strings.ColorRedline</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

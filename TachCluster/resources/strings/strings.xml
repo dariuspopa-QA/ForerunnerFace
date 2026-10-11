@@ -1,0 +1,9 @@
+<strings>
+    <string id="AppName">Tach Cluster</string>
+    <string id="AccentTitle">Needle colour</string>
+    <string id="ColorSafetyOrange">Safety Orange</string>
+    <string id="ColorHiVisYellow">Hi-Vis Yellow</string>
+    <string id="ColorCoolantBlue">Coolant Blue</string>
+    <string id="ColorRedline">Redline</string>
+
+</strings>
