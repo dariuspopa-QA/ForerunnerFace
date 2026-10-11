@@ -13,6 +13,7 @@
     <string id="InkTitle">Data value color</string>
     <string id="DimTitle">Label color</string>
     <string id="NightTitle">Night mode (red)</string>
+    <string id="DateFormatTitle">Date format</string>
 
     <!-- Field metrics -->
     <string id="MetricHr">Heart rate</string>
@@ -56,6 +57,12 @@
     <string id="ColorStone">Stone</string>
     <string id="ColorSlate">Slate</string>
     <string id="ColorSand">Sand</string>
+
+    <!-- Date formats -->
+    <string id="DateFormatWatch">Watch (from distance units)</string>
+    <string id="DateFormatNamed">MON 28 SEP</string>
+    <string id="DateFormatDmy">DD-MM-YYYY</string>
+    <string id="DateFormatMdy">MM-DD-YYYY</string>
 
     <!-- Night mode -->
     <string id="NightOff">Off</string>

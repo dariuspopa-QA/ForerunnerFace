@@ -28,7 +28,7 @@ $fonts = @(
     # values: metric formats plus letters for system data fields (e.g. "GOOD", "ms")
     @('Value', 'value', 'BarlowCondensed-SemiBold.ttf', 28, 14, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
     @('ArcValue', 'arc_value', 'BarlowCondensed-SemiBold.ttf', 26, 13, ($digits + '%-')),
-    @('Mono22', 'mono22', 'DMMono-Regular.ttf', 22, 12, ($upper + $digits + ' ')),
+    @('Mono22', 'mono22', 'DMMono-Regular.ttf', 22, 12, ($upper + $digits + ' -')),
     @('Mono16', 'mono16', 'DMMono-Regular.ttf', 16, 10, ($upper + $digits + ' ./-%' + [char]0xB0)),
     @('Mono14', 'mono14', 'DMMono-Regular.ttf', 14, 10, ($upper + ' '))
 )

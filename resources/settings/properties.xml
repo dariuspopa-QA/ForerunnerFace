@@ -12,6 +12,10 @@
     <property id="InkColor" type="number">0xF4F4EF</property>
     <property id="DimColor" type="number">0xB0B0AA</property>
 
+    <!-- Date: 0 watch (from its distance units), 1 "MON 28 SEP", 2 DD-MM-YYYY, 3 MM-DD-YYYY.
+         The time always follows the watch's 12 / 24 h setting. -->
+    <property id="DateFormat" type="number">0</property>
+
     <!-- Red night palette: 0 Off, 1 Auto (profile sleep / wake times), 2 On -->
     <property id="NightMode" type="number">0</property>
 

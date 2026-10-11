@@ -7,10 +7,31 @@ module ApexFormat {
     const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-    // "MON 28 SEP": weekday, day without padding, month. dayOfWeek is Gregorian's
-    // 1 = Sunday .. 7 = Saturday, month is 1 .. 12.
-    function dateText(dayOfWeek as Number, day as Number, month as Number) as String {
-        return DAYS[dayOfWeek - 1] + " " + day + " " + MONTHS[month - 1];
+    // DateFormat setting: follow the watch, "MON 28 SEP", "MON 28-09-2026", "MON 09-28-2026"
+    enum { DATE_WATCH = 0, DATE_NAMED = 1, DATE_DMY = 2, DATE_MDY = 3 }
+
+    // The date format to draw for the DateFormat setting. Connect IQ doesn't expose the
+    // watch's date order, so "watch" infers it from the distance units: miles means
+    // US-style month first, km day first.
+    function dateFormat(setting as Number, statute as Boolean) as Number {
+        if (setting == DATE_NAMED || setting == DATE_DMY || setting == DATE_MDY) {
+            return setting;
+        }
+        return statute ? DATE_MDY : DATE_DMY;
+    }
+
+    // Weekday followed by the date in the given (resolved) format's order. dayOfWeek is
+    // Gregorian's 1 = Sunday .. 7 = Saturday, month is 1 .. 12. The named format keeps
+    // the day unpadded ("WED 9 JUL"), the numeric ones pad day and month ("WED 09-07-2026").
+    function dateText(dayOfWeek as Number, day as Number, month as Number, year as Number, format as Number) as String {
+        var weekday = DAYS[dayOfWeek - 1] + " ";
+        if (format == DATE_DMY) {
+            return weekday + twoDigits(day) + "-" + twoDigits(month) + "-" + year;
+        }
+        if (format == DATE_MDY) {
+            return weekday + twoDigits(month) + "-" + twoDigits(day) + "-" + year;
+        }
+        return weekday + day + " " + MONTHS[month - 1];
     }
 
     // Zero-padded two-digit value for hours (24 h) and minutes.
@@ -18,9 +39,18 @@ module ApexFormat {
         return value.format("%02d");
     }
 
-    // "07:04"
-    function clockText(hour as Number, minute as Number) as String {
-        return twoDigits(hour) + ":" + twoDigits(minute);
+    // Hour of a 0 .. 23 clock: zero-padded in 24 h ("07"), 1 .. 12 unpadded in 12 h ("7").
+    function hourText(hour as Number, twelve as Boolean) as String {
+        if (!twelve) {
+            return twoDigits(hour);
+        }
+        var h = hour % 12;
+        return (h == 0 ? 12 : h).toString();
+    }
+
+    // "07:04", or "7:04" in 12 h
+    function clockText(hour as Number, minute as Number, twelve as Boolean) as String {
+        return hourText(hour, twelve) + ":" + twoDigits(minute);
     }
 
     // "8,214"; negative values keep their sign.

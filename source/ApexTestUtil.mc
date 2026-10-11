@@ -12,7 +12,7 @@ module ApexTestUtil {
     // Glyph sets of the custom fonts (CLAUDE.md, Fonts)
     const VALUE_GLYPHS = "0123456789,.:%°h-";
     const LABEL_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
-    const DATE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+    const DATE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -";
 
     function onlyGlyphs(text as String, glyphs as String) as Boolean {
         var chars = text.toCharArray();

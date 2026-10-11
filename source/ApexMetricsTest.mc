@@ -140,13 +140,15 @@ function labelsUseOnlyMonoFontGlyphs(logger as Logger) as Boolean {
     return true;
 }
 
-// Mono22 only has A-Z, 0-9 and space.
+// Mono22 only has A-Z, 0-9, space and "-".
 (:test)
 function everyDateUsesOnlyDateFontGlyphs(logger as Logger) as Boolean {
-    for (var dow = 1; dow <= 7; dow++) {
-        for (var month = 1; month <= 12; month++) {
-            var text = ApexFormat.dateText(dow, 31, month);
-            Test.assertMessage(ApexTestUtil.onlyGlyphs(text, ApexTestUtil.DATE_GLYPHS), "date '" + text + "'");
+    for (var format = ApexFormat.DATE_NAMED; format <= ApexFormat.DATE_MDY; format++) {
+        for (var dow = 1; dow <= 7; dow++) {
+            for (var month = 1; month <= 12; month++) {
+                var text = ApexFormat.dateText(dow, 31, month, 2026, format);
+                Test.assertMessage(ApexTestUtil.onlyGlyphs(text, ApexTestUtil.DATE_GLYPHS), "date '" + text + "'");
+            }
         }
     }
     return true;

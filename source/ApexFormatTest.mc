@@ -5,20 +5,53 @@ import Toybox.Test;
 
 (:test)
 function dateTextUsesUpperCaseWeekdayUnpaddedDayAndMonth(logger as Logger) as Boolean {
-    ApexTestUtil.assertEqual(ApexFormat.dateText(2, 28, 9), "MON 28 SEP");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(2, 28, 9, 2026, ApexFormat.DATE_NAMED), "MON 28 SEP");
     return true;
 }
 
 (:test)
 function dateTextCoversFirstAndLastWeekdayAndMonth(logger as Logger) as Boolean {
-    ApexTestUtil.assertEqual(ApexFormat.dateText(1, 1, 1), "SUN 1 JAN");
-    ApexTestUtil.assertEqual(ApexFormat.dateText(7, 31, 12), "SAT 31 DEC");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(1, 1, 1, 2026, ApexFormat.DATE_NAMED), "SUN 1 JAN");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(7, 31, 12, 2026, ApexFormat.DATE_NAMED), "SAT 31 DEC");
     return true;
 }
 
 (:test)
 function dateTextDoesNotPadSingleDigitDays(logger as Logger) as Boolean {
-    ApexTestUtil.assertEqual(ApexFormat.dateText(4, 9, 7), "WED 9 JUL");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(4, 9, 7, 2026, ApexFormat.DATE_NAMED), "WED 9 JUL");
+    return true;
+}
+
+(:test)
+function dateTextNumericFormatsPadDayAndMonth(logger as Logger) as Boolean {
+    ApexTestUtil.assertEqual(ApexFormat.dateText(4, 9, 7, 2026, ApexFormat.DATE_DMY), "WED 09-07-2026");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(4, 9, 7, 2026, ApexFormat.DATE_MDY), "WED 07-09-2026");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(2, 28, 9, 2026, ApexFormat.DATE_DMY), "MON 28-09-2026");
+    ApexTestUtil.assertEqual(ApexFormat.dateText(2, 28, 9, 2026, ApexFormat.DATE_MDY), "MON 09-28-2026");
+    return true;
+}
+
+(:test)
+function dateFormatWatchFollowsUnitsAndExplicitChoicesWin(logger as Logger) as Boolean {
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(ApexFormat.DATE_WATCH, true), ApexFormat.DATE_MDY);
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(ApexFormat.DATE_WATCH, false), ApexFormat.DATE_DMY);
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(ApexFormat.DATE_NAMED, true), ApexFormat.DATE_NAMED);
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(ApexFormat.DATE_DMY, true), ApexFormat.DATE_DMY);
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(ApexFormat.DATE_MDY, false), ApexFormat.DATE_MDY);
+    // unknown values (e.g. a stored setting from a future version) follow the watch
+    ApexTestUtil.assertEqual(ApexFormat.dateFormat(9, false), ApexFormat.DATE_DMY);
+    return true;
+}
+
+(:test)
+function hourTextPadsIn24hAndMapsTo1To12In12h(logger as Logger) as Boolean {
+    ApexTestUtil.assertEqual(ApexFormat.hourText(7, false), "07");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(0, false), "00");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(0, true), "12");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(7, true), "7");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(12, true), "12");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(13, true), "1");
+    ApexTestUtil.assertEqual(ApexFormat.hourText(23, true), "11");
     return true;
 }
 
@@ -45,8 +78,9 @@ function thousandsGroupsDigits(logger as Logger) as Boolean {
 
 (:test)
 function clockTextZeroPadsBothParts(logger as Logger) as Boolean {
-    ApexTestUtil.assertEqual(ApexFormat.clockText(7, 4), "07:04");
-    ApexTestUtil.assertEqual(ApexFormat.clockText(19, 12), "19:12");
+    ApexTestUtil.assertEqual(ApexFormat.clockText(7, 4, false), "07:04");
+    ApexTestUtil.assertEqual(ApexFormat.clockText(19, 12, false), "19:12");
+    ApexTestUtil.assertEqual(ApexFormat.clockText(19, 12, true), "7:12");
     return true;
 }
 
@@ -151,7 +185,7 @@ function complicationValueTextAppendsOnlyStringUnits(logger as Logger) as Boolea
 function formattedValuesUseOnlyValueFontGlyphs(logger as Logger) as Boolean {
     var samples = [
         ApexFormat.thousands(1005007), ApexFormat.thousands(-1846),
-        ApexFormat.clockText(19, 12), ApexFormat.recoveryText(14),
+        ApexFormat.clockText(19, 12, true), ApexFormat.recoveryText(14),
         ApexFormat.percentText(68), ApexFormat.distanceText(640000, false),
         ApexFormat.altitudeText(-12, false), ApexFormat.temperatureText(-5.6f, false),
         ApexFormat.numberText(null), ApexFormat.twoDigits(7)

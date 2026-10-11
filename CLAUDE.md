@@ -34,8 +34,8 @@ Call `dc.setAntiAlias(true)` before drawing.
 | Seconds comet | line from r 224 → r 202 (y 3 → 25 at 12 o'clock), width 4, round caps, accent, rotated to `sec × 6°`. Active mode only |
 | Arc track | r 198, width 4, colour `rule`, 270° from clock 225° (bottom-left) clockwise to clock 135° (bottom-right). In CIQ degrees: from 225° clockwise to 315° (`Graphics.ARC_CLOCKWISE`, 225 → −45) |
 | Arc fill | same arc, accent, round caps, length = 270° × pct, starting at the bottom-left end |
-| Date | `MON 28 SEP` (weekday, day without padding, month; upper case), mono 22 px (enlarged from the design's 13 px, too small on the watch), letter-spacing ≈ 3 px, colour `dim`, centred at y ≈ 86 |
-| Hours | condensed 164 px, heaviest weight (800), colour `numerals`, right-aligned to x = 222, digits vertically centred at y ≈ 185 (cap height ≈ 115 px), zero-padded 24 h |
+| Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), mono 22 px (enlarged from the design's 13 px, too small on the watch), letter-spacing ≈ 3 px, colour `dim`, centred at y ≈ 86 |
+| Hours | condensed 164 px, heaviest weight (800), colour `numerals`, right-aligned to x = 222, digits vertically centred at y ≈ 185 (cap height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
 | Minutes | same size, thinnest weight (200), colour `numerals` (AOD: `dim`), left-aligned from x = 232 |
 | Separator | 60 × 1 px line, x 197 → 257, y 266, colour `rule` |
 | Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label mono 16 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility) colour `dim` centred at y ≈ 290, value condensed semibold (600) 28 px colour `ink` centred at y ≈ 316. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
@@ -117,6 +117,10 @@ calls `WatchUi.requestUpdate()`.
 - `AccentColor`, `NumeralColor`: list of the colours above (numerals has an "Accent" entry — use a sentinel like `-1`)
 - `InkColor`, `DimColor`: optional, defaults `0xF4F4EF` / `0xB0B0AA`
 - `NightMode`: 0 Off (default), 1 Auto, 2 On (see Display modes)
+- `DateFormat`: 0 Watch (default), 1 `MON 28 SEP`, 2 DD-MM-YYYY, 3 MM-DD-YYYY (weekday kept in front).
+  Connect IQ doesn't expose the watch's date order, so Watch infers it from `distanceUnits`
+  (statute → MM-DD-YYYY, metric → DD-MM-YYYY), re-read each minute. There is no time-format
+  setting on purpose: the time always follows the watch's 12 / 24 h setting
 
 Accent and numeral lists were extended beyond the design's five/four colours (Amber, Mint, Cobalt,
 Violet, Scarlet; numerals also Silver and every accent hue) so the user has a range to pick from.
@@ -190,7 +194,7 @@ line box).
 | `TimeAod` | Barlow Condensed 300 | 164 px | `0123456789` |
 | `Value` | Barlow Condensed 600 | 28 px (14) | digits, `,.:%-/+°`, space, `A–Z a–z` (system data values) |
 | `ArcValue` | Barlow Condensed 600 | 26 px (13) | `0123456789%-` |
-| `Mono22` | DM Mono 400 | 22 px (12) | `A–Z 0–9` space |
+| `Mono22` | DM Mono 400 | 22 px (12) | `A–Z 0–9 -` space |
 | `Mono16` | DM Mono 400 | 16 px (10) | `A–Z 0–9 ./-%°` space |
 | `Mono14` | DM Mono 400 | 14 px (10) | `A–Z` space |
 

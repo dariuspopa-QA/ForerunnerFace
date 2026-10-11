@@ -87,10 +87,16 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mDayDim as Number = 0xB0B0AA;
 
     // Night (red) mode: the NightMode setting, whether it is on now, and the
-    // minute it was last evaluated
+    // minute it (and the clock / date formats) was last evaluated
     private var mNightMode as Number = ApexLayout.NIGHT_OFF;
     private var mNight as Boolean = false;
     private var mNightMinute as Number = -1;
+
+    // DateFormat setting (ApexFormat enum), the date format drawn, and whether the
+    // watch shows 12 h time
+    private var mDateSetting as Number = ApexFormat.DATE_WATCH;
+    private var mDateFormat as Number = ApexFormat.DATE_DMY;
+    private var mTwelveHour as Boolean = false;
 
     // Colours in use (ApexLayout.palette of the above)
     private var mAccent as Number = 0xC8FF2E;
@@ -322,6 +328,8 @@ class ApexFaceView extends WatchUi.WatchFace {
         mDayNumerals = ApexLayout.numeralColor(numerals, mDayAccent);
         mDayInk = prop("InkColor", 0xF4F4EF);
         mDayDim = prop("DimColor", 0xB0B0AA);
+        mDateSetting = prop("DateFormat", ApexFormat.DATE_WATCH);
+        updateFormats();
         var night = prop("NightMode", ApexLayout.NIGHT_OFF);
         mNightMode = (night >= ApexLayout.NIGHT_OFF && night <= ApexLayout.NIGHT_ON) ? night : ApexLayout.NIGHT_OFF;
         mNightMinute = -1;
@@ -338,18 +346,29 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     // ---- Night mode ----------------------------------------------------
 
-    // Re-evaluates Auto night mode once a minute and switches the palette on change.
+    // Re-evaluates Auto night mode once a minute and switches the palette on change;
+    // also picks up a change of the watch's 12 / 24 h or unit settings.
     private function updateNight(clock as System.ClockTime) as Void {
         var minute = clock.hour * 60 + clock.min;
         if (minute == mNightMinute) {
             return;
         }
         mNightMinute = minute;
+        updateFormats();
         var night = nightNow(clock);
         if (night != mNight) {
             mNight = night;
             applyPalette();
         }
+    }
+
+    // 12 / 24 h time from the watch's own setting; the date format from the DateFormat
+    // setting (or the watch's distance units, see ApexFormat.dateFormat).
+    private function updateFormats() as Void {
+        var settings = System.getDeviceSettings();
+        mTwelveHour = !settings.is24Hour;
+        mData.setTwelveHour(mTwelveHour);
+        mDateFormat = ApexFormat.dateFormat(mDateSetting, settings.distanceUnits == System.UNIT_STATUTE);
     }
 
     // On: always. Auto: between the sleep and wake times of the user profile.
@@ -596,7 +615,8 @@ class ApexFaceView extends WatchUi.WatchFace {
     }
 
     private function drawDate(dc as Dc, now as Gregorian.Info) as Void {
-        var text = ApexFormat.dateText(now.day_of_week as Number, now.day as Number, now.month as Number);
+        var text = ApexFormat.dateText(now.day_of_week as Number, now.day as Number, now.month as Number,
+            now.year as Number, mDateFormat);
         drawTracked(dc, text, C, DATE_Y, mFontDate, DATE_TRACKING, mDim);
     }
 
@@ -604,7 +624,7 @@ class ApexFaceView extends WatchUi.WatchFace {
             hoursColor as Number, minutesColor as Number) as Void {
         var y = (TIME_Y + mShiftY) * mScale;
         dc.setColor(hoursColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText((HOURS_RIGHT_X + mShiftX) * mScale, y, hoursFont, ApexFormat.twoDigits(now.hour as Number),
+        dc.drawText((HOURS_RIGHT_X + mShiftX) * mScale, y, hoursFont, ApexFormat.hourText(now.hour as Number, mTwelveHour),
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(minutesColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText((MINUTES_LEFT_X + mShiftX) * mScale, y, minutesFont, ApexFormat.twoDigits(now.min as Number),

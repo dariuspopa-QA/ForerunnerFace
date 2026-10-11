@@ -179,8 +179,14 @@ class ApexData {
     private var mHaveSun as Boolean = false;
     private var mSunrise as Time.Moment or Null;
     private var mSunset as Time.Moment or Null;
+    private var mTwelveHour as Boolean = false;
 
     function initialize() {
+    }
+
+    // Sunrise / sunset follow the face's 12 / 24 h time format.
+    function setTwelveHour(twelve as Boolean) as Void {
+        mTwelveHour = twelve;
     }
 
     // Call once per update; drops cached values when the minute changes.
@@ -366,7 +372,7 @@ class ApexData {
             return ApexMetrics.NO_VALUE;
         }
         var t = Gregorian.info(moment, Time.FORMAT_SHORT);
-        return ApexFormat.clockText(t.hour as Number, t.min as Number);
+        return ApexFormat.clockText(t.hour as Number, t.min as Number, mTwelveHour);
     }
 
     // ---- Helpers -------------------------------------------------------

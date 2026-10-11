@@ -14,7 +14,8 @@ What's on the face
 • A 270° arc around the dial, with its value at 6 o'clock: Body Battery, Step goal, Battery, Stress or Intensity minutes (or turn it off)
 • Three data fields under the time, each one your choice
 • A single accent tick that sweeps the rim for seconds
-• Weekday and date
+• Weekday and date in your watch's style (DD-MM-YYYY or MM-DD-YYYY), or MON 28 SEP
+• 12-hour or 24-hour time, as set on your watch
 
 Data fields
 Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
@@ -33,7 +34,7 @@ A red palette that's easy on your eyes in the dark: Off, On, or Auto (between th
 
 Customise
 • On the watch: from the watch face, hold the menu button, select Watch Face, then START > Customize to change the data and colours.
-• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode.
+• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode and the date format.
 
 Supported watches (66 models, round screens from 218 to 466 px)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
@@ -56,10 +57,7 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.0.1)
-• New typefaces: the time now uses a true heavy/thin condensed pair (hours bold, minutes light), with crisp labels, each sized for your watch's screen.
-• Night mode: a red palette that's easy on your eyes in the dark. Off, On, or Auto between your sleep and wake times. Find it in the face's settings in the Connect IQ app.
-• MIP watches (fēnix 7/8 Solar, Forerunner 255/955, Enduro 3 and others) now keep the seconds when your wrist is down.
-• Better burn-in protection in always-on mode on AMOLED watches.
-• The on-watch editor only offers Sleep score on watches that have it.
-• Fixes a crash when the Recovery field was selected on watches that don't track recovery time (Venu 2, Venu 2S, vívoactive 6, Approach S50).
+WHAT'S NEW (version 1.0.2)
+• The time now follows your watch's 12-hour / 24-hour setting, including sunrise and sunset.
+• The date follows your watch too: MM-DD-YYYY if your watch uses miles, DD-MM-YYYY if it uses kilometres, with the weekday in front.
+• Prefer another date style? Pick DD-MM-YYYY, MM-DD-YYYY or the classic MON 28 SEP under Date format in the face's settings in the Connect IQ app.

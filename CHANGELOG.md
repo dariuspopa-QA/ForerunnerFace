@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.2
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • The time now follows your watch's 12-hour / 24-hour setting, including sunrise and sunset.
+> • The date follows your watch too: MM-DD-YYYY if your watch uses miles, DD-MM-YYYY if it uses kilometres, with the weekday in front.
+> • Prefer another date style? Pick DD-MM-YYYY, MM-DD-YYYY or the classic MON 28 SEP under Date format in the face's settings in the Connect IQ app.
+
+Details (since 1.0.1):
+
+- Time: always follows `DeviceSettings.is24Hour` (re-read once a minute); was always 24 h.
+  In 12 h the hours are 1–12 without a leading zero and no AM/PM marker; the Sunrise /
+  Sunset fields follow it (`7:12`).
+- New `DateFormat` setting: 0 Watch (default), 1 `MON 28 SEP` (the 1.0.1 look),
+  2 `MON 28-09-2026`, 3 `MON 09-28-2026`. Connect IQ has no API for the watch's date order,
+  so Watch infers it from the distance units (statute → month first).
+- Visible change on update: the default date switches from `MON 28 SEP` to the numeric form,
+  and 12 h watches now show 12 h time.
+- The date font (`Mono22`) gains a `-` glyph on every screen size; no other font changes.
+- Tests for the new formats; the date-glyph test covers all three date styles.
+
 ## 1.0.1
 
 Store text ("What's new", also in `store/description.txt`):
