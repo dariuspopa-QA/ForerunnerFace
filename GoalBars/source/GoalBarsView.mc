@@ -30,6 +30,10 @@ const C_LOW     = 0xFF453A;
 const C_DND     = 0xA78BFA;
 const C_AOD     = 0x6E6E73;
 const C_AOD_DIM = 0x3A3A3C;
+const C_AOD_MIN = 0x4A4A4E;   // always-on minutes: gray, never the accent
+const C_AOD_TICK = 0x2C2C2E;
+const AOD_SHIFT = 0.04;       // burn-in shift, fraction of radius
+const AOD_TIME_K = 0.86;      // always-on time size vs awake (fewer lit pixels)
 const C_BG_GRAY = 0xB0B0B8;
 
 // One fixed color per metric (Apple system palette: vivid but coordinated),
@@ -38,7 +42,8 @@ const C_BG_GRAY = 0xB0B0B8;
 // makes an empty bar look designed rather than like a placeholder.
 const BAR_COLORS = [0x34C759, 0x64D2FF, 0x5E5CE6, 0xFF375F, 0xFFD60A, 0xBF5AF2, 0xFF9F0A];
 const TRACK_TINT = 0.20;
-const KCAL_GOAL  = 500;
+// Active calories goal choices (CaloriesGoal setting; Garmin has no calorie goal API)
+const KCAL_GOALS = [300, 500, 750, 1000];
 
 const BG_LEVELS = [0.14, 0.24, 0.36];
 
@@ -101,6 +106,7 @@ class GoalBarsView extends WatchUi.WatchFace {
     private var _clockMode = 0;
     private var _timeWeight = 0;
     private var _dateFormat = 0;
+    private var _kcalGoal = 500;
     private var _bars = [0, 1, 4, 2];
     private var _showPace = true;
     private var _showNotif = true;
@@ -135,7 +141,7 @@ class GoalBarsView extends WatchUi.WatchFace {
     function initialize(editMode as Boolean) {
         WatchFace.initialize();
         _editMode = editMode;
-        loadSettings();
+        loadSettings(false);
     }
 
     // ---------- Settings ----------
@@ -154,7 +160,8 @@ class GoalBarsView extends WatchUi.WatchFace {
         return (v == null || v < 0 || v >= max) ? def : v;
     }
 
-    function loadSettings() as Void {
+    // fromPhone: the settings just changed in the Connect IQ app (see phoneWins()).
+    function loadSettings(fromPhone as Boolean) as Void {
         _accent      = ACCENTS[clampIdx(prop("AccentColor", 0), ACCENTS.size(), 0)];
         _layout      = clampIdx(prop("Layout", 0), 2, 0);
         _bgStyle     = clampIdx(prop("BgStyle", 0), 9, 0);
@@ -163,6 +170,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         _clockMode   = prop("ClockMode", 0);
         _timeWeight  = clampIdx(prop("TimeWeight", 0), 2, 0);
         _dateFormat  = prop("DateFormat", 0);
+        _kcalGoal    = KCAL_GOALS[clampIdx(prop("CaloriesGoal", 1), KCAL_GOALS.size(), 1)];
         _bars = [
             clampIdx(prop("Bar1", 0), BAR_COLORS.size(), 0),
             clampIdx(prop("Bar2", 1), BAR_COLORS.size(), 1),
@@ -175,20 +183,55 @@ class GoalBarsView extends WatchUi.WatchFace {
         _showDnd     = prop("ShowDnd", true);
         _aodDate     = prop("AodShowDate", true);
         _fontsReady  = false;
-        applyEditor(editorSettings(null), null);
+        var s = editorSettings(null);
+        applyEditor(s, null, phoneWins(s, fromPhone));
+    }
+
+    // On watches with the on-watch editor (fr970) both it and the Connect IQ app set
+    // the style, accent and bars; whichever was changed last wins. A phone change
+    // remembers the editor's state at that moment, and the phone settings hold until
+    // the editor's choices differ from it (the face was edited on the watch).
+    private function phoneWins(s, fromPhone as Boolean) as Boolean {
+        if (s == null || _editMode) {
+            return false;
+        }
+        var key = editorKey(s);
+        try {
+            if (fromPhone) {
+                Application.Storage.setValue("PhoneOverEditor", key);
+                return true;
+            }
+            var pinned = Application.Storage.getValue("PhoneOverEditor");
+            return (pinned instanceof String) && pinned.equals(key);
+        } catch (e) {
+            return fromPhone;
+        }
+    }
+
+    private function editorKey(s) as String {
+        var key = "" + s.styleId + "/" + ((s.accentColor != null) ? s.accentColor.color : null);
+        var refs = s.complicationSettings;
+        if (refs != null) {
+            for (var i = 0; i < refs.size(); i++) {
+                key += "/" + refs[i].uniqueIdentifier + ":" + complicationType(refs[i].complicationId);
+            }
+        }
+        return key;
     }
 
     // ---------- Native watch face editor ----------
     // Slots: 1-4 = the bars, 5 = the bottom data field.
 
-    function applyEditor(s, editedType) as Void {
+    // phoneWins: keep the phone's style, accent and bars; only the bottom field
+    // (which has no phone setting) is taken from the editor.
+    function applyEditor(s, editedType, phoneWins as Boolean) as Void {
         if (s == null) {
             return;
         }
-        if (s.styleId != null) {
+        if (s.styleId != null && !phoneWins) {
             _layout = (s.styleId == 2) ? 1 : 0;
         }
-        if (s.accentColor != null && s.accentColor.color != null) {
+        if (s.accentColor != null && s.accentColor.color != null && !phoneWins) {
             _accent = s.accentColor.color;
         }
         var refs = s.complicationSettings;
@@ -196,7 +239,7 @@ class GoalBarsView extends WatchUi.WatchFace {
             for (var i = 0; i < refs.size(); i++) {
                 var slot = refs[i].uniqueIdentifier;
                 var type = complicationType(refs[i].complicationId);
-                if (slot != null && slot >= 1 && slot <= 4) {
+                if (slot != null && slot >= 1 && slot <= 4 && !phoneWins) {
                     var kind = kindForComplication(type);
                     if (kind != null) {
                         _bars[slot - 1] = kind;
@@ -302,7 +345,7 @@ class GoalBarsView extends WatchUi.WatchFace {
 
         var k = r * FONT_K;
         _timeFont   = vfont(timeFaces, k * (stacked ? S_TIME_SIZE : C_TIME_SIZE), Graphics.FONT_NUMBER_HOT);
-        _aodFont    = vfont(reg, k * (stacked ? S_TIME_SIZE : C_TIME_SIZE), Graphics.FONT_NUMBER_MILD);
+        _aodFont    = vfont(reg, k * AOD_TIME_K * (stacked ? S_TIME_SIZE : C_TIME_SIZE), Graphics.FONT_NUMBER_MILD);
         _hrFont     = vfont(bold, k * HR_SIZE, Graphics.FONT_SMALL);
         _dateFont   = vfont(reg, k * DATE_SIZE, Graphics.FONT_TINY);
         _valFont    = vfont(bold, k * (stacked ? S_VAL_SIZE : C_VAL_SIZE), Graphics.FONT_SMALL);
@@ -361,7 +404,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         var settings = System.getDeviceSettings();
 
         var burnIn = (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection;
-        if (!_awake && burnIn) {
+        if (!_awake && burnIn && !_editMode) {
             drawAod(dc, cx, cy, r, clock, settings);
             return;
         }
@@ -392,7 +435,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         var tr = cx + r * S_TIME_R;
         var just = Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(C_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(tr, cy + r * S_HOUR_Y, _timeFont, hourString(clock, settings, true), just);
+        dc.drawText(tr, cy + r * S_HOUR_Y, _timeFont, hourString(clock, settings), just);
         dc.setColor(_accent, Graphics.COLOR_TRANSPARENT);
         dc.drawText(tr, cy + r * S_MIN_Y, _timeFont, clock.min.format("%02d"), just);
         drawCard(dc, cx, cy, r, S_CARD);
@@ -404,7 +447,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         var y = cy + r * C_TIME_Y;
         var gap = r * C_TIME_GAP;
         dc.setColor(C_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx - gap, y, _timeFont, hourString(clock, settings, false),
+        dc.drawText(cx - gap, y, _timeFont, hourString(clock, settings),
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(_accent, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx + gap, y, _timeFont, clock.min.format("%02d"),
@@ -422,7 +465,7 @@ class GoalBarsView extends WatchUi.WatchFace {
         drawStatus(dc, cx, cy + r * STATUS_Y, r, settings);
         if (_dateFormat != DF_OFF) {
             dc.setColor(C_GRAY, Graphics.COLOR_TRANSPARENT);
-            drawSpaced(dc, cx, cy + r * DATE_Y, _dateFont, dateString(_layout == 1), r * 0.014);
+            drawSpaced(dc, cx, cy + r * DATE_Y, _dateFont, dateString(), r * 0.014);
         }
     }
 
@@ -516,20 +559,21 @@ class GoalBarsView extends WatchUi.WatchFace {
 
     // ---------- Time and date ----------
 
-    private function hourString(clock, settings, pad as Boolean) as String {
+    // Zero-padded in 24 h; 1-12 without padding in 12 h (as in ApexFace).
+    private function hourString(clock, settings) as String {
         var hour = clock.hour;
         var use24 = (_clockMode == 0) ? settings.is24Hour : (_clockMode == 1);
         if (!use24) {
             hour = hour % 12;
             if (hour == 0) { hour = 12; }
         }
-        return (pad || use24) ? hour.format("%02d") : hour.format("%d");
+        return use24 ? hour.format("%02d") : hour.format("%d");
     }
 
     // Weekday and date by the DateFormat setting: "MON 28 SEP", or day and month padded
     // "MON 28-09-2026" / "MON 09-28-2026". Watch picks the numeric order from the
     // distance units (Connect IQ has no API for the watch's date order): miles = month first.
-    private function dateString(withMonth as Boolean) as String {
+    private function dateString() as String {
         var m = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var weekday = m.day_of_week.toUpper() + " ";
         var format = _dateFormat;
@@ -542,9 +586,7 @@ class GoalBarsView extends WatchUi.WatchFace {
             var month = d.month.format("%02d");
             return weekday + (format == DF_DMY ? day + "-" + month : month + "-" + day) + "-" + d.year;
         }
-        var s = weekday + m.day.format("%d");
-        if (withMonth) { s = s + " " + m.month.toUpper(); }
-        return s;
+        return weekday + m.day.format("%d") + " " + m.month.toUpper();
     }
 
     // Letter-spaced caps (Monkey C text has no tracking option), centered on x.
@@ -672,7 +714,7 @@ class GoalBarsView extends WatchUi.WatchFace {
             return [(s == null) ? 0.0 : (100 - s) / 100.0, s == null ? "--" : s.format("%d"), -1.0];
         }
         var kcal = activeCalories(am.calories == null ? 0 : am.calories);
-        return [kcal.toFloat() / KCAL_GOAL, thousands(kcal, compact), dayPace()];
+        return [kcal.toFloat() / _kcalGoal,thousands(kcal, compact), dayPace()];
     }
 
     // ---------- Bars ----------
@@ -869,47 +911,66 @@ class GoalBarsView extends WatchUi.WatchFace {
     }
 
     // ---------- Always-on (low power) ----------
-    // Same time position as the awake face (so nothing jumps when the wrist
-    // drops), in regular weight and dimmed, plus one dot per bar where the
-    // card was: filled in the metric's color once its goal is met.
+    // Like ApexFace: nothing accent-colored, a thinner and slightly smaller time
+    // in grays at the awake position (so nothing jumps when the wrist drops), the
+    // 12 hour ticks, the date in both layouts, and one dot per bar where the card
+    // was (filled in the metric's color once its goal is met). Everything moves
+    // together each minute against burn-in; the ticks are inset by the largest shift.
 
     private function drawAod(dc, cx, cy, r, clock, settings) as Void {
         var shifts = [[0, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
         var s = shifts[clock.min % shifts.size()];
-        var dx = s[0] * r * 0.04;
-        var dy = s[1] * r * 0.04;
-        var minColor = scaleColor(_accent, 0.55);
+        var dx = s[0] * r * AOD_SHIFT;
+        var dy = s[1] * r * AOD_SHIFT;
         var card;
+
+        drawAodTicks(dc, cx + dx, cy + dy, r);
+        if (_aodDate && _dateFormat != DF_OFF) {
+            dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
+            drawSpaced(dc, cx + dx, cy + r * DATE_Y + dy, _dateFont, dateString(), r * 0.014);
+        }
 
         if (_layout == 0) {
             var tr = cx + r * S_TIME_R + dx;
             var just = Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER;
             dc.setColor(C_AOD, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(tr, cy + r * S_HOUR_Y + dy, _aodFont, hourString(clock, settings, true), just);
-            dc.setColor(minColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(tr, cy + r * S_HOUR_Y + dy, _aodFont, hourString(clock, settings), just);
+            dc.setColor(C_AOD_MIN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(tr, cy + r * S_MIN_Y + dy, _aodFont, clock.min.format("%02d"), just);
             card = S_CARD;
         } else {
             var y = cy + r * C_TIME_Y + dy;
             var gap = r * C_TIME_GAP;
             dc.setColor(C_AOD, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(cx + dx - gap, y, _aodFont, hourString(clock, settings, false),
+            dc.drawText(cx + dx - gap, y, _aodFont, hourString(clock, settings),
                 Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
-            dc.setColor(minColor, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(C_AOD_MIN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx + dx + gap, y, _aodFont, clock.min.format("%02d"),
                 Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
             dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(cx + dx, y - r * 0.075, r * 0.022);
             dc.fillCircle(cx + dx, y + r * 0.080, r * 0.022);
-            if (_aodDate && _dateFormat != DF_OFF) {
-                dc.setColor(C_AOD_DIM, Graphics.COLOR_TRANSPARENT);
-                drawSpaced(dc, cx + dx, cy + r * DATE_Y + dy, _dateFont, dateString(true), r * 0.014);
-            }
             card = C_CARD;
         }
         var step = r * 0.077;
         drawAodDots(dc, cx + r * (card[0] + card[2] / 2.0) - step * 1.5 + dx,
             cy + r * (card[1] + card[3] / 2.0) + dy, r);
+    }
+
+    // The 12 hour ticks of the bezel, dim, pulled in by the burn-in shift.
+    private function drawAodTicks(dc, cx, cy, r) as Void {
+        var outer = r * (0.971 - AOD_SHIFT * 1.5);
+        var inner = outer - r * 0.048;
+        var pw = (r * 0.012).toNumber();
+        dc.setPenWidth(pw < 2 ? 2 : pw);
+        dc.setColor(C_AOD_TICK, Graphics.COLOR_TRANSPARENT);
+        for (var i = 0; i < 12; i++) {
+            var a = i * Math.PI / 6.0;
+            var sn = Math.sin(a);
+            var cs = Math.cos(a);
+            dc.drawLine(cx + outer * sn, cy - outer * cs, cx + inner * sn, cy - inner * cs);
+        }
+        dc.setPenWidth(1);
     }
 
     private function drawAodDots(dc, x, y, r) as Void {

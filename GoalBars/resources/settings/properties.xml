@@ -12,6 +12,8 @@
     <property id="Bar2" type="number">1</property>
     <property id="Bar3" type="number">4</property>
     <property id="Bar4" type="number">2</property>
+    <!-- active calories goal: 0 300, 1 500, 2 750, 3 1000 kcal -->
+    <property id="CaloriesGoal" type="number">1</property>
     <property id="ShowPace" type="boolean">true</property>
     <property id="ShowNotifications" type="boolean">true</property>
     <property id="ShowAlarms" type="boolean">true</property>

@@ -53,7 +53,12 @@
     <string id="Move">Move alert</string>
     <string id="BodyBattery">Body Battery</string>
     <string id="Stress">Stress (inverted)</string>
-    <string id="Calories">Active calories (goal 500)</string>
+    <string id="Calories">Active calories</string>
+    <string id="KcalGoalTitle">Active calories goal</string>
+    <string id="Kcal300">300 kcal</string>
+    <string id="Kcal500">500 kcal</string>
+    <string id="Kcal750">750 kcal</string>
+    <string id="Kcal1000">1000 kcal</string>
 
     <string id="NotifTitle">Show notification count</string>
     <string id="AlarmsTitle">Show alarm count</string>

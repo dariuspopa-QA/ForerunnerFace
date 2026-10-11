@@ -11,7 +11,7 @@ import Toybox.WatchUi;
 // the view applies those choices as overrides on top of its saved settings.
 //
 // A view using this implements:
-//   applyEditor(settings, editedType)  - apply a WatchFaceConfig.Settings
+//   applyEditor(settings, editedType, phoneWins) - apply a WatchFaceConfig.Settings
 //   slotBox(slot) as [x, y, w, h]?      - screen box of an editable slot
 //   slotAt(x, y) as Number?             - slot under a tap, if any
 //   drawSlot(dc, slot)                  - draw one slot alone (editor preview)
@@ -113,7 +113,7 @@ class EditorDelegate extends WatchUi.WatchFaceDelegate {
         if (id != null) {
             var s = editorSettings(id);
             if (s != null) {
-                _view.applyEditor(s, options[:type]);
+                _view.applyEditor(s, options[:type], false);
             }
         }
     }

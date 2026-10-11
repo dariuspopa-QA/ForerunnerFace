@@ -28,7 +28,7 @@ class GoalBarsApp extends Application.AppBase {
     // Called when settings change in the Garmin Connect app
     function onSettingsChanged() as Void {
         if (_view != null) {
-            _view.loadSettings();
+            _view.loadSettings(true);
         }
         WatchUi.requestUpdate();
     }

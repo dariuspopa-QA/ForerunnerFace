@@ -106,6 +106,14 @@
             <listEntry value="6">@Strings.Calories</listEntry>
         </settingConfig>
     </setting>
+    <setting propertyKey="@Properties.CaloriesGoal" title="@Strings.KcalGoalTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Kcal300</listEntry>
+            <listEntry value="1">@Strings.Kcal500</listEntry>
+            <listEntry value="2">@Strings.Kcal750</listEntry>
+            <listEntry value="3">@Strings.Kcal1000</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.ShowPace" title="@Strings.PaceTitle">
         <settingConfig type="boolean"/>
     </setting>
