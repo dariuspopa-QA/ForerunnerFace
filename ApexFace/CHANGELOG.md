@@ -1,10 +1,21 @@
 # Changelog
 
-## Unreleased
+## 1.0.3
 
-- Fix: a crash on the fr970 (Invalid Value while drawing the arc label). The fonts are now
-  held by the face instead of as graphics pool references the watch can purge, and the
-  cached ring is drawn from `get()`, falling back to direct drawing.
+Store text ("What's new", also in `store/description.txt`):
+
+> • Fixes a crash that could close the face when you returned to it, for example after an activity, a notification or a sync.
+
+Details (since 1.0.2):
+
+- Fix: fatal `Invalid Value` in `getTextWidthInPixels` while drawing the arc label
+  (fr970 crash log, 1.0.1). On API 4+ `loadResource` returns fonts as graphics pool
+  references the watch may purge; drawing with one it can't bring back can't be caught.
+  `loadFonts` now keeps the resources themselves (system fonts if one won't load), and the
+  cached ring is drawn from `get()`, falling back to direct drawing (also when the pool
+  is too full to allocate it, as on the Venu 2 simulator with the fonts held).
+- New test `fontsAreHeldAsResources` (fails on 1.0.2).
+- No visible change.
 
 ## 1.0.2
 

@@ -587,12 +587,14 @@ class ApexFaceView extends WatchUi.WatchFace {
         mRingDirty = false;
         mRing = null;
         var ring;
+        var bitmap;
         try {
             ring = Graphics.createBufferedBitmap({:width => width, :height => height});
+            // get() allocates from the pool and throws when it is full
+            bitmap = ring.get();
         } catch (e) {
             return;
         }
-        var bitmap = ring.get();
         if (bitmap == null) {
             return;
         }

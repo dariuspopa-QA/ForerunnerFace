@@ -57,7 +57,5 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.0.2)
-• The time now follows your watch's 12-hour / 24-hour setting, including sunrise and sunset.
-• The date follows your watch too: MM-DD-YYYY if your watch uses miles, DD-MM-YYYY if it uses kilometres, with the weekday in front.
-• Prefer another date style? Pick DD-MM-YYYY, MM-DD-YYYY or the classic MON 28 SEP under Date format in the face's settings in the Connect IQ app.
+WHAT'S NEW (version 1.0.3)
+• Fixes a crash that could close the face when you returned to it, for example after an activity, a notification or a sync.
