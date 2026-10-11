@@ -1,0 +1,66 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0xD7FF1F">@Strings.ColorHiVis</listEntry>
+            <listEntry value="0xFFD400">@Strings.ColorYellow</listEntry>
+            <listEntry value="0xFF6A13">@Strings.ColorSafetyOrange</listEntry>
+            <listEntry value="0x3AD0FF">@Strings.ColorCoolantBlue</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DateFormat" title="@Strings.DateFormatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DateFormatWatch</listEntry>
+            <listEntry value="1">@Strings.DateFormatNamed</listEntry>
+            <listEntry value="2">@Strings.DateFormatDmy</listEntry>
+            <listEntry value="3">@Strings.DateFormatMdy</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ShiftStart" title="@Strings.ShiftStartTitle">
+        <settingConfig type="list">
+            <listEntry value="300">@Strings.Start300</listEntry>
+            <listEntry value="330">@Strings.Start330</listEntry>
+            <listEntry value="360">@Strings.Start360</listEntry>
+            <listEntry value="390">@Strings.Start390</listEntry>
+            <listEntry value="420">@Strings.Start420</listEntry>
+            <listEntry value="450">@Strings.Start450</listEntry>
+            <listEntry value="480">@Strings.Start480</listEntry>
+            <listEntry value="510">@Strings.Start510</listEntry>
+            <listEntry value="540">@Strings.Start540</listEntry>
+            <listEntry value="570">@Strings.Start570</listEntry>
+            <listEntry value="600">@Strings.Start600</listEntry>
+            <listEntry value="630">@Strings.Start630</listEntry>
+            <listEntry value="660">@Strings.Start660</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ShiftLength" title="@Strings.ShiftLengthTitle">
+        <settingConfig type="list">
+            <listEntry value="240">@Strings.Len240</listEntry>
+            <listEntry value="360">@Strings.Len360</listEntry>
+            <listEntry value="420">@Strings.Len420</listEntry>
+            <listEntry value="480">@Strings.Len480</listEntry>
+            <listEntry value="540">@Strings.Len540</listEntry>
+            <listEntry value="600">@Strings.Len600</listEntry>
+            <listEntry value="720">@Strings.Len720</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BreakTime" title="@Strings.BreakTitle">
+        <settingConfig type="list">
+            <listEntry value="-1">@Strings.BreakNone</listEntry>
+            <listEntry value="600">@Strings.Break600</listEntry>
+            <listEntry value="630">@Strings.Break630</listEntry>
+            <listEntry value="660">@Strings.Break660</listEntry>
+            <listEntry value="690">@Strings.Break690</listEntry>
+            <listEntry value="720">@Strings.Break720</listEntry>
+            <listEntry value="750">@Strings.Break750</listEntry>
+            <listEntry value="780">@Strings.Break780</listEntry>
+            <listEntry value="810">@Strings.Break810</listEntry>
+            <listEntry value="840">@Strings.Break840</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Bay" title="@Strings.BayTitle" prompt="@Strings.BayPrompt">
+        <settingConfig type="numeric" min="0" max="99"/>
+    </setting>
+    <setting propertyKey="@Properties.JobName" title="@Strings.JobTitle" prompt="@Strings.JobPrompt">
+        <settingConfig type="alphaNumeric" maxLength="22"/>
+    </setting>
+</settings>

@@ -1,0 +1,229 @@
+import Toybox.Application;
+import Toybox.Graphics;
+import Toybox.Lang;
+import Toybox.Math;
+import Toybox.System;
+import Toybox.Time;
+import Toybox.Time.Gregorian;
+import Toybox.WatchUi;
+
+// Flat Rate: a shift clock for the shop. The ring fills over the shift (its last tenth in
+// red); ON CLOCK, BOOK (the shift length) and LEFT under the time; a hazard-stripe band
+// names the next stop (break or shift end). Shift start, length, break, bay and the job
+// line are phone settings. Geometry follows the canvas mockup (FlatRate.dc.html, 454 px).
+class FaceView extends WatchUi.WatchFace {
+
+    private const C = FaceKit.C;
+    private const TIME_Y = 165.0f;
+    private const BAND_Y = 326.0f;
+    private const BAND_H = 40.0f;
+    private const LATE = 0xFF5A3C;
+
+    private var mAccent as Number = 0xD7FF1F;
+    private var mDateSetting as Number = FaceKit.DATE_NAMED;
+    private var mStart as Number = 420;       // minutes after midnight
+    private var mLength as Number = 480;      // minutes
+    private var mBreak as Number = 720;       // minutes after midnight, -1 = none
+    private var mBay as Number = 3;           // 0 = not shown
+    private var mJob as String = "ON THE CLOCK";
+    private var mScale as Float = 1.0f;
+    private var mAwake as Boolean = true;
+    private var mEditMode as Boolean;
+    private var mData as FaceData = new FaceData();
+
+    private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
+    private var mFontTimeAod as FontType = Graphics.FONT_NUMBER_HOT;
+    private var mFontTop as FontType = Graphics.FONT_XTINY;
+    private var mFontJob as FontType = Graphics.FONT_TINY;
+    private var mFontBoxLabel as FontType = Graphics.FONT_XTINY;
+    private var mFontBoxValue as FontType = Graphics.FONT_TINY;
+    private var mFontBand as FontType = Graphics.FONT_XTINY;
+    private var mFontBottom as FontType = Graphics.FONT_XTINY;
+
+    function initialize(editMode as Boolean) {
+        WatchFace.initialize();
+        mEditMode = editMode;
+        loadSettings();
+    }
+
+    function onLayout(dc as Dc) as Void {
+        mScale = dc.getWidth() / FaceKit.DESIGN;
+        try {
+            mFontTime = WatchUi.loadResource(Rez.Fonts.Time) as FontResource;
+            mFontTimeAod = WatchUi.loadResource(Rez.Fonts.TimeAod) as FontResource;
+            mFontTop = WatchUi.loadResource(Rez.Fonts.Top) as FontResource;
+            mFontJob = WatchUi.loadResource(Rez.Fonts.Job) as FontResource;
+            mFontBoxLabel = WatchUi.loadResource(Rez.Fonts.BoxLabel) as FontResource;
+            mFontBoxValue = WatchUi.loadResource(Rez.Fonts.BoxValue) as FontResource;
+            mFontBand = WatchUi.loadResource(Rez.Fonts.Band) as FontResource;
+            mFontBottom = WatchUi.loadResource(Rez.Fonts.Bottom) as FontResource;
+        } catch (e) {
+        }
+    }
+
+    function onExitSleep() as Void {
+        mAwake = true;
+        WatchUi.requestUpdate();
+    }
+
+    function onEnterSleep() as Void {
+        mAwake = false;
+        WatchUi.requestUpdate();
+    }
+
+    function loadSettings() as Void {
+        mAccent = FaceKit.prop("AccentColor", 0xD7FF1F);
+        mDateSetting = FaceKit.prop("DateFormat", FaceKit.DATE_NAMED);
+        mStart = FaceKit.prop("ShiftStart", 420);
+        mLength = FaceKit.prop("ShiftLength", 480);
+        mBreak = FaceKit.prop("BreakTime", 720);
+        mBay = FaceKit.prop("Bay", 3);
+        mJob = "ON THE CLOCK";
+        try {
+            var job = Application.Properties.getValue("JobName");
+            if (job instanceof String && job.length() > 0) {
+                mJob = job.toUpper();
+            }
+        } catch (e) {
+        }
+        if (mLength < 30) {
+            mLength = 30;
+        }
+        var editor = FaceEditor.settingsFor(null);
+        if (editor != null) {
+            applyEditor(editor);
+        }
+    }
+
+    function applyEditor(settings as Application.WatchFaceConfig.Settings) as Void {
+        var accent = settings.accentColor;
+        if (accent != null && accent.color instanceof Number) {
+            mAccent = accent.color as Number;
+        }
+    }
+
+    function onUpdate(dc as Dc) as Void {
+        dc.setAntiAlias(true);
+        mData.refresh();
+        var clock = System.getClockTime();
+        var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        FaceDemo.time(clock, now);
+        var hm = FaceKit.hourText(clock.hour) + ":" + FaceKit.twoDigits(clock.min);
+        var nowMin = clock.hour * 60 + clock.min + clock.sec / 60.0f;
+        var elapsed = nowMin - mStart;
+        elapsed = elapsed < 0 ? 0.0f : (elapsed > mLength ? mLength.toFloat() : elapsed);
+        var progress = elapsed / mLength;
+
+        if ((!mAwake || FaceDemo.FORCE_AOD) && !mEditMode && FaceKit.burnInProtection()) {
+            drawAlwaysOn(dc, clock, hm, progress, nowMin);
+            return;
+        }
+        dc.setColor(ShopKit.GROUND, ShopKit.GROUND);
+        dc.clear();
+        var mid = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+
+        var lit = Math.round(progress * 100).toNumber();
+        for (var i = 0; i < 100; i++) {
+            dc.setColor(i < lit ? (i >= 90 ? LATE : mAccent) : 0x1E2022, Graphics.COLOR_TRANSPARENT);
+            ShopKit.bar(dc, i * 3.6f, 205, 223, 4, mScale);
+        }
+
+        if (mBay > 0) {
+            dc.setColor(ShopKit.MUTED, Graphics.COLOR_TRANSPARENT);
+            FaceKit.drawTracked(dc, C * mScale, 62 * mScale, mFontTop, "BAY " + mBay, 2 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+        dc.setColor(ShopKit.TEXT, Graphics.COLOR_TRANSPARENT);
+        FaceKit.drawTracked(dc, C * mScale, 86 * mScale, mFontJob, mJob, 1 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(C * mScale, TIME_Y * mScale, mFontTime, hm, mid);
+
+        var left = mLength - elapsed;
+        box(dc, 0, "ON CLOCK", minutesText(elapsed), false);
+        box(dc, 1, "BOOK", (mLength / 60.0f).format("%.1f") + " h", false);
+        box(dc, 2, "LEFT", minutesText(left), true);
+
+        drawBand(dc, nowMin);
+
+        dc.setColor(ShopKit.MUTED, Graphics.COLOR_TRANSPARENT);
+        FaceKit.drawTracked(dc, C * mScale, 388 * mScale, mFontBottom,
+            FaceKit.dateText(now, FaceKit.dateFormat(mDateSetting)) + " · HR " + ShopKit.orDash(mData.heartRate()),
+            3 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    // "1:36" for a number of minutes.
+    private function minutesText(minutes as Float) as String {
+        var m = minutes.toNumber();
+        return (m / 60).toString() + ":" + FaceKit.twoDigits(m % 60);
+    }
+
+    // One of the three boxes under the time (0..2, left to right).
+    private function box(dc as Dc, i as Number, label as String, value as String, accent as Boolean) as Void {
+        var w = (270.0f - 16) / 3;
+        var x = 92 + i * (w + 8);
+        dc.setColor(accent ? mAccent : 0x141516, Graphics.COLOR_TRANSPARENT);
+        ShopKit.box(dc, x, 236, w, 56, 8, mScale);
+        var cx = (x + w / 2) * mScale;
+        dc.setColor(accent ? ShopKit.GROUND : ShopKit.MUTED, Graphics.COLOR_TRANSPARENT);
+        FaceKit.drawTracked(dc, cx, 252 * mScale, mFontBoxLabel, label, 2 * mScale, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.setColor(accent ? ShopKit.GROUND : ShopKit.TEXT, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, 274 * mScale, mFontBoxValue, value, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // What comes next: shift start, break, shift end, or done.
+    private function nextText(nowMin as Float) as String {
+        var end = mStart + mLength;
+        if (nowMin < mStart) {
+            return "START " + clockText(mStart);
+        }
+        if (mBreak > mStart && mBreak < end && nowMin < mBreak) {
+            return "NEXT · BREAK " + clockText(mBreak);
+        }
+        if (nowMin < end) {
+            return "NEXT · END " + clockText(end);
+        }
+        return "SHIFT OVER";
+    }
+
+    private function clockText(minutes as Number) as String {
+        return FaceKit.clockText(minutes / 60.0f);
+    }
+
+    // Hazard stripes across the screen with the next stop on a black plate.
+    private function drawBand(dc as Dc, nowMin as Float) as Void {
+        var top = BAND_Y * mScale;
+        var h = BAND_H * mScale;
+        dc.setClip(0, top, dc.getWidth(), h + 1);
+        dc.setColor(ShopKit.GROUND, Graphics.COLOR_TRANSPARENT);
+        dc.fillRectangle(0, top, dc.getWidth(), h + 1);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        var period = 39.6f;
+        for (var x = -BAND_H; x < FaceKit.DESIGN; x += period) {
+            dc.fillPolygon([[x * mScale, top + h], [(x + period / 2) * mScale, top + h],
+                [(x + period / 2 + BAND_H) * mScale, top], [(x + BAND_H) * mScale, top]]);
+        }
+        dc.clearClip();
+
+        var text = nextText(nowMin);
+        var track = 2 * mScale;
+        var w = FaceKit.trackedWidth(dc, mFontBand, text, track) + 24 * mScale;
+        dc.setColor(ShopKit.GROUND, Graphics.COLOR_TRANSPARENT);
+        dc.fillRectangle(C * mScale - w / 2, top + 9 * mScale, w, h - 18 * mScale);
+        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        FaceKit.drawTracked(dc, C * mScale, top + h / 2, mFontBand, text, track, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    // Always-On: thin digits, the shift as a thin arc, the next stop.
+    private function drawAlwaysOn(dc as Dc, clock as System.ClockTime, hm as String, progress as Float, nowMin as Float) as Void {
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+        var shift = ShopKit.shift(clock.min);
+        var cx = (C + shift[0]) * mScale;
+        var dy = shift[1] * mScale;
+        var dim = FaceKit.mix(mAccent, 0x000000, 0.55f);
+        dc.setColor(dim, Graphics.COLOR_TRANSPARENT);
+        FaceKit.roundArc(dc, cx, C * mScale + dy, 212 * mScale, 0.0f, progress * 360, FaceKit.penWidth(3.0f, mScale));
+        FaceKit.drawTracked(dc, cx, (BAND_Y + BAND_H / 2) * mScale + dy, mFontBand, nextText(nowMin), 2 * mScale,
+            Graphics.TEXT_JUSTIFY_CENTER);
+        dc.setColor(ShopKit.AOD_TEXT, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, TIME_Y * mScale + dy, mFontTimeAod, hm, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+}

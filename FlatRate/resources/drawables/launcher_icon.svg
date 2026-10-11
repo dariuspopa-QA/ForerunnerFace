@@ -1,0 +1,6 @@
+<svg width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Flat Rate: a shift ring over a hazard stripe -->
+<rect width="65" height="65" fill="#050505"/>
+<path d="M32.5 9 A23.5 23.5 0 1 1 9.5 37" stroke="#D7FF1F" stroke-width="5"/>
+<path d="M14 44 L22 36 L28 36 L20 44 Z M26 44 L34 36 L40 36 L32 44 Z M38 44 L46 36 L52 36 L44 44 Z" fill="#D7FF1F"/>
+</svg>
