@@ -62,6 +62,17 @@ module ApexTestUtil {
         return view.testProbe(dc);
     }
 
+    // probe() with the TimeColon setting on or off.
+    function probeColon(colon as Boolean) as Dictionary<Symbol, Numeric or Boolean> {
+        var saved = saveProperties(["TimeColon"]);
+        try {
+            Application.Properties.setValue("TimeColon", colon);
+            return probe();
+        } finally {
+            restoreProperties(saved);
+        }
+    }
+
     function saveProperties(keys as Array<String>) as Dictionary {
         var saved = {};
         for (var i = 0; i < keys.size(); i++) {

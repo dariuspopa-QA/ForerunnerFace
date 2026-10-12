@@ -55,15 +55,26 @@ $expectedDefaults = [ordered]@{
     DimColor = 0xB0B0AA
     NightMode = 0         # Off
 }
+# On / off settings (boolean properties, toggles in the app)
+$toggles = @{
+    TimeColon = 'false'   # no colon: the 1.0 look
+}
 $props = @{}
 foreach ($p in $properties.properties.property) {
+    if ($p.type -eq 'boolean') {
+        Check ($toggles.ContainsKey($p.id)) "boolean property $($p.id) is a known toggle"
+        if ($toggles.ContainsKey($p.id)) {
+            Check ($p.InnerText.Trim() -eq $toggles[$p.id]) "property $($p.id) defaults to $($toggles[$p.id])"
+        }
+        continue
+    }
     $props[$p.id] = Num $p.InnerText
 }
 foreach ($key in $expectedDefaults.Keys) {
     Check ($props.ContainsKey($key) -and $props[$key] -eq $expectedDefaults[$key]) "property $key defaults to $('0x{0:X}' -f $expectedDefaults[$key])"
 }
 foreach ($p in $properties.properties.property) {
-    Check ($p.type -eq 'number') "property $($p.id) is a number"
+    Check ($p.type -eq 'number' -or $toggles.ContainsKey($p.id)) "property $($p.id) is a number"
 }
 
 # ---- Settings lists -------------------------------------------------------
@@ -87,6 +98,10 @@ foreach ($key in 'Field1', 'Field2', 'Field3') {
 }
 Check (SameSet $lists['Arc'] @(0, 1, 2, 3, 5, 6)) "Arc lists every arc id except READINESS (4)"
 Check (SameSet $lists["NightMode"] @(0, 1, 2)) "NightMode lists Off, Auto, On"
+foreach ($key in $toggles.Keys) {
+    $s = $settings.settings.setting | Where-Object { $_.propertyKey -eq "@Properties.$key" }
+    Check ($s -ne $null -and $s.settingConfig.type -eq 'boolean') "toggle $key has a boolean setting"
+}
 
 $accents = @(0xC8FF2E, 0xFF5A1F, 0x4FD1FF, 0xFF3D7F, 0xF4F4EF)  # design's five
 foreach ($c in $accents) {

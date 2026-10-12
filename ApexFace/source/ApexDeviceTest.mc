@@ -28,7 +28,7 @@ function bitmapFontsLoadOnThisWatch(logger as Logger) as Boolean {
     return true;
 }
 
-// Font heights follow the screen: the time is ~0.7 of its 164 px design size scaled
+// Font heights follow the screen: the time is ~0.7 of its 176 px design size scaled
 // (cap height), the small text at least its legibility minimum.
 (:test)
 function fontSizesMatchThisScreen(logger as Logger) as Boolean {
@@ -36,11 +36,11 @@ function fontSizesMatchThisScreen(logger as Logger) as Boolean {
     var s = p[:scale] as Float;
     var hours = p[:hHours] as Number;
     logger.debug("time " + hours + " px, value " + p[:hValue] + ", label " + p[:hLabel] + ", date " + p[:hDate]);
-    Test.assertMessage(hours >= 164 * s * 0.6f && hours <= 164 * s * 0.8f, "time height " + hours + " for scale " + s);
-    var labelSize = 16 * s > 10 ? 16 * s : 10;
+    Test.assertMessage(hours >= 176 * s * 0.6f && hours <= 176 * s * 0.8f, "time height " + hours + " for scale " + s);
+    var labelSize = 18 * s > 10 ? 18 * s : 10;
     var label = p[:hLabel] as Number;
     Test.assertMessage(label >= labelSize * 0.5f && label <= labelSize * 1.1f, "label height " + label);
-    var valueSize = 28 * s > 14 ? 28 * s : 14;
+    var valueSize = 34 * s > 16 ? 34 * s : 16;
     var value = p[:hValue] as Number;
     Test.assertMessage(value >= valueSize * 0.6f && value <= valueSize * 1.1f, "value height " + value);
     Test.assertMessage(value > label, "values must be larger than labels");
@@ -73,19 +73,66 @@ function textRowsDoNotOverlapOnThisScreen(logger as Logger) as Boolean {
     return true;
 }
 
-// Hours (right-aligned) and minutes (left-aligned) stay inside the arc at their row.
+// Half the width (px) of the circle of radius r at a distance dy from the centre.
+function halfChord(r as Float, dy as Float) as Float {
+    return Math.sqrt(r * r - dy * dy).toFloat();
+}
+
+// The time's box (widest hours, both weights; minutes) stays inside the arc at its top
+// corners, where the arc closes in, with and without the colon. The box includes
+// the digits' side bearings, so 1 px of it may touch the arc's inner edge.
 (:test)
 function timeFitsInsideTheArcOnThisScreen(logger as Logger) as Boolean {
+    for (var colon = 0; colon < 2; colon++) {
+        var p = ApexTestUtil.probeColon(colon == 1);
+        ApexTestUtil.assertEqual(p[:colon], colon == 1);
+        var c = ApexTestUtil.screen() / 2.0f;
+        var top = (p[:timeY] as Float) - (p[:hHours] as Number) / 2.0f;
+        var hc = halfChord(p[:arcInner] as Float, top - c) + 1;
+        var hoursWide = (p[:wHours] as Number) > (p[:wHoursAod] as Number) ? p[:wHours] as Number : p[:wHoursAod] as Number;
+        var left = (p[:hoursRight] as Float) - hoursWide;
+        var right = (p[:minutesLeft] as Float) + (p[:wMinutes] as Number);
+        var what = colon == 1 ? " (colon)" : "";
+        logger.debug("time" + what + " " + left + " .. " + right + ", arc " + (c - hc) + " .. " + (c + hc));
+        Test.assertMessage(left > c - hc, "hours" + what + " start at " + left + ", arc at " + (c - hc));
+        Test.assertMessage(right < c + hc, "minutes" + what + " end at " + right + ", arc at " + (c + hc));
+        if (colon == 1) {
+            // the colon's ink (about half its advance) fits between hours and minutes
+            var w = p[:wColon] as Number;
+            Test.assertMessage(w * 0.6f <= (p[:minutesLeft] as Float) - (p[:hoursRight] as Float), "colon " + w + " px too wide");
+        }
+    }
+    return true;
+}
+
+// The date (widest form, 14 characters) stays inside the arc at its top corners.
+(:test)
+function dateFitsInsideTheArcOnThisScreen(logger as Logger) as Boolean {
     var p = ApexTestUtil.probe();
     var c = ApexTestUtil.screen() / 2.0f;
-    var r = p[:arcInner] as Float;
-    var dy = (p[:timeY] as Float) - c;
-    var halfChord = Math.sqrt(r * r - dy * dy);
-    var hoursWide = (p[:wHours] as Number) > (p[:wHoursAod] as Number) ? p[:wHours] as Number : p[:wHoursAod] as Number;
-    var left = (p[:hoursRight] as Float) - hoursWide;
-    var right = (p[:minutesLeft] as Float) + (p[:wMinutes] as Number);
-    Test.assertMessage(left > c - halfChord, "hours start at " + left + ", arc at " + (c - halfChord));
-    Test.assertMessage(right < c + halfChord, "minutes end at " + right + ", arc at " + (c + halfChord));
+    var top = (p[:dateY] as Float) - (p[:hDate] as Number) / 2.0f;
+    var hc = halfChord(p[:arcInner] as Float, top - c);
+    var w = p[:wDate] as Float;
+    logger.debug("date " + w + " px, room " + (2 * hc));
+    Test.assertMessage(w / 2 < hc, "date " + w + " px wide, arc leaves " + (2 * hc));
+    return true;
+}
+
+// The longest arc label (INTENSITY MIN) stays clear of the ticks around 6 o'clock:
+// no tick's inner end (minor r 216, major r 213) falls inside its box.
+(:test)
+function readoutLabelClearsTheTicksOnThisScreen(logger as Logger) as Boolean {
+    var p = ApexTestUtil.probe();
+    var s = p[:scale] as Float;
+    var c = ApexTestUtil.screen() / 2.0f;
+    var bottom = (p[:readoutLabelY] as Float) + (p[:hReadoutLabel] as Number) / 2.0f - c;
+    var half = (p[:wReadoutLabel] as Float) / 2;
+    for (var deg = 120; deg <= 240; deg += 6) {
+        var r = (deg % 30 == 0 ? 213 : 216) * s;
+        var tick = ApexLayout.clockPoint(deg, r);
+        Test.assertMessage(tick[0].abs() > half + 1 || tick[1] > bottom + 0.5f,
+            "tick at " + deg + " (" + tick[0] + ", " + tick[1] + ") inside the readout label (half width " + half + ", bottom " + bottom + ")");
+    }
     return true;
 }
 

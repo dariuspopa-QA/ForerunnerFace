@@ -14,6 +14,7 @@
     <string id="DimTitle">Label color</string>
     <string id="NightTitle">Night mode (red)</string>
     <string id="DateFormatTitle">Date format</string>
+    <string id="TimeColonTitle">Colon between hours and minutes</string>
 
     <!-- Field metrics -->
     <string id="MetricHr">Heart rate</string>

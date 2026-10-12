@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.0
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • Bigger text: the time, the date, the three data fields and the arc value are all larger and easier to read.
+> • New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app.
+
+Details (since 1.0.3):
+
+- New `TimeColon` setting (on / off, default off, so the face looks as before apart from the
+  sizes). The colon uses the minutes' thin weight and colour (dim in always-on), centred on the
+  digits; the hours and minutes move apart to make room for it.
+- Larger type (454 px design sizes): time 164 → 176 px, date 22 → 26 px, field values
+  28 → 34 px, field labels 16 → 18 px, arc value 26 → 32 px, arc label 14 → 16 px. Other
+  screens scale with their width. Text already at its minimum size stays as it was: labels
+  on 218–260 px screens, the arc label up to 280 px and the date on 218 px.
+- Layout re-fitted around the bigger time: date at y 94, time at y 202, separator at 280,
+  field labels / values at 302 / 334, arc value at 386.
+- The date's letter spacing goes from 3 to 2 px so the larger date still fits inside the arc.
+- Fonts regenerated for all 9 screen sizes; the minutes font gains a `:` glyph.
+- New per-watch tests: date and time (with and without colon, at the top corners) inside the
+  arc, the longest arc label clear of the bottom ticks, and the colon setting in every mode.
+- The resource check accepts on / off settings.
+
 ## 1.0.3
 
 Store text ("What's new", also in `store/description.txt`):

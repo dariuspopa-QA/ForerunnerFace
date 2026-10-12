@@ -16,6 +16,9 @@
          The time always follows the watch's 12 / 24 h setting. -->
     <property id="DateFormat" type="number">0</property>
 
+    <!-- Colon between hours and minutes -->
+    <property id="TimeColon" type="boolean">false</property>
+
     <!-- Red night palette: 0 Off, 1 Auto (profile sleep / wake times), 2 On -->
     <property id="NightMode" type="number">0</property>
 

@@ -13,7 +13,7 @@ module ApexLayout {
     const ARC_SWEEP = 270;
 
     // Arc readout value centre; taps below it (near the centre line) select the arc
-    const READOUT_VALUE_Y = 389.0f;
+    const READOUT_VALUE_Y = 386.0f;
 
     // Taps outside this radius select the arc (the rim)
     const ARC_HIT_R = 170.0f;

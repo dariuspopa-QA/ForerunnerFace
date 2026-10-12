@@ -15,7 +15,7 @@ What's on the face
 • Three data fields under the time, each one your choice
 • A single accent tick that sweeps the rim for seconds
 • Weekday and date in your watch's style (DD-MM-YYYY or MM-DD-YYYY), or MON 28 SEP
-• 12-hour or 24-hour time, as set on your watch
+• 12-hour or 24-hour time, as set on your watch, with or without a colon
 
 Data fields
 Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
@@ -34,7 +34,7 @@ A red palette that's easy on your eyes in the dark: Off, On, or Auto (between th
 
 Customise
 • On the watch: from the watch face, hold the menu button, select Watch Face, then START > Customize to change the data and colours.
-• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode and the date format.
+• On your phone: open APEX in the Connect IQ Store app and change its settings, including Night mode, the date format and the colon between hours and minutes.
 
 Supported watches (66 models, round screens from 218 to 466 px)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
@@ -57,5 +57,6 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.0.3)
-• Fixes a crash that could close the face when you returned to it, for example after an activity, a notification or a sync.
+WHAT'S NEW (version 1.1.0)
+• Bigger text: the time, the date, the three data fields and the arc value are all larger and easier to read.
+• New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app.

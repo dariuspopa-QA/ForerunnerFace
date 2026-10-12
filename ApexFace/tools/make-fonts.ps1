@@ -22,15 +22,16 @@ $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 $lower = 'abcdefghijklmnopqrstuvwxyz'
 # id, file, ttf, design px, minimum px, glyphs
 $fonts = @(
-    @('TimeHeavy', 'time_heavy', 'BarlowCondensed-ExtraBold.ttf', 164, 0, $digits),
-    @('TimeThin', 'time_thin', 'BarlowCondensed-ExtraLight.ttf', 164, 0, $digits),
-    @('TimeAod', 'time_aod', 'BarlowCondensed-Light.ttf', 164, 0, $digits),
+    # the optional colon (TimeColon setting) is drawn in the minutes' thin weight
+    @('TimeHeavy', 'time_heavy', 'BarlowCondensed-ExtraBold.ttf', 176, 0, $digits),
+    @('TimeThin', 'time_thin', 'BarlowCondensed-ExtraLight.ttf', 176, 0, ($digits + ':')),
+    @('TimeAod', 'time_aod', 'BarlowCondensed-Light.ttf', 176, 0, $digits),
     # values: metric formats plus letters for system data fields (e.g. "GOOD", "ms")
-    @('Value', 'value', 'BarlowCondensed-SemiBold.ttf', 28, 14, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
-    @('ArcValue', 'arc_value', 'BarlowCondensed-SemiBold.ttf', 26, 13, ($digits + '%-')),
-    @('Mono22', 'mono22', 'DMMono-Regular.ttf', 22, 12, ($upper + $digits + ' -')),
-    @('Mono16', 'mono16', 'DMMono-Regular.ttf', 16, 10, ($upper + $digits + ' ./-%' + [char]0xB0)),
-    @('Mono14', 'mono14', 'DMMono-Regular.ttf', 14, 10, ($upper + ' '))
+    @('Value', 'value', 'BarlowCondensed-SemiBold.ttf', 34, 16, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
+    @('ArcValue', 'arc_value', 'BarlowCondensed-SemiBold.ttf', 32, 15, ($digits + '%-')),
+    @('Mono22', 'mono22', 'DMMono-Regular.ttf', 26, 12, ($upper + $digits + ' -')),
+    @('Mono16', 'mono16', 'DMMono-Regular.ttf', 18, 10, ($upper + $digits + ' ./-%' + [char]0xB0)),
+    @('Mono14', 'mono14', 'DMMono-Regular.ttf', 16, 10, ($upper + ' '))
 )
 
 $collections = @{}
@@ -130,6 +131,11 @@ function MakeFont([string]$outDir, [string]$file, [string]$ttf, [int]$px, [strin
                 (New-Object System.Drawing.Rectangle $gl.minX, $gl.minY, $gl.w, $gl.h), 'Pixel')
             $xoff = $gl.minX - $pad
             $yoff = [int][Math]::Round($gl.minY - $capTop)
+            # Time fonts (digits only): the colon sits at text height in the typeface;
+            # centre it on the digits instead.
+            if ([string]$gl.ch -eq ':' -and $glyphs -notmatch '[A-Za-z]') {
+                $yoff = [int][Math]::Round(($baseline - $capTop - $gl.h) / 2)
+            }
         } else {
             $xoff = 0; $yoff = 0
         }

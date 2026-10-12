@@ -32,36 +32,40 @@ class ApexFaceView extends WatchUi.WatchFace {
     private const ARC_SWEEP = ApexLayout.ARC_SWEEP;
 
     // Date
-    private const DATE_Y = 86.0f;
-    private const DATE_SIZE = 22;
-    private const DATE_TRACKING = 3.0f;
+    private const DATE_Y = 94.0f;
+    private const DATE_SIZE = 26;
+    private const DATE_TRACKING = 2.0f;
 
-    // Time
-    private const TIME_SIZE = 164;
-    private const TIME_Y = 185.0f;
+    // Time. With the colon (TimeColon setting) the hours end COLON_HALF left of the
+    // centre and the minutes start COLON_HALF right of it; the colon sits COLON_X right
+    // of the centre, as the thin minute digits have wider side bearings than the hours.
+    private const TIME_SIZE = 176;
+    private const TIME_Y = 202.0f;
     private const HOURS_RIGHT_X = 222.0f;
     private const MINUTES_LEFT_X = 232.0f;
+    private const COLON_HALF = 11.0f;
+    private const COLON_X = 2.0f;
 
     // Separator and data fields
     private const SEP_HALF = 30.0f;
-    private const SEP_Y = 266.0f;
+    private const SEP_Y = 280.0f;
     private const FIELD_GAP = 36.0f;
-    private const FIELD_LABEL_Y = 290.0f;
-    private const FIELD_LABEL_SIZE = 16;
-    private const FIELD_VALUE_Y = 316.0f;
-    private const FIELD_VALUE_SIZE = 28;
+    private const FIELD_LABEL_Y = 302.0f;
+    private const FIELD_LABEL_SIZE = 18;
+    private const FIELD_VALUE_Y = 334.0f;
+    private const FIELD_VALUE_SIZE = 34;
     private const LABEL_TRACKING = 2.0f;
 
     // Arc readout
     private const READOUT_VALUE_Y = ApexLayout.READOUT_VALUE_Y;
-    private const READOUT_VALUE_SIZE = 26;
+    private const READOUT_VALUE_SIZE = 32;
     private const READOUT_LABEL_Y = 412.0f;
 
     // Value row under the field labels and the arc readout value over its label, in
     // design pixels; computed in layoutRows from the real font heights
     private var mFieldValueY as Float = FIELD_VALUE_Y;
     private var mReadoutValueY as Float = READOUT_VALUE_Y;
-    private const READOUT_LABEL_SIZE = 14;
+    private const READOUT_LABEL_SIZE = 16;
 
     private const COLOR_GROUND = 0x000000;
     private var mAmoled as Boolean = true;
@@ -97,6 +101,9 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mDateSetting as Number = FaceFormat.DATE_WATCH;
     private var mDateFormat as Number = FaceFormat.DATE_DMY;
     private var mTwelveHour as Boolean = false;
+
+    // TimeColon setting: a colon between hours and minutes
+    private var mColon as Boolean = false;
 
     // Colours in use (ApexLayout.palette of the above)
     private var mAccent as Number = 0xC8FF2E;
@@ -324,6 +331,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         mDayInk = FaceKit.prop("InkColor", 0xF4F4EF);
         mDayDim = FaceKit.prop("DimColor", 0xB0B0AA);
         mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
+        mColon = FaceKit.prop("TimeColon", 0) == 1;
         updateFormats();
         var night = FaceKit.prop("NightMode", ApexLayout.NIGHT_OFF);
         mNightMode = (night >= ApexLayout.NIGHT_OFF && night <= ApexLayout.NIGHT_ON) ? night : ApexLayout.NIGHT_OFF;
@@ -634,15 +642,26 @@ class ApexFaceView extends WatchUi.WatchFace {
         drawTracked(dc, text, C, DATE_Y, mFontDate, DATE_TRACKING, mDim);
     }
 
+    // The colon, if on, is drawn in the minutes' (thin) weight and colour.
     private function drawTime(dc as Dc, now as Gregorian.Info, hoursFont as FontType, minutesFont as FontType,
             hoursColor as Number, minutesColor as Number) as Void {
         var y = (TIME_Y + mShiftY) * mScale;
+        var x = (C + mShiftX) * mScale;
+        var split = timeSplit();
         dc.setColor(hoursColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText((HOURS_RIGHT_X + mShiftX) * mScale, y, hoursFont, FaceFormat.hourText(now.hour as Number, mTwelveHour),
+        dc.drawText(x - split[0] * mScale, y, hoursFont, FaceFormat.hourText(now.hour as Number, mTwelveHour),
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(minutesColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText((MINUTES_LEFT_X + mShiftX) * mScale, y, minutesFont, FaceFormat.twoDigits(now.min as Number),
+        if (mColon) {
+            dc.drawText(x + COLON_X * mScale, y, minutesFont, ":", Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        }
+        dc.drawText(x + split[1] * mScale, y, minutesFont, FaceFormat.twoDigits(now.min as Number),
             Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Design distances [hours right edge, minutes left edge] from the centre.
+    private function timeSplit() as [Float, Float] {
+        return mColon ? [COLON_HALF, COLON_HALF] : [C - HOURS_RIGHT_X, MINUTES_LEFT_X - C];
     }
 
     // Up to three columns centred on the screen; empty slots are skipped and the
@@ -802,7 +821,10 @@ class ApexFaceView extends WatchUi.WatchFace {
             :dateY => DATE_Y * mScale, :timeY => TIME_Y * mScale, :sepY => SEP_Y * mScale,
             :labelY => FIELD_LABEL_Y * mScale, :valueY => mFieldValueY * mScale,
             :readoutValueY => mReadoutValueY * mScale, :readoutLabelY => READOUT_LABEL_Y * mScale,
-            :hoursRight => HOURS_RIGHT_X * mScale, :minutesLeft => MINUTES_LEFT_X * mScale,
+            :hoursRight => (C - timeSplit()[0]) * mScale, :minutesLeft => (C + timeSplit()[1]) * mScale,
+            :colon => mColon, :wColon => dc.getTextWidthInPixels(":", mFontMinutes),
+            :wDate => trackedWidth(dc, "WED 28-09-2026", mFontDate, DATE_TRACKING),
+            :wReadoutLabel => trackedWidth(dc, ApexMetrics.arcLabel(ApexMetrics.A_INTENSITY), mFontReadoutLabel, LABEL_TRACKING),
             :arcInner => (ARC_R - ARC_W) * mScale,
             :hDate => dc.getFontHeight(mFontDate), :hHours => dc.getFontHeight(mFontHours),
             :hLabel => dc.getFontHeight(mFontLabel), :hValue => dc.getFontHeight(mFontValue),

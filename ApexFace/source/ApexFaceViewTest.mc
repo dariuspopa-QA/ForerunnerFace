@@ -20,7 +20,7 @@ function activeModeRendersFieldRowInsideTheScreen(logger as Logger) as Boolean {
             continue;
         }
         Test.assertMessage(box[0] >= 0 && box[0] + box[2] <= ApexTestUtil.screen(), "field " + slot + " outside the screen");
-        Test.assertMessage(box[1] < ApexTestUtil.px(290) && box[1] + box[3] > ApexTestUtil.px(316), "field " + slot + " box misses label / value rows");
+        Test.assertMessage(box[1] < ApexTestUtil.px(302) && box[1] + box[3] > ApexTestUtil.px(334), "field " + slot + " box misses label / value rows");
         Test.assertMessage(box[0] > lastRight, "field " + slot + " overlaps the previous one");
         lastRight = box[0] + box[2];
         if (first == null) {
@@ -80,7 +80,7 @@ function slotAtFindsEachSlotByItsBox(logger as Logger) as Boolean {
     }
     ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(10)), ApexEditor.SLOT_ARC);      // rim at 12
     ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(395)), ApexEditor.SLOT_ARC);     // readout
-    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(185)), null);                   // time
+    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(202)), null);                   // time
     return true;
 }
 
@@ -252,5 +252,33 @@ function fontsAreHeldAsResources(logger as Logger) as Boolean {
     var p = ApexTestUtil.probe();
     Test.assertMessage(p[:customFonts] as Boolean, "custom fonts not loaded");
     Test.assertMessage(p[:fontsHeld] as Boolean, "a font is still a pool reference");
+    return true;
+}
+
+// TimeColon: off keeps the 1.0 split around the centre, on centres a colon between
+// hours and minutes; both draw awake and in Always-On.
+(:test)
+function timeColonSettingMovesTheTimeApart(logger as Logger) as Boolean {
+    var off = ApexTestUtil.probeColon(false);
+    var on = ApexTestUtil.probeColon(true);
+    ApexTestUtil.assertEqual(off[:colon], false);
+    ApexTestUtil.assertEqual(on[:colon], true);
+    var c = ApexTestUtil.screen() / 2.0f;
+    ApexTestUtil.assertNear(off[:hoursRight] as Float, c - 5 * (off[:scale] as Float), 1, "hours right, no colon");
+    ApexTestUtil.assertNear(on[:hoursRight] as Float, c - 11 * (on[:scale] as Float), 1, "hours right, colon");
+    ApexTestUtil.assertNear((on[:hoursRight] as Float) + (on[:minutesLeft] as Float), 2 * c, 1, "time centred");
+    var saved = ApexTestUtil.saveProperties(["TimeColon"]);
+    try {
+        Application.Properties.setValue("TimeColon", true);
+        var view = new ApexFaceView(false);
+        view.loadPhoneSettings();
+        var dc = ApexTestUtil.render(view);
+        view.onEnterSleep();
+        view.onUpdate(dc);
+        view.onExitSleep();
+        view.onUpdate(dc);
+    } finally {
+        ApexTestUtil.restoreProperties(saved);
+    }
     return true;
 }

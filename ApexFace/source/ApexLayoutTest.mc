@@ -188,8 +188,8 @@ function rowExtentForSystemFonts(logger as Logger) as Boolean {
 
 (:test)
 function rowBelowKeepsDesignPositionWhenThereIsRoom(logger as Logger) as Boolean {
-    // 454 px: label 290 (Mono16, cap 11 -> extent 9.5), value 316 (Value 28, cap 20 -> extent 14)
-    ApexTestUtil.assertEqual(ApexLayout.rowBelow(290.0f, 316.0f, 9.5f, 14.0f), 316.0f);
+    // 454 px: label 302 (Mono16, cap 15 -> extent 11.5), value 334 (Value 34, 33 -> extent 20.5)
+    ApexTestUtil.assertEqual(ApexLayout.rowBelow(302.0f, 334.0f, 11.5f, 20.5f), 334.0f);
     return true;
 }
 
@@ -203,8 +203,8 @@ function rowBelowPushesDownWhenFontsAreTall(logger as Logger) as Boolean {
 
 (:test)
 function rowAboveKeepsDesignPositionWhenThereIsRoom(logger as Logger) as Boolean {
-    // 454 px: readout value 389 (ArcValue 26, extent 13.5), label 412 (Mono14, extent 9)
-    ApexTestUtil.assertEqual(ApexLayout.rowAbove(412.0f, 389.0f, 9.0f, 13.5f), 389.0f);
+    // 454 px: readout value 386 (ArcValue 32, 23 -> extent 15.5), label 412 (Mono14, 13 -> extent 10.5)
+    ApexTestUtil.assertEqual(ApexLayout.rowAbove(412.0f, 386.0f, 10.5f, 15.5f), 386.0f);
     return true;
 }
 
@@ -408,7 +408,7 @@ function boxContainsIncludesEdges(logger as Logger) as Boolean {
 function inArcZoneCoversRimAndReadout(logger as Logger) as Boolean {
     Test.assert(ApexLayout.inArcZone(0.0f, -200.0f));      // rim at 12
     Test.assert(ApexLayout.inArcZone(-150.0f, 150.0f));    // bottom-left arc end
-    Test.assert(ApexLayout.inArcZone(0.0f, 162.0f));       // readout value (227, 389)
+    Test.assert(ApexLayout.inArcZone(0.0f, 159.0f));       // readout value (227, 386)
     Test.assert(ApexLayout.inArcZone(0.0f, 185.0f));       // readout label (227, 412)
     return true;
 }
@@ -417,8 +417,8 @@ function inArcZoneCoversRimAndReadout(logger as Logger) as Boolean {
 function inArcZoneLeavesTimeAndFieldsAlone(logger as Logger) as Boolean {
     Test.assert(!ApexLayout.inArcZone(0.0f, 0.0f));        // centre
     Test.assert(!ApexLayout.inArcZone(-60.0f, -42.0f));    // hours
-    Test.assert(!ApexLayout.inArcZone(0.0f, 89.0f));       // field values (y 316)
-    Test.assert(!ApexLayout.inArcZone(120.0f, 89.0f));     // right field
+    Test.assert(!ApexLayout.inArcZone(0.0f, 107.0f));      // field values (y 334)
+    Test.assert(!ApexLayout.inArcZone(120.0f, 107.0f));    // right field
     Test.assert(!ApexLayout.inArcZone(0.0f, 140.0f));      // just above the readout
     Test.assert(!ApexLayout.inArcZone(75.0f, 150.0f));     // beside the readout, inside the ring
     return true;
