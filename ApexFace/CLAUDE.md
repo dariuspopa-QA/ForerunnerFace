@@ -37,7 +37,7 @@ Call `dc.setAntiAlias(true)` before drawing.
 | Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), mono 26 px (enlarged from the design's 13 px, then from 22 px in 1.1.0), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
 | Hours | condensed 176 px (164 px before 1.1.0), heaviest weight (800), colour `numerals`, right-aligned to x = 222 (x = 216 with the colon), digits vertically centred at y ≈ 202 (cap height ≈ 124 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
 | Minutes | same size, thinnest weight (200), colour `numerals` (AOD: `dim`), left-aligned from x = 232 (x = 238 with the colon) |
-| Colon | optional (`TimeColon` setting, off by default): thin weight, minutes' colour, centred at x = 229 (2 px towards the thin minutes, whose digits have wider side bearings), centred on the digits by the font generator |
+| Colon | optional (`TimeColon` phone setting or the editor's "APEX with colon" style, off by default): thin weight, minutes' colour, centred at x = 229 (2 px towards the thin minutes, whose digits have wider side bearings), centred on the digits by the font generator |
 | Separator | 60 × 1 px line, x 197 → 257, y 280, colour `rule` |
 | Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label mono 18 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility, 16 px before 1.1.0) colour `dim` centred at y ≈ 302, value condensed semibold (600) 34 px (28 px before 1.1.0) colour `ink` centred at y ≈ 334. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
 | Arc readout | value condensed 600 32 px (26 px before 1.1.0), accent, centred at (227, 386); label mono 16 px (letter-spacing ≈ 2 px; enlarged from 9 px, 14 px before 1.1.0) `dim`, centred at (227, 412) |
@@ -127,7 +127,8 @@ calls `WatchUi.requestUpdate()`.
   Connect IQ doesn't expose the watch's date order, so Watch infers it from `distanceUnits`
   (statute → MM-DD-YYYY, metric → DD-MM-YYYY), re-read each minute. There is no time-format
   setting on purpose: the time always follows the watch's 12 / 24 h setting
-- `TimeColon` (boolean, default false): a colon between hours and minutes (phone settings only)
+- `TimeColon` (boolean, default false): a colon between hours and minutes. The editor's style sets it
+  too; whichever side changed last wins (`FaceEditor.pick`)
 
 Accent and numeral lists were extended beyond the design's five/four colours (Amber, Mint, Cobalt,
 Violet, Scarlet; numerals also Silver and every accent hue) so the user has a range to pick from.
@@ -142,7 +143,11 @@ the phone settings (editor wins when it has a value).
 - Data slots 1–3 = the fields (left → right), an explicit list of system data types; types the face has its own source for map to
   the metric table, any other system data field is shown via `Complications.getComplication`
 - Data slot 4 = the arc (Body Battery, Steps → step goal, Battery, Stress, Intensity minutes)
+- Style 1 "APEX" (default) / style 2 "APEX with colon" (`ApexEditor.STYLE_COLON`)
 - Accent colour = accent; Data colour = numerals (time digits)
+- While a slot is being edited the editor draws it (`drawSlot`) right after each scroll, before the
+  face's next `onUpdate`: `drawSlot` re-reads the edited configuration and lays the fields out again,
+  or it shows the previous choice (fixed in 1.2.0)
 - Every data slot lists its types explicitly with a `default` (HR, Steps, Sunset, Body Battery), and both colour lists mark a default. Never use `allowAny` on a slot: it cannot carry a default, and the editor then fills the slot with its own first choice (Battery) as soon as Data is opened
 - Test in the simulator with File → Edit Watch Face (Ctrl+E); Simulation → Complications sets values
 
@@ -171,6 +176,18 @@ Add the permissions the sources need (e.g. `SensorHistory`, `UserProfile`, `Posi
 | 14 | `NOTIFS` | `System.getDeviceSettings().notificationCount` | `3` |
 | 15 | `SEC` | `System.getClockTime().sec` (Active mode only) | `07` |
 | 16 | — | Empty slot | — |
+| 17 | `INT MIN` | weekly intensity minutes (`activeMinutesWeek.total`) | `97` |
+| 18 | `PULSE OX` | `Complications` `COMPLICATION_TYPE_PULSE_OX` | `98%` |
+| 19 | `RESP` | `COMPLICATION_TYPE_RESPIRATION_RATE` | `14` |
+| 20 | `SLEEP` | `COMPLICATION_TYPE_SLEEP_SCORE` (`has`-guarded; `--` where the firmware lacks it) | `82` |
+| 21 | `VO2 MAX` | `COMPLICATION_TYPE_VO2MAX_RUN` | `52` |
+| 22 | `VO2 BIKE` | `COMPLICATION_TYPE_VO2MAX_BIKE` | `48` |
+| 23 | `PRESSURE` | `COMPLICATION_TYPE_SEA_LEVEL_PRESSURE`, Pa → hPa, no unit | `1013` |
+| 24 | `RUN KM` / `RUN MI` | `COMPLICATION_TYPE_WEEKLY_RUN_DISTANCE`, m → km / mi | `17.0` |
+| 25 | `SOLAR` | `COMPLICATION_TYPE_SOLAR_INPUT` (`--` without solar) | `50%` |
+
+17–25 are the editor's extra data types, so the phone settings offer the same list as the watch;
+`ApexMetrics.complicationType` / `fieldForComplication` map both ways.
 
 ### Arc metrics (label, percent, readout)
 

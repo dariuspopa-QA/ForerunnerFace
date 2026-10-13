@@ -2,6 +2,7 @@
 
     <string id="AppName">APEX</string>
     <string id="StyleApex">APEX</string>
+    <string id="StyleApexColon">APEX with colon</string>
 
     <!-- Setting titles -->
     <string id="Field1Title">Field 1 (left)</string>
@@ -32,6 +33,15 @@
     <string id="MetricBattery">Battery</string>
     <string id="MetricNotifs">Notifications</string>
     <string id="MetricSeconds">Seconds</string>
+    <string id="MetricIntensity">Intensity minutes (week)</string>
+    <string id="MetricPulseOx">Pulse Ox</string>
+    <string id="MetricRespiration">Respiration</string>
+    <string id="MetricSleepScore">Sleep score</string>
+    <string id="MetricVo2Run">VO2 max (run)</string>
+    <string id="MetricVo2Bike">VO2 max (bike)</string>
+    <string id="MetricPressure">Pressure</string>
+    <string id="MetricRunWeek">Weekly run distance</string>
+    <string id="MetricSolar">Solar intensity</string>
     <string id="MetricEmpty">Empty</string>
 
     <!-- Arc metrics -->

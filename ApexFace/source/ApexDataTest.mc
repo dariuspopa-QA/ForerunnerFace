@@ -11,11 +11,12 @@ function everyFieldRendersAValueOrNoValue(logger as Logger) as Boolean {
     var data = new ApexData();
     var clock = System.getClockTime();
     data.refresh(clock);
-    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_EMPTY; id++) {
+    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_SOLAR; id++) {
         var value = data.fieldValue(id, clock, true);
         logger.debug(ApexMetrics.fieldLabel(id) + " = " + value);
         Test.assertMessage(value.length() > 0, "field " + id + " is empty");
-        Test.assertMessage(ApexTestUtil.onlyGlyphs(value, ApexTestUtil.VALUE_GLYPHS),
+        var glyphs = ApexMetrics.complicationType(id) != null ? ApexTestUtil.SYSTEM_VALUE_GLYPHS : ApexTestUtil.VALUE_GLYPHS;
+        Test.assertMessage(ApexTestUtil.onlyGlyphs(value, glyphs),
             "field " + id + " value '" + value + "' has a glyph outside the Value font");
     }
     return true;

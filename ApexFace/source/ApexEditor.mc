@@ -10,6 +10,10 @@ module ApexEditor {
 
     const SLOT_FIELD_1 = 1;
     const SLOT_ARC = 4;
+
+    // Styles (configs/watchface.xml): the plain time, or with a colon
+    const STYLE_PLAIN = 1;
+    const STYLE_COLON = 2;
 }
 
 // Draws one editable slot through the view; the editor animates it while that slot is selected.
@@ -43,6 +47,7 @@ class ApexEditorDelegate extends WatchUi.WatchFaceDelegate {
             :configId as Application.WatchFaceConfig.Id,
             :type as WatchUi.WatchFaceConfigType or Null,
             :committed as Boolean }) as Void {
+        mView.setEditConfig(options[:configId]);
         var settings = FaceEditor.settingsFor(options[:configId]);
         if (settings != null) {
             mView.applyEditor(settings, options[:type]);

@@ -9,6 +9,7 @@
     <watchface-config>
         <styles>
             <style id="1" label="@Strings.StyleApex" default="true"/>
+            <style id="2" label="@Strings.StyleApexColon"/>
         </styles>
         <data>
             <complication id="1">

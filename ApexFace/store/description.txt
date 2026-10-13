@@ -18,8 +18,8 @@ What's on the face
 • 12-hour or 24-hour time, as set on your watch, with or without a colon
 
 Data fields
-Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, or Empty. Leave a slot empty and the row re-centres.
-In the on-watch editor you can also pick other system data, such as Pulse Ox, Respiration, Sleep score (where your watch has it), VO2 max, Pressure or Weekly run distance.
+Heart rate, Steps, Distance, Calories, Floors, Stress, Body Battery, Recovery time, Sunrise, Sunset, Altitude, Temperature, Battery, Notifications, Seconds, Intensity minutes, Pulse Ox, Respiration, Sleep score (where your watch has it), VO2 max (run or bike), Pressure, Weekly run distance, Solar intensity (solar watches), or Empty. Leave a slot empty and the row re-centres.
+The same list is in the on-watch editor and in the Connect IQ app.
 
 Colours
 • Accent: Volt, Ember, Glacier, Signal, Amber, Mint, Cobalt, Violet, Scarlet, Ghost
@@ -57,6 +57,7 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.1.0)
-• Bigger text: the time, the date, the three data fields and the arc value are all larger and easier to read.
-• New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app.
+WHAT'S NEW (version 1.2.0)
+• On-watch editor: the data field you scroll to is now shown right away (it showed the previous choice).
+• More data fields in the Connect IQ app settings, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
+• New style in the on-watch editor: APEX with colon, a colon between hours and minutes.

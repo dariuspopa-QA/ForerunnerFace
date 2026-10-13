@@ -11,7 +11,10 @@ module ApexTestUtil {
 
     // Glyph sets of the custom fonts (CLAUDE.md, Fonts)
     const VALUE_GLYPHS = "0123456789,.:%°h-";
+    // The whole Value font: system data values carry their own units ("98%", "12.4km")
+    const SYSTEM_VALUE_GLYPHS = "0123456789,.:%-/+ °ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     const LABEL_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    const FIELD_LABEL_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ./-%";
     const DATE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -";
 
     function onlyGlyphs(text as String, glyphs as String) as Boolean {

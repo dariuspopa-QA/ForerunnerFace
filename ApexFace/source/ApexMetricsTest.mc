@@ -9,7 +9,7 @@ import Toybox.Test;
 
 (:test)
 function validFieldKeepsEveryListedField(logger as Logger) as Boolean {
-    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_EMPTY; id++) {
+    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_SOLAR; id++) {
         if (id != ApexMetrics.F_READY) {
             ApexTestUtil.assertEqual(ApexMetrics.validField(id), id);
         }
@@ -21,7 +21,7 @@ function validFieldKeepsEveryListedField(logger as Logger) as Boolean {
 function validFieldEmptiesHiddenAndUnknownIds(logger as Logger) as Boolean {
     ApexTestUtil.assertEqual(ApexMetrics.validField(ApexMetrics.F_READY), ApexMetrics.F_EMPTY);
     ApexTestUtil.assertEqual(ApexMetrics.validField(-1), ApexMetrics.F_EMPTY);
-    ApexTestUtil.assertEqual(ApexMetrics.validField(17), ApexMetrics.F_EMPTY);
+    ApexTestUtil.assertEqual(ApexMetrics.validField(ApexMetrics.F_SOLAR + 1), ApexMetrics.F_EMPTY);
     ApexTestUtil.assertEqual(ApexMetrics.validField(0xC8FF2E), ApexMetrics.F_EMPTY);
     return true;
 }
@@ -126,12 +126,12 @@ function arcLabelsMatchTheArcTable(logger as Logger) as Boolean {
     return true;
 }
 
-// Mono16 / Mono14 only have A-Z and space.
+// Field labels (Mono16) use A-Z, digits and space; arc labels (Mono14) A-Z and space.
 (:test)
 function labelsUseOnlyMonoFontGlyphs(logger as Logger) as Boolean {
-    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_EMPTY; id++) {
+    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_SOLAR; id++) {
         var label = ApexMetrics.fieldLabel(id);
-        Test.assertMessage(ApexTestUtil.onlyGlyphs(label, ApexTestUtil.LABEL_GLYPHS), "field label '" + label + "'");
+        Test.assertMessage(ApexTestUtil.onlyGlyphs(label, ApexTestUtil.FIELD_LABEL_GLYPHS), "field label '" + label + "'");
     }
     for (var id = ApexMetrics.A_BODY_BATTERY; id <= ApexMetrics.A_OFF; id++) {
         var label = ApexMetrics.arcLabel(id);
@@ -171,7 +171,15 @@ function fieldForComplicationMapsOwnSources(logger as Logger) as Boolean {
         [Complications.COMPLICATION_TYPE_ALTITUDE, ApexMetrics.F_ALTITUDE],
         [Complications.COMPLICATION_TYPE_CURRENT_TEMPERATURE, ApexMetrics.F_TEMP],
         [Complications.COMPLICATION_TYPE_BATTERY, ApexMetrics.F_BATTERY],
-        [Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT, ApexMetrics.F_NOTIFS]
+        [Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT, ApexMetrics.F_NOTIFS],
+        [Complications.COMPLICATION_TYPE_INTENSITY_MINUTES, ApexMetrics.F_INTENSITY],
+        [Complications.COMPLICATION_TYPE_PULSE_OX, ApexMetrics.F_PULSE_OX],
+        [Complications.COMPLICATION_TYPE_RESPIRATION_RATE, ApexMetrics.F_RESPIRATION],
+        [Complications.COMPLICATION_TYPE_VO2MAX_RUN, ApexMetrics.F_VO2_RUN],
+        [Complications.COMPLICATION_TYPE_VO2MAX_BIKE, ApexMetrics.F_VO2_BIKE],
+        [Complications.COMPLICATION_TYPE_SEA_LEVEL_PRESSURE, ApexMetrics.F_PRESSURE],
+        [Complications.COMPLICATION_TYPE_WEEKLY_RUN_DISTANCE, ApexMetrics.F_RUN_WEEK],
+        [Complications.COMPLICATION_TYPE_SOLAR_INPUT, ApexMetrics.F_SOLAR]
     ];
     for (var i = 0; i < pairs.size(); i++) {
         ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(pairs[i][0] as Complications.Type), pairs[i][1]);
@@ -179,13 +187,29 @@ function fieldForComplicationMapsOwnSources(logger as Logger) as Boolean {
     return true;
 }
 
-// Types without an own source fall through to the system value (null here).
+// Types the face has no field for fall through to the system value (null here).
 (:test)
 function fieldForComplicationLeavesOtherTypesToTheSystem(logger as Logger) as Boolean {
     ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(null), null);
-    ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(Complications.COMPLICATION_TYPE_PULSE_OX), null);
-    ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(Complications.COMPLICATION_TYPE_VO2MAX_RUN), null);
-    ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(Complications.COMPLICATION_TYPE_INTENSITY_MINUTES), null);
+    ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(Complications.COMPLICATION_TYPE_CURRENT_WEATHER), null);
+    return true;
+}
+
+// The system data fields (phone settings 17-25) read the type the editor offers;
+// the editor maps each type back to the same field, so both lists agree.
+(:test)
+function systemDataFieldsRoundTripThroughTheEditorType(logger as Logger) as Boolean {
+    for (var id = ApexMetrics.F_PULSE_OX; id <= ApexMetrics.F_SOLAR; id++) {
+        var type = ApexMetrics.complicationType(id);
+        if (type == null) {
+            Test.assertMessage(id == ApexMetrics.F_SLEEP, "field " + id + " has no data type");
+            continue;
+        }
+        ApexTestUtil.assertEqual(ApexMetrics.fieldForComplication(type), id);
+    }
+    for (var id = ApexMetrics.F_HR; id <= ApexMetrics.F_INTENSITY; id++) {
+        ApexTestUtil.assertEqual(ApexMetrics.complicationType(id), null);
+    }
     return true;
 }
 

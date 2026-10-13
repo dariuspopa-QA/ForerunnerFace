@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.2.0
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • On-watch editor: the data field you scroll to is now shown right away (it showed the previous choice).
+> • More data fields in the Connect IQ app settings, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
+> • New style in the on-watch editor: APEX with colon, a colon between hours and minutes.
+
+Details (since 1.1.0):
+
+- Fix: in the on-watch editor a data slot showed the previously selected type. The editor
+  draws the slot it animates right after each scroll, before the face's next update, and
+  the slot was drawn from the field texts cached at that update. `drawSlot` now re-reads
+  the edited configuration and recomputes the field layout first.
+- Phone settings: field ids 17–25 (Intensity minutes, Pulse Ox, Respiration, Sleep score,
+  VO2 max run / bike, Pressure, Weekly run distance, Solar intensity), read through the
+  same Complications data the editor uses; types missing on a watch show `--`. The editor
+  maps those types to the same ids, so both sides show the same label.
+- Pressure shows hPa without the unit (`1013`); weekly run distance in km or mi with one
+  decimal (`RUN KM` / `RUN MI`); the system reports Pa and metres.
+- Editor styles: "APEX" and "APEX with colon". The colon follows whichever of the phone's
+  TimeColon setting and the editor style was changed last.
+- Tests: the new fields round-trip between setting id and editor type and render on every
+  watch; 402 resource checks.
+
 ## 1.1.0
 
 Store text ("What's new", also in `store/description.txt`):

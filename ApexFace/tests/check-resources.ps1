@@ -92,7 +92,7 @@ foreach ($key in $props.Keys) {
     }
 }
 
-$fieldIds = @(0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16)   # 7 READY hidden
+$fieldIds = @(0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16) + (17..25)   # 7 READY hidden; 17-25 system data
 foreach ($key in 'Field1', 'Field2', 'Field3') {
     Check (SameSet $lists[$key] $fieldIds) "$key lists every field id except READY (7)"
 }

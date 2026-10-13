@@ -2,6 +2,7 @@ import Toybox.Activity;
 import Toybox.ActivityMonitor;
 import Toybox.Complications;
 import Toybox.Lang;
+import Toybox.Math;
 import Toybox.SensorHistory;
 import Toybox.System;
 import Toybox.Time;
@@ -28,7 +29,17 @@ module ApexMetrics {
         F_BATTERY = 13,
         F_NOTIFS = 14,
         F_SEC = 15,
-        F_EMPTY = 16
+        F_EMPTY = 16,
+        // System data (Complications), also offered by the on-watch editor
+        F_INTENSITY = 17,
+        F_PULSE_OX = 18,
+        F_RESPIRATION = 19,
+        F_SLEEP = 20,
+        F_VO2_RUN = 21,
+        F_VO2_BIKE = 22,
+        F_PRESSURE = 23,
+        F_RUN_WEEK = 24,
+        F_SOLAR = 25
     }
 
     enum {
@@ -45,7 +56,7 @@ module ApexMetrics {
 
     // A field id from settings, or F_EMPTY when it is unknown or hidden (READY).
     function validField(id as Number) as Number {
-        return (id < F_HR || id > F_EMPTY || id == F_READY) ? F_EMPTY : id;
+        return (id < F_HR || id > F_SOLAR || id == F_READY) ? F_EMPTY : id;
     }
 
     // An arc id from settings, or A_OFF when it is unknown or hidden (READINESS).
@@ -70,13 +81,36 @@ module ApexMetrics {
         return clampFraction(value.toFloat() / goal);
     }
 
-    // Built-in field for a data type picked in the watch face editor, or null
-    // when the face has no own source for it (it then shows the system value).
+    // System data type a field reads through Complications, or null for the fields
+    // with their own source. Null too when this watch's API lacks the type.
+    function complicationType(id as Number) as Complications.Type or Null {
+        switch (id) {
+            case F_PULSE_OX: return Complications.COMPLICATION_TYPE_PULSE_OX;
+            case F_RESPIRATION: return Complications.COMPLICATION_TYPE_RESPIRATION_RATE;
+            case F_SLEEP:
+                return (Complications has :COMPLICATION_TYPE_SLEEP_SCORE) ? Complications.COMPLICATION_TYPE_SLEEP_SCORE : null;
+            case F_VO2_RUN: return Complications.COMPLICATION_TYPE_VO2MAX_RUN;
+            case F_VO2_BIKE: return Complications.COMPLICATION_TYPE_VO2MAX_BIKE;
+            case F_PRESSURE: return Complications.COMPLICATION_TYPE_SEA_LEVEL_PRESSURE;
+            case F_RUN_WEEK: return Complications.COMPLICATION_TYPE_WEEKLY_RUN_DISTANCE;
+            case F_SOLAR: return Complications.COMPLICATION_TYPE_SOLAR_INPUT;
+        }
+        return null;
+    }
+
+    // Field for a data type picked in the watch face editor, or null when the face
+    // has none (it then shows the system value under the system label).
     function fieldForComplication(type as Complications.Type or Null) as Number or Null {
         if (type == null) {
             return null;
         }
+        for (var id = F_PULSE_OX; id <= F_SOLAR; id++) {
+            if (complicationType(id) == type) {
+                return id;
+            }
+        }
         switch (type) {
+            case Complications.COMPLICATION_TYPE_INTENSITY_MINUTES: return F_INTENSITY;
             case Complications.COMPLICATION_TYPE_HEART_RATE: return F_HR;
             case Complications.COMPLICATION_TYPE_STEPS: return F_STEPS;
             case Complications.COMPLICATION_TYPE_CALORIES: return F_CALORIES;
@@ -128,6 +162,15 @@ module ApexMetrics {
             case F_BATTERY: return "BATTERY";
             case F_NOTIFS: return "NOTIFS";
             case F_SEC: return "SEC";
+            case F_INTENSITY: return "INT MIN";
+            case F_PULSE_OX: return "PULSE OX";
+            case F_RESPIRATION: return "RESP";
+            case F_SLEEP: return "SLEEP";
+            case F_VO2_RUN: return "VO2 MAX";
+            case F_VO2_BIKE: return "VO2 BIKE";
+            case F_PRESSURE: return "PRESSURE";
+            case F_RUN_WEEK: return settings.distanceUnits == System.UNIT_STATUTE ? "RUN MI" : "RUN KM";
+            case F_SOLAR: return "SOLAR";
         }
         return "";
     }
@@ -142,6 +185,41 @@ module ApexMetrics {
             case A_INTENSITY: return "INTENSITY MIN";
         }
         return "";
+    }
+
+    // Sea level pressure in hPa without the unit ("1013"); the system reports pascals.
+    function pressureText(id as Complications.Id) as String {
+        try {
+            var c = Complications.getComplication(id);
+            var value = c.value;
+            if (value instanceof Number || value instanceof Float || value instanceof Double) {
+                var pa = value.toFloat();
+                var unit = c.unit;
+                if (!(unit instanceof String) || (unit as String).equals("Pa")) {
+                    pa = pa / 100.0f;
+                }
+                return Math.round(pa).toNumber().toString();
+            }
+        } catch (e) {
+        }
+        return NO_VALUE;
+    }
+
+    // Weekly run distance in km or mi (the watch's distance units), one decimal; the
+    // system reports metres.
+    function runWeekText(id as Complications.Id) as String {
+        try {
+            var value = Complications.getComplication(id).value;
+            if (value instanceof Number || value instanceof Float || value instanceof Double) {
+                var km = value.toFloat() / 1000.0f;
+                if (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) {
+                    km = km / 1.609344f;
+                }
+                return km.format("%.1f");
+            }
+        } catch (e) {
+        }
+        return NO_VALUE;
     }
 
     // [value text, label] of a system data field picked in the watch face
@@ -238,7 +316,20 @@ class ApexData {
                 return FaceFormat.numberText(System.getDeviceSettings().notificationCount);
             case ApexMetrics.F_SEC:
                 return awake ? FaceFormat.twoDigits(clock.sec) : ApexMetrics.NO_VALUE;
+            case ApexMetrics.F_INTENSITY:
+                return FaceFormat.thousandsText(intensityMinutes());
         }
+        var type = ApexMetrics.complicationType(id);
+        if (type == null) {
+            return ApexMetrics.NO_VALUE;
+        }
+        if (id == ApexMetrics.F_PRESSURE) {
+            return ApexMetrics.pressureText(new Complications.Id(type));
+        }
+        if (id == ApexMetrics.F_RUN_WEEK) {
+            return ApexMetrics.runWeekText(new Complications.Id(type));
+        }
+        return ApexMetrics.complicationText(new Complications.Id(type))[0];
         return ApexMetrics.NO_VALUE;
     }
 

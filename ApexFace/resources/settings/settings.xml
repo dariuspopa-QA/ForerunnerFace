@@ -17,6 +17,15 @@
             <listEntry value="13">@Strings.MetricBattery</listEntry>
             <listEntry value="14">@Strings.MetricNotifs</listEntry>
             <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="17">@Strings.MetricIntensity</listEntry>
+            <listEntry value="18">@Strings.MetricPulseOx</listEntry>
+            <listEntry value="19">@Strings.MetricRespiration</listEntry>
+            <listEntry value="20">@Strings.MetricSleepScore</listEntry>
+            <listEntry value="21">@Strings.MetricVo2Run</listEntry>
+            <listEntry value="22">@Strings.MetricVo2Bike</listEntry>
+            <listEntry value="23">@Strings.MetricPressure</listEntry>
+            <listEntry value="24">@Strings.MetricRunWeek</listEntry>
+            <listEntry value="25">@Strings.MetricSolar</listEntry>
             <listEntry value="16">@Strings.MetricEmpty</listEntry>
         </settingConfig>
     </setting>
@@ -38,6 +47,15 @@
             <listEntry value="13">@Strings.MetricBattery</listEntry>
             <listEntry value="14">@Strings.MetricNotifs</listEntry>
             <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="17">@Strings.MetricIntensity</listEntry>
+            <listEntry value="18">@Strings.MetricPulseOx</listEntry>
+            <listEntry value="19">@Strings.MetricRespiration</listEntry>
+            <listEntry value="20">@Strings.MetricSleepScore</listEntry>
+            <listEntry value="21">@Strings.MetricVo2Run</listEntry>
+            <listEntry value="22">@Strings.MetricVo2Bike</listEntry>
+            <listEntry value="23">@Strings.MetricPressure</listEntry>
+            <listEntry value="24">@Strings.MetricRunWeek</listEntry>
+            <listEntry value="25">@Strings.MetricSolar</listEntry>
             <listEntry value="16">@Strings.MetricEmpty</listEntry>
         </settingConfig>
     </setting>
@@ -59,6 +77,15 @@
             <listEntry value="13">@Strings.MetricBattery</listEntry>
             <listEntry value="14">@Strings.MetricNotifs</listEntry>
             <listEntry value="15">@Strings.MetricSeconds</listEntry>
+            <listEntry value="17">@Strings.MetricIntensity</listEntry>
+            <listEntry value="18">@Strings.MetricPulseOx</listEntry>
+            <listEntry value="19">@Strings.MetricRespiration</listEntry>
+            <listEntry value="20">@Strings.MetricSleepScore</listEntry>
+            <listEntry value="21">@Strings.MetricVo2Run</listEntry>
+            <listEntry value="22">@Strings.MetricVo2Bike</listEntry>
+            <listEntry value="23">@Strings.MetricPressure</listEntry>
+            <listEntry value="24">@Strings.MetricRunWeek</listEntry>
+            <listEntry value="25">@Strings.MetricSolar</listEntry>
             <listEntry value="16">@Strings.MetricEmpty</listEntry>
         </settingConfig>
     </setting>

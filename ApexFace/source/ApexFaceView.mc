@@ -102,7 +102,9 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mDateFormat as Number = FaceFormat.DATE_DMY;
     private var mTwelveHour as Boolean = false;
 
-    // TimeColon setting: a colon between hours and minutes
+    // Colon between hours and minutes: the TimeColon phone setting, or the editor's
+    // style (STYLE_COLON), whichever was changed last (FaceEditor.pick)
+    private var mPhoneColon as Boolean = false;
     private var mColon as Boolean = false;
 
     // Colours in use (ApexLayout.palette of the above)
@@ -149,9 +151,11 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mFieldTexts as Array<[String, String] or Null> = [null, null, null];
     private var mFieldBoxes as Array<[Number, Number, Number, Number] or Null> = [null, null, null];
 
-    // Watch face editor: running inside it, and the slot it is currently animating
+    // Watch face editor: running inside it, the slot it is currently animating, and
+    // the configuration being edited
     private var mEditMode as Boolean;
     private var mEditingSlot as Number or Null;
+    private var mEditConfig as Application.WatchFaceConfig.Id or Null;
 
     function initialize(editMode as Boolean) {
         WatchFace.initialize();
@@ -331,7 +335,8 @@ class ApexFaceView extends WatchUi.WatchFace {
         mDayInk = FaceKit.prop("InkColor", 0xF4F4EF);
         mDayDim = FaceKit.prop("DimColor", 0xB0B0AA);
         mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
-        mColon = FaceKit.prop("TimeColon", 0) == 1;
+        mPhoneColon = FaceKit.prop("TimeColon", 0) == 1;
+        mColon = mPhoneColon;
         updateFormats();
         var night = FaceKit.prop("NightMode", ApexLayout.NIGHT_OFF);
         mNightMode = (night >= ApexLayout.NIGHT_OFF && night <= ApexLayout.NIGHT_ON) ? night : ApexLayout.NIGHT_OFF;
@@ -415,6 +420,26 @@ class ApexFaceView extends WatchUi.WatchFace {
         if (dataColor != null && dataColor.color instanceof Number) {
             mDayNumerals = dataColor.color as Number;
         }
+        applyEditorData(settings);
+
+        if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
+            mEditingSlot = null;
+        }
+        applyPalette();
+        WatchUi.requestUpdate();
+    }
+
+    // The configuration the editor is changing (its slot drawables re-read it).
+    function setEditConfig(configId as Application.WatchFaceConfig.Id or Null) as Void {
+        mEditConfig = configId;
+    }
+
+    // Style (colon) and the data in the four slots.
+    private function applyEditorData(settings as Application.WatchFaceConfig.Settings) as Void {
+        var style = settings.styleId;
+        if (style != null) {
+            mColon = FaceEditor.pick("TimeColon", mPhoneColon ? 1 : 0, style == ApexEditor.STYLE_COLON ? 1 : 0, 0) == 1;
+        }
 
         var refs = settings.complicationSettings;
         if (refs != null) {
@@ -442,12 +467,6 @@ class ApexFaceView extends WatchUi.WatchFace {
                 }
             }
         }
-
-        if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
-            mEditingSlot = null;
-        }
-        applyPalette();
-        WatchUi.requestUpdate();
     }
 
     // The editor draws this slot itself (animated), so the face leaves it out.
@@ -484,13 +503,21 @@ class ApexFaceView extends WatchUi.WatchFace {
         return null;
     }
 
+    // The editor draws the selected slot as soon as the user scrolls to a new choice,
+    // before the face's next onUpdate: re-read the edited configuration and lay the
+    // fields out again, or the slot would show the previous choice.
     function drawSlot(dc as Dc, slot as Number) as Void {
         dc.setAntiAlias(true);
+        var settings = mEditConfig != null ? FaceEditor.settingsFor(mEditConfig) : null;
+        if (settings != null) {
+            applyEditorData(settings);
+        }
         if (slot == ApexEditor.SLOT_ARC) {
             drawArcSlot(dc);
         } else {
             var index = slot - ApexEditor.SLOT_FIELD_1;
             if (index >= 0 && index < 3) {
+                layoutFields(dc, System.getClockTime());
                 drawField(dc, index);
             }
         }
@@ -667,6 +694,22 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Up to three columns centred on the screen; empty slots are skipped and the
     // row re-centres. In the editor, empty slots show "--" so they can be tapped.
     private function drawFields(dc as Dc, clock as System.ClockTime) as Void {
+        if (!layoutFields(dc, clock)) {
+            return;
+        }
+        dc.setPenWidth(1);
+        dc.setColor(mRule, Graphics.COLOR_TRANSPARENT);
+        dc.drawLine((C - SEP_HALF) * mScale, SEP_Y * mScale, (C + SEP_HALF) * mScale, SEP_Y * mScale);
+        for (var i = 0; i < 3; i++) {
+            if (mFieldBoxes[i] != null && mEditingSlot != ApexEditor.SLOT_FIELD_1 + i) {
+                drawField(dc, i);
+            }
+        }
+    }
+
+    // Texts and boxes of the field columns (mFieldTexts, mFieldBoxes); false when
+    // every slot is empty.
+    private function layoutFields(dc as Dc, clock as System.ClockTime) as Boolean {
         var widths = [null, null, null] as Array<Float or Null>;
         var count = 0;
         for (var i = 0; i < 3; i++) {
@@ -682,26 +725,18 @@ class ApexFaceView extends WatchUi.WatchFace {
             count++;
         }
         if (count == 0) {
-            return;
+            return false;
         }
         var lefts = ApexLayout.fieldColumns(widths, FIELD_GAP * mScale, C * mScale);
-
-        dc.setPenWidth(1);
-        dc.setColor(mRule, Graphics.COLOR_TRANSPARENT);
-        dc.drawLine((C - SEP_HALF) * mScale, SEP_Y * mScale, (C + SEP_HALF) * mScale, SEP_Y * mScale);
-
         var top = px(FIELD_LABEL_Y - 12);
         var height = px(mFieldValueY + 18) - top;
         for (var i = 0; i < 3; i++) {
             var left = lefts[i];
-            if (left == null) {
-                continue;
-            }
-            mFieldBoxes[i] = [left.toNumber(), top, Math.ceil(widths[i] as Float).toNumber(), height];
-            if (mEditingSlot != ApexEditor.SLOT_FIELD_1 + i) {
-                drawField(dc, i);
+            if (left != null) {
+                mFieldBoxes[i] = [left.toNumber(), top, Math.ceil(widths[i] as Float).toNumber(), height];
             }
         }
+        return true;
     }
 
     // [label, value] for a field slot, or null when the slot is empty.
