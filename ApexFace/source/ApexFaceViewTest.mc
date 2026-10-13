@@ -80,7 +80,7 @@ function slotAtFindsEachSlotByItsBox(logger as Logger) as Boolean {
     }
     ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(10)), ApexEditor.SLOT_ARC);      // rim at 12
     ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(395)), ApexEditor.SLOT_ARC);     // readout
-    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(202)), null);                   // time
+    ApexTestUtil.assertEqual(view.slotAt(ApexTestUtil.px(227), ApexTestUtil.px(196)), null);                   // time
     return true;
 }
 

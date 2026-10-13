@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.1
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • The time is back to its original size; the date and data fields stay larger.
+> • On-watch editor: the data you scroll to is shown right away, and the first field no longer disappears while you edit it.
+
+Details (since 1.2.0):
+
+- Time back to 164 px (1.0 size; 176 px since 1.1.0 was too big on the watch), its row
+  at y 196, centred between date and separator. Date and field sizes stay as in 1.1.0.
+- Fix (editor, still in 1.2.0): the preview of the slot being edited showed the previous
+  data type. The editor asks for the slot's drawable (`getComplicationDrawable`) with the
+  type just scrolled to before it reports the edit, and the saved configuration can still
+  hold the old one then; the face now takes the type from that `ComplicationRef`. The
+  1.2.0 re-read of the configuration in `drawSlot` is gone.
+- Fix (editor): the first field went blank when the editor opened on it. The editor asks
+  for that slot before the face has laid out its fields, and the face returned no
+  drawable; it now uses the column's design box until the layout exists.
+- Screenshots with and without the colon: `dist/screenshots-1.2.1/` (not committed).
+
 ## 1.2.0
 
 Store text ("What's new", also in `store/description.txt`):

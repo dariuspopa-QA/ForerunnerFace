@@ -23,9 +23,9 @@ $lower = 'abcdefghijklmnopqrstuvwxyz'
 # id, file, ttf, design px, minimum px, glyphs
 $fonts = @(
     # the optional colon (TimeColon setting) is drawn in the minutes' thin weight
-    @('TimeHeavy', 'time_heavy', 'BarlowCondensed-ExtraBold.ttf', 176, 0, $digits),
-    @('TimeThin', 'time_thin', 'BarlowCondensed-ExtraLight.ttf', 176, 0, ($digits + ':')),
-    @('TimeAod', 'time_aod', 'BarlowCondensed-Light.ttf', 176, 0, $digits),
+    @('TimeHeavy', 'time_heavy', 'BarlowCondensed-ExtraBold.ttf', 164, 0, $digits),
+    @('TimeThin', 'time_thin', 'BarlowCondensed-ExtraLight.ttf', 164, 0, ($digits + ':')),
+    @('TimeAod', 'time_aod', 'BarlowCondensed-Light.ttf', 164, 0, $digits),
     # values: metric formats plus letters for system data fields (e.g. "GOOD", "ms")
     @('Value', 'value', 'BarlowCondensed-SemiBold.ttf', 34, 16, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
     @('ArcValue', 'arc_value', 'BarlowCondensed-SemiBold.ttf', 32, 15, ($digits + '%-')),

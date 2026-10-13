@@ -57,7 +57,6 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.2.0)
-• On-watch editor: the data field you scroll to is now shown right away (it showed the previous choice).
-• More data fields in the Connect IQ app settings, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
-• New style in the on-watch editor: APEX with colon, a colon between hours and minutes.
+WHAT'S NEW (version 1.2.1)
+• The time is back to its original size; the date and data fields stay larger.
+• On-watch editor: the data you scroll to is shown right away, and the first field no longer disappears while you edit it.

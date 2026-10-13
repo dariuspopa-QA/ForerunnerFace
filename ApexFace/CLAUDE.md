@@ -35,7 +35,7 @@ Call `dc.setAntiAlias(true)` before drawing.
 | Arc track | r 198, width 4, colour `rule`, 270° from clock 225° (bottom-left) clockwise to clock 135° (bottom-right). In CIQ degrees: from 225° clockwise to 315° (`Graphics.ARC_CLOCKWISE`, 225 → −45) |
 | Arc fill | same arc, accent, round caps, length = 270° × pct, starting at the bottom-left end |
 | Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), mono 26 px (enlarged from the design's 13 px, then from 22 px in 1.1.0), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
-| Hours | condensed 176 px (164 px before 1.1.0), heaviest weight (800), colour `numerals`, right-aligned to x = 222 (x = 216 with the colon), digits vertically centred at y ≈ 202 (cap height ≈ 124 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
+| Hours | condensed 164 px (176 px in 1.1.0–1.2.0, too big on the watch), heaviest weight (800), colour `numerals`, right-aligned to x = 222 (x = 216 with the colon), digits vertically centred at y ≈ 196 (cap height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
 | Minutes | same size, thinnest weight (200), colour `numerals` (AOD: `dim`), left-aligned from x = 232 (x = 238 with the colon) |
 | Colon | optional (`TimeColon` phone setting or the editor's "APEX with colon" style, off by default): thin weight, minutes' colour, centred at x = 229 (2 px towards the thin minutes, whose digits have wider side bearings), centred on the digits by the font generator |
 | Separator | 60 × 1 px line, x 197 → 257, y 280, colour `rule` |
@@ -44,8 +44,8 @@ Call `dc.setAntiAlias(true)` before drawing.
 
 Use `dc.getWidth()` / 454 as a scale factor so the layout survives other resolutions.
 
-The 1.1.0 sizes are about as large as the ring allows: with the colon the time's top corners
-come within ~1 px of the arc on the 218 px watch, and the date fills the chord at its row.
+The date fills the chord at its row; the time has ~6 px to spare at the arc on the 218 px watch
+with the colon (it had ~1 px at the 1.1.0 size of 176 px).
 `ApexDeviceTest` checks the date, the time (with and without colon, at its top corners) and
 the longest arc label against the arc and ticks on every screen size.
 
@@ -213,9 +213,9 @@ line box).
 
 | Font resource | Face | 454 px size (min) | Glyphs |
 |---|---|---|---|
-| `TimeHeavy` | Barlow Condensed 800 | 176 px | `0123456789` |
-| `TimeThin` | Barlow Condensed 200 | 176 px | `0123456789:` (colon centred on the digits) |
-| `TimeAod` | Barlow Condensed 300 | 176 px | `0123456789` |
+| `TimeHeavy` | Barlow Condensed 800 | 164 px | `0123456789` |
+| `TimeThin` | Barlow Condensed 200 | 164 px | `0123456789:` (colon centred on the digits) |
+| `TimeAod` | Barlow Condensed 300 | 164 px | `0123456789` |
 | `Value` | Barlow Condensed 600 | 34 px (16) | digits, `,.:%-/+°`, space, `A–Z a–z` (system data values) |
 | `ArcValue` | Barlow Condensed 600 | 32 px (15) | `0123456789%-` |
 | `Mono22` | DM Mono 400 | 26 px (12) | `A–Z 0–9 -` space |

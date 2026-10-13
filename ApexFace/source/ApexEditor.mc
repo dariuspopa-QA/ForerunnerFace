@@ -47,7 +47,6 @@ class ApexEditorDelegate extends WatchUi.WatchFaceDelegate {
             :configId as Application.WatchFaceConfig.Id,
             :type as WatchUi.WatchFaceConfigType or Null,
             :committed as Boolean }) as Void {
-        mView.setEditConfig(options[:configId]);
         var settings = FaceEditor.settingsFor(options[:configId]);
         if (settings != null) {
             mView.applyEditor(settings, options[:type]);
@@ -60,7 +59,8 @@ class ApexEditorDelegate extends WatchUi.WatchFaceDelegate {
         if (slot == null) {
             return null;
         }
-        var box = mView.slotBox(slot);
+        mView.applyComplication(complication);
+        var box = mView.editorSlotBox(slot);
         if (box == null) {
             return null;
         }

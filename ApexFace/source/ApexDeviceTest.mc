@@ -28,7 +28,7 @@ function bitmapFontsLoadOnThisWatch(logger as Logger) as Boolean {
     return true;
 }
 
-// Font heights follow the screen: the time is ~0.7 of its 176 px design size scaled
+// Font heights follow the screen: the time is ~0.7 of its 164 px design size scaled
 // (cap height), the small text at least its legibility minimum.
 (:test)
 function fontSizesMatchThisScreen(logger as Logger) as Boolean {
@@ -36,7 +36,7 @@ function fontSizesMatchThisScreen(logger as Logger) as Boolean {
     var s = p[:scale] as Float;
     var hours = p[:hHours] as Number;
     logger.debug("time " + hours + " px, value " + p[:hValue] + ", label " + p[:hLabel] + ", date " + p[:hDate]);
-    Test.assertMessage(hours >= 176 * s * 0.6f && hours <= 176 * s * 0.8f, "time height " + hours + " for scale " + s);
+    Test.assertMessage(hours >= 164 * s * 0.6f && hours <= 164 * s * 0.8f, "time height " + hours + " for scale " + s);
     var labelSize = 18 * s > 10 ? 18 * s : 10;
     var label = p[:hLabel] as Number;
     Test.assertMessage(label >= labelSize * 0.5f && label <= labelSize * 1.1f, "label height " + label);

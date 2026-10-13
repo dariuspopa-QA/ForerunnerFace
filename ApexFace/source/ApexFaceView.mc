@@ -39,8 +39,8 @@ class ApexFaceView extends WatchUi.WatchFace {
     // Time. With the colon (TimeColon setting) the hours end COLON_HALF left of the
     // centre and the minutes start COLON_HALF right of it; the colon sits COLON_X right
     // of the centre, as the thin minute digits have wider side bearings than the hours.
-    private const TIME_SIZE = 176;
-    private const TIME_Y = 202.0f;
+    private const TIME_SIZE = 164;
+    private const TIME_Y = 196.0f;
     private const HOURS_RIGHT_X = 222.0f;
     private const MINUTES_LEFT_X = 232.0f;
     private const COLON_HALF = 11.0f;
@@ -151,11 +151,9 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mFieldTexts as Array<[String, String] or Null> = [null, null, null];
     private var mFieldBoxes as Array<[Number, Number, Number, Number] or Null> = [null, null, null];
 
-    // Watch face editor: running inside it, the slot it is currently animating, and
-    // the configuration being edited
+    // Watch face editor: running inside it, and the slot it is currently animating
     private var mEditMode as Boolean;
     private var mEditingSlot as Number or Null;
-    private var mEditConfig as Application.WatchFaceConfig.Id or Null;
 
     function initialize(editMode as Boolean) {
         WatchFace.initialize();
@@ -429,11 +427,6 @@ class ApexFaceView extends WatchUi.WatchFace {
         WatchUi.requestUpdate();
     }
 
-    // The configuration the editor is changing (its slot drawables re-read it).
-    function setEditConfig(configId as Application.WatchFaceConfig.Id or Null) as Void {
-        mEditConfig = configId;
-    }
-
     // Style (colon) and the data in the four slots.
     private function applyEditorData(settings as Application.WatchFaceConfig.Settings) as Void {
         var style = settings.styleId;
@@ -444,27 +437,34 @@ class ApexFaceView extends WatchUi.WatchFace {
         var refs = settings.complicationSettings;
         if (refs != null) {
             for (var i = 0; i < refs.size(); i++) {
-                var slot = refs[i].uniqueIdentifier;
-                var id = refs[i].complicationId;
-                if (slot == null || id == null) {
-                    continue;
-                }
-                var type = id.getType();
-                if (slot == ApexEditor.SLOT_ARC) {
-                    var arc = ApexMetrics.arcForComplication(type);
-                    if (arc != null) {
-                        mArcId = arc;
-                    }
-                } else if (slot >= ApexEditor.SLOT_FIELD_1 && slot < ApexEditor.SLOT_FIELD_1 + 3) {
-                    var index = slot - ApexEditor.SLOT_FIELD_1;
-                    var field = ApexMetrics.fieldForComplication(type);
-                    if (field != null) {
-                        mFieldIds[index] = field;
-                        mFieldComplications[index] = null;
-                    } else {
-                        mFieldComplications[index] = id;
-                    }
-                }
+                applyComplication(refs[i]);
+            }
+        }
+    }
+
+    // One slot's data type. The editor hands the slot it is about to preview to
+    // getComplicationDrawable with the type the user just scrolled to, before it reports
+    // the edit (onWatchFaceConfigEdited); applying it there keeps the preview current.
+    function applyComplication(ref as Application.WatchFaceConfig.ComplicationRef) as Void {
+        var slot = ref.uniqueIdentifier;
+        var id = ref.complicationId;
+        if (slot == null || id == null) {
+            return;
+        }
+        var type = id.getType();
+        if (slot == ApexEditor.SLOT_ARC) {
+            var arc = ApexMetrics.arcForComplication(type);
+            if (arc != null) {
+                mArcId = arc;
+            }
+        } else if (slot >= ApexEditor.SLOT_FIELD_1 && slot < ApexEditor.SLOT_FIELD_1 + 3) {
+            var index = slot - ApexEditor.SLOT_FIELD_1;
+            var field = ApexMetrics.fieldForComplication(type);
+            if (field != null) {
+                mFieldIds[index] = field;
+                mFieldComplications[index] = null;
+            } else {
+                mFieldComplications[index] = id;
             }
         }
     }
@@ -487,6 +487,19 @@ class ApexFaceView extends WatchUi.WatchFace {
         return (index >= 0 && index < 3) ? mFieldBoxes[index] : null;
     }
 
+    // slotBox for the editor's highlight. The editor asks for the selected slot before
+    // the face has laid out its fields; until then a field gets its column's design box
+    // (left / centre / right), so the slot is never left without a drawable.
+    function editorSlotBox(slot as Number) as [Number, Number, Number, Number] or Null {
+        var box = slotBox(slot);
+        var index = slot - ApexEditor.SLOT_FIELD_1;
+        if (box != null || index < 0 || index > 2) {
+            return box;
+        }
+        var top = px(FIELD_LABEL_Y - 12);
+        return [px(C - 160 + index * 110), top, px(100), px(mFieldValueY + 18) - top];
+    }
+
     // Fields first; the rim and the readout below the fields count as the arc.
     function slotAt(x as Number, y as Number) as Number or Null {
         for (var i = 0; i < 3; i++) {
@@ -503,15 +516,10 @@ class ApexFaceView extends WatchUi.WatchFace {
         return null;
     }
 
-    // The editor draws the selected slot as soon as the user scrolls to a new choice,
-    // before the face's next onUpdate: re-read the edited configuration and lay the
-    // fields out again, or the slot would show the previous choice.
+    // The editor draws the selected slot before the face's next onUpdate (and the
+    // first time before any): lay the fields out again for the current choice.
     function drawSlot(dc as Dc, slot as Number) as Void {
         dc.setAntiAlias(true);
-        var settings = mEditConfig != null ? FaceEditor.settingsFor(mEditConfig) : null;
-        if (settings != null) {
-            applyEditorData(settings);
-        }
         if (slot == ApexEditor.SLOT_ARC) {
             drawArcSlot(dc);
         } else {
