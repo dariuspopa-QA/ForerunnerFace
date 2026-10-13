@@ -28,7 +28,7 @@ function bitmapFontsLoadOnThisWatch(logger as Logger) as Boolean {
     return true;
 }
 
-// Font heights follow the screen: the time is ~0.7 of its 164 px design size scaled
+// Font heights follow the screen: the time is ~0.7 of its 156 px design size scaled
 // (cap height), the small text at least its legibility minimum.
 (:test)
 function fontSizesMatchThisScreen(logger as Logger) as Boolean {
@@ -36,7 +36,7 @@ function fontSizesMatchThisScreen(logger as Logger) as Boolean {
     var s = p[:scale] as Float;
     var hours = p[:hHours] as Number;
     logger.debug("time " + hours + " px, value " + p[:hValue] + ", label " + p[:hLabel] + ", date " + p[:hDate]);
-    Test.assertMessage(hours >= 164 * s * 0.6f && hours <= 164 * s * 0.8f, "time height " + hours + " for scale " + s);
+    Test.assertMessage(hours >= 156 * s * 0.6f && hours <= 156 * s * 0.8f, "time height " + hours + " for scale " + s);
     var labelSize = 18 * s > 10 ? 18 * s : 10;
     var label = p[:hLabel] as Number;
     Test.assertMessage(label >= labelSize * 0.5f && label <= labelSize * 1.1f, "label height " + label);
@@ -97,9 +97,9 @@ function timeFitsInsideTheArcOnThisScreen(logger as Logger) as Boolean {
         Test.assertMessage(left > c - hc, "hours" + what + " start at " + left + ", arc at " + (c - hc));
         Test.assertMessage(right < c + hc, "minutes" + what + " end at " + right + ", arc at " + (c + hc));
         if (colon == 1) {
-            // the colon's ink (about half its advance) fits between hours and minutes
+            // the colon's ink (half its advance in Roboto) fits between hours and minutes
             var w = p[:wColon] as Number;
-            Test.assertMessage(w * 0.6f <= (p[:minutesLeft] as Float) - (p[:hoursRight] as Float), "colon " + w + " px too wide");
+            Test.assertMessage(w * 0.5f <= (p[:minutesLeft] as Float) - (p[:hoursRight] as Float), "colon " + w + " px too wide");
         }
     }
     return true;

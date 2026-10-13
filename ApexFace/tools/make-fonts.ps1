@@ -1,6 +1,7 @@
 # Generates the Connect IQ bitmap fonts (BMFont text .fnt + .png) for every screen size
 # the products use, into resources-round-<W>x<W>/fonts/. Sources: tools/fonts/*.ttf
-# (Barlow Condensed, DM Mono; SIL Open Font License, see tools/fonts/OFL-*.txt).
+# (Roboto, Roboto Condensed: Apache License 2.0, tools/fonts/LICENSE-roboto.txt. Barlow
+# Condensed and DM Mono, used up to 1.2.1, stay there under the SIL OFL, OFL-*.txt).
 #
 #   powershell -ExecutionPolicy Bypass -File tools\make-fonts.ps1
 #
@@ -22,16 +23,17 @@ $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 $lower = 'abcdefghijklmnopqrstuvwxyz'
 # id, file, ttf, design px, minimum px, glyphs
 $fonts = @(
-    # the optional colon (TimeColon setting) is drawn in the minutes' thin weight
-    @('TimeHeavy', 'time_heavy', 'BarlowCondensed-ExtraBold.ttf', 164, 0, $digits),
-    @('TimeThin', 'time_thin', 'BarlowCondensed-ExtraLight.ttf', 164, 0, ($digits + ':')),
-    @('TimeAod', 'time_aod', 'BarlowCondensed-Light.ttf', 164, 0, $digits),
+    # Roboto as in the 1.0.0 look: hours Condensed Bold, minutes Condensed Regular (the
+    # optional colon is drawn in the minutes' font), always-on hours Condensed Light
+    @('TimeHeavy', 'time_heavy', 'RobotoCondensed-Bold.ttf', 156, 0, $digits),
+    @('TimeThin', 'time_thin', 'RobotoCondensed-Regular.ttf', 156, 0, ($digits + ':')),
+    @('TimeAod', 'time_aod', 'RobotoCondensed-Light.ttf', 156, 0, ($digits + ':')),
     # values: metric formats plus letters for system data fields (e.g. "GOOD", "ms")
-    @('Value', 'value', 'BarlowCondensed-SemiBold.ttf', 34, 16, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
-    @('ArcValue', 'arc_value', 'BarlowCondensed-SemiBold.ttf', 32, 15, ($digits + '%-')),
-    @('Mono22', 'mono22', 'DMMono-Regular.ttf', 26, 12, ($upper + $digits + ' -')),
-    @('Mono16', 'mono16', 'DMMono-Regular.ttf', 18, 10, ($upper + $digits + ' ./-%' + [char]0xB0)),
-    @('Mono14', 'mono14', 'DMMono-Regular.ttf', 16, 10, ($upper + ' '))
+    @('Value', 'value', 'RobotoCondensed-Bold.ttf', 34, 16, ($digits + ',.:%-/+ ' + [char]0xB0 + $upper + $lower)),
+    @('ArcValue', 'arc_value', 'RobotoCondensed-Bold.ttf', 32, 15, ($digits + '%-')),
+    @('Mono22', 'mono22', 'Roboto-Regular.ttf', 26, 12, ($upper + $digits + ' -')),
+    @('Mono16', 'mono16', 'Roboto-Regular.ttf', 18, 10, ($upper + $digits + ' ./-%' + [char]0xB0)),
+    @('Mono14', 'mono14', 'Roboto-Regular.ttf', 16, 10, ($upper + ' '))
 )
 
 $collections = @{}

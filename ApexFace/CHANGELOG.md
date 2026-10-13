@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • New look: the face is set in Roboto again, as in the first version. Lighter hours, clearer minutes, date and data.
+
+Details (since 1.2.1):
+
+- Typefaces as in the 1.0.0 build (the user's preferred look): time in Roboto Condensed
+  (hours Bold, minutes Regular), date and labels in Roboto Regular, field and arc values
+  in Roboto Condensed Bold. Always-on: hours and minutes in Roboto Condensed Light, to keep
+  the lit pixels low. Bitmap fonts generated from the static hinted Roboto TTFs
+  (googlefonts/roboto, Apache 2.0).
+- Sizes as in 1.2.1, except the time: 156 px, the same digit height as Barlow at 164 px
+  (Roboto Condensed is wider; at 164 px the time with the colon would cross the arc).
+- Colon: 26 px gap between hours and minutes (22 px before), 1 px right of centre.
+- Tests: colon-width check adjusted for Roboto's colon (ink about half its advance).
+
 ## 1.2.1
 
 Store text ("What's new", also in `store/description.txt`):

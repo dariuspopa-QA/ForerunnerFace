@@ -38,13 +38,13 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     // Time. With the colon (TimeColon setting) the hours end COLON_HALF left of the
     // centre and the minutes start COLON_HALF right of it; the colon sits COLON_X right
-    // of the centre, as the thin minute digits have wider side bearings than the hours.
-    private const TIME_SIZE = 164;
+    // of the centre, nudging it away from the heavier hours.
+    private const TIME_SIZE = 156;
     private const TIME_Y = 196.0f;
     private const HOURS_RIGHT_X = 222.0f;
     private const MINUTES_LEFT_X = 232.0f;
-    private const COLON_HALF = 11.0f;
-    private const COLON_X = 2.0f;
+    private const COLON_HALF = 13.0f;
+    private const COLON_X = 1.0f;
 
     // Separator and data fields
     private const SEP_HALF = 30.0f;
@@ -134,7 +134,7 @@ class ApexFaceView extends WatchUi.WatchFace {
     private var mRing as BufferedBitmapReference or Null;
     private var mRingDirty as Boolean = true;
 
-    // Custom bitmap fonts (Barlow Condensed / DM Mono, per screen size in
+    // Custom bitmap fonts (Roboto Condensed / Roboto, per screen size in
     // resources-round-*/fonts). System fonts stand in if they can't be loaded.
     private var mCustomFonts as Boolean = false;
     private var mFontHours as FontType = Graphics.FONT_NUMBER_THAI_HOT;
@@ -265,7 +265,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         dc.setPenWidth(1);
 
         drawDate(dc, now);
-        drawTime(dc, now, mFontTimeAod, mFontMinutes, mNumerals, mDim);
+        drawTime(dc, now, mFontTimeAod, mFontTimeAod, mNumerals, mDim);
     }
 
     // ---- Seconds -------------------------------------------------------
@@ -677,7 +677,7 @@ class ApexFaceView extends WatchUi.WatchFace {
         drawTracked(dc, text, C, DATE_Y, mFontDate, DATE_TRACKING, mDim);
     }
 
-    // The colon, if on, is drawn in the minutes' (thin) weight and colour.
+    // The colon, if on, is drawn in the minutes' font and colour.
     private function drawTime(dc as Dc, now as Gregorian.Info, hoursFont as FontType, minutesFont as FontType,
             hoursColor as Number, minutesColor as Number) as Void {
         var y = (TIME_Y + mShiftY) * mScale;

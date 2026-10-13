@@ -15,8 +15,10 @@ Live canvas: https://claude.ai/artifact/7gsMZx2RaPwpc2yYd2UVtC
 
 ## Concept
 
-Pure black ground, near-white ink, ONE accent colour. Huge time: hours at the heaviest weight,
-minutes at the thinnest weight of the same condensed face — weight, not colour, separates them.
+Pure black ground, near-white ink, ONE accent colour. Huge time: hours in Roboto Condensed Bold,
+minutes in Roboto Condensed Regular — weight, not colour, separates them. (The design and 1.0.1–1.2.1
+used Barlow Condensed 800 / 200; from 1.3.0 the face is set in Roboto as the 1.0.0 build looked on
+the watch, at the user's request: the ExtraBold hours were too heavy.)
 A 270° arc (default Body Battery) wraps the face with its number in the gap at 6 o'clock. A single
 accent tick sweeps the rim for seconds. Three small data fields under the time. Nothing else.
 
@@ -34,18 +36,18 @@ Call `dc.setAntiAlias(true)` before drawing.
 | Seconds comet | line from r 224 → r 202 (y 3 → 25 at 12 o'clock), width 4, round caps, accent, rotated to `sec × 6°`. Active mode only |
 | Arc track | r 198, width 4, colour `rule`, 270° from clock 225° (bottom-left) clockwise to clock 135° (bottom-right). In CIQ degrees: from 225° clockwise to 315° (`Graphics.ARC_CLOCKWISE`, 225 → −45) |
 | Arc fill | same arc, accent, round caps, length = 270° × pct, starting at the bottom-left end |
-| Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), mono 26 px (enlarged from the design's 13 px, then from 22 px in 1.1.0), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
-| Hours | condensed 164 px (176 px in 1.1.0–1.2.0, too big on the watch), heaviest weight (800), colour `numerals`, right-aligned to x = 222 (x = 216 with the colon), digits vertically centred at y ≈ 196 (cap height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
-| Minutes | same size, thinnest weight (200), colour `numerals` (AOD: `dim`), left-aligned from x = 232 (x = 238 with the colon) |
-| Colon | optional (`TimeColon` phone setting or the editor's "APEX with colon" style, off by default): thin weight, minutes' colour, centred at x = 229 (2 px towards the thin minutes, whose digits have wider side bearings), centred on the digits by the font generator |
+| Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), Roboto Regular 26 px (enlarged from the design's 13 px, then from 22 px in 1.1.0), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
+| Hours | Roboto Condensed Bold 156 px (same digit height as Barlow at 164 px; 176 px in 1.1.0–1.2.0 was too big), colour `numerals`, right-aligned to x = 222 (x = 214 with the colon), digits vertically centred at y ≈ 196 (digit height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
+| Minutes | same size, Roboto Condensed Regular, colour `numerals` (AOD: Roboto Condensed Light, `dim`), left-aligned from x = 232 (x = 240 with the colon) |
+| Colon | optional (`TimeColon` phone setting or the editor's "APEX with colon" style, off by default): minutes' font and colour, centred at x = 228 (1 px away from the heavier hours), centred on the digits by the font generator |
 | Separator | 60 × 1 px line, x 197 → 257, y 280, colour `rule` |
-| Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label mono 18 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility, 16 px before 1.1.0) colour `dim` centred at y ≈ 302, value condensed semibold (600) 34 px (28 px before 1.1.0) colour `ink` centred at y ≈ 334. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
-| Arc readout | value condensed 600 32 px (26 px before 1.1.0), accent, centred at (227, 386); label mono 16 px (letter-spacing ≈ 2 px; enlarged from 9 px, 14 px before 1.1.0) `dim`, centred at (227, 412) |
+| Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label Roboto Regular 18 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility, 16 px before 1.1.0) colour `dim` centred at y ≈ 302, value Roboto Condensed Bold 34 px (28 px before 1.1.0) colour `ink` centred at y ≈ 334. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
+| Arc readout | value Roboto Condensed Bold 32 px (26 px before 1.1.0), accent, centred at (227, 386); label Roboto Regular 16 px (letter-spacing ≈ 2 px; enlarged from 9 px, 14 px before 1.1.0) `dim`, centred at (227, 412) |
 
 Use `dc.getWidth()` / 454 as a scale factor so the layout survives other resolutions.
 
-The date fills the chord at its row; the time has ~6 px to spare at the arc on the 218 px watch
-with the colon (it had ~1 px at the 1.1.0 size of 176 px).
+The time has ~2 px to spare at the arc on the 218 px watch with the colon (Roboto Condensed is
+wider than Barlow, hence 156 px).
 `ApexDeviceTest` checks the date, the time (with and without colon, at its top corners) and
 the longest arc label against the arc and ticks on every screen size.
 
@@ -88,7 +90,7 @@ every product is round. On those watches:
 | rule (arc track, separator) | `0x2A2A28` | not drawn | `0x3A120E` |
 | numerals | setting | hours = numerals, minutes = dim | `0xFF4A3D` |
 | accent | setting | only if something accent is shown (nothing by default) | `0xFF4A3D` |
-| hours weight | 800 | 300 (thin) | 800 |
+| hours / minutes font | Condensed Bold / Regular | Condensed Light / Light | Condensed Bold / Regular |
 
 Accent choices: Volt `0xC8FF2E` (default), Ember `0xFF5A1F`, Glacier `0x4FD1FF`, Signal `0xFF3D7F`, Ghost `0xF4F4EF`.
 Numeral choices: Chalk `0xF4F4EF` (default), Bone `0xE9DFC9`, Ice `0xCFE3FF`, Accent (= current accent).
@@ -203,8 +205,9 @@ Add the permissions the sources need (e.g. `SensorHistory`, `UserProfile`, `Posi
 
 ## Fonts
 
-The design's Google Fonts (Barlow Condensed 800/200/300/600, DM Mono 400; OFL, sources and licences
-in `tools/fonts/`) are converted to Connect IQ bitmap fonts (BMFont `.fnt` + `.png`) by
+Roboto and Roboto Condensed (static hinted TTFs from googlefonts/roboto, Apache 2.0, licence in
+`tools/fonts/LICENSE-roboto.txt`; the design's Barlow Condensed and DM Mono files stay there, unused
+since 1.3.0) are converted to Connect IQ bitmap fonts (BMFont `.fnt` + `.png`) by
 `tools\make-fonts.ps1`, one set per screen size in `resources-round-<W>x<W>/fonts/`. Regenerate after
 changing sizes or glyphs. Sizes are the 454 px design sizes × width / 454, with minimums for small
 screens; MIP screens get 1-bit hinted glyphs below 20 px. Each font's line box runs from cap top to
@@ -213,18 +216,19 @@ line box).
 
 | Font resource | Face | 454 px size (min) | Glyphs |
 |---|---|---|---|
-| `TimeHeavy` | Barlow Condensed 800 | 164 px | `0123456789` |
-| `TimeThin` | Barlow Condensed 200 | 164 px | `0123456789:` (colon centred on the digits) |
-| `TimeAod` | Barlow Condensed 300 | 164 px | `0123456789` |
-| `Value` | Barlow Condensed 600 | 34 px (16) | digits, `,.:%-/+°`, space, `A–Z a–z` (system data values) |
-| `ArcValue` | Barlow Condensed 600 | 32 px (15) | `0123456789%-` |
-| `Mono22` | DM Mono 400 | 26 px (12) | `A–Z 0–9 -` space |
-| `Mono16` | DM Mono 400 | 18 px (10) | `A–Z 0–9 ./-%°` space |
-| `Mono14` | DM Mono 400 | 16 px (10) | `A–Z` space |
+| `TimeHeavy` | Roboto Condensed Bold | 156 px | `0123456789` |
+| `TimeThin` | Roboto Condensed Regular | 156 px | `0123456789:` (colon centred on the digits) |
+| `TimeAod` | Roboto Condensed Light | 156 px | `0123456789:` |
+| `Value` | Roboto Condensed Bold | 34 px (16) | digits, `,.:%-/+°`, space, `A–Z a–z` (system data values) |
+| `ArcValue` | Roboto Condensed Bold | 32 px (15) | `0123456789%-` |
+| `Mono22` | Roboto Regular | 26 px (12) | `A–Z 0–9 -` space |
+| `Mono16` | Roboto Regular | 18 px (10) | `A–Z 0–9 ./-%°` space |
+| `Mono14` | Roboto Regular | 16 px (10) | `A–Z` space |
 
-The `Mono*` resource names keep their 1.0 sizes; the table gives the current ones.
+The resource names keep their 1.0 meaning (`Mono*` = the small text at its 1.0 size, `TimeThin` =
+the minutes); the table gives the current faces and sizes.
 
-Letter-spacing isn't supported by `drawText`, so the tracked mono labels are drawn character by
+Letter-spacing isn't supported by `drawText`, so the tracked labels and date are drawn character by
 character (`drawTracked`). All eight fonts together use about 4 KB of app memory on a 218 px watch.
 If they fail to load, the view falls back to scalable then system fonts.
 On API 4+ `loadResource` hands fonts out as graphics pool references that the watch may purge;

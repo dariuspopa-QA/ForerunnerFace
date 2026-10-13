@@ -265,7 +265,7 @@ function timeColonSettingMovesTheTimeApart(logger as Logger) as Boolean {
     ApexTestUtil.assertEqual(on[:colon], true);
     var c = ApexTestUtil.screen() / 2.0f;
     ApexTestUtil.assertNear(off[:hoursRight] as Float, c - 5 * (off[:scale] as Float), 1, "hours right, no colon");
-    ApexTestUtil.assertNear(on[:hoursRight] as Float, c - 11 * (on[:scale] as Float), 1, "hours right, colon");
+    ApexTestUtil.assertNear(on[:hoursRight] as Float, c - 13 * (on[:scale] as Float), 1, "hours right, colon");
     ApexTestUtil.assertNear((on[:hoursRight] as Float) + (on[:minutesLeft] as Float), 2 * c, 1, "time centred");
     var saved = ApexTestUtil.saveProperties(["TimeColon"]);
     try {
