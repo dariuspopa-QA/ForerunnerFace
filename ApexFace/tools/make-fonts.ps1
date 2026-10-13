@@ -1,7 +1,7 @@
 # Generates the Connect IQ bitmap fonts (BMFont text .fnt + .png) for every screen size
 # the products use, into resources-round-<W>x<W>/fonts/. Sources: tools/fonts/*.ttf
 # (Roboto, Roboto Condensed: Apache License 2.0, tools/fonts/LICENSE-roboto.txt. Barlow
-# Condensed and DM Mono, used up to 1.2.1, stay there under the SIL OFL, OFL-*.txt).
+# Condensed and DM Mono, used in 1.0.1–1.0.3, stay there under the SIL OFL, OFL-*.txt).
 #
 #   powershell -ExecutionPolicy Bypass -File tools\make-fonts.ps1
 #

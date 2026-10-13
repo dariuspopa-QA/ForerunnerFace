@@ -16,8 +16,8 @@ Live canvas: https://claude.ai/artifact/7gsMZx2RaPwpc2yYd2UVtC
 ## Concept
 
 Pure black ground, near-white ink, ONE accent colour. Huge time: hours in Roboto Condensed Bold,
-minutes in Roboto Condensed Regular — weight, not colour, separates them. (The design and 1.0.1–1.2.1
-used Barlow Condensed 800 / 200; from 1.3.0 the face is set in Roboto as the 1.0.0 build looked on
+minutes in Roboto Condensed Regular — weight, not colour, separates them. (The design and 1.0.1–1.0.3
+used Barlow Condensed 800 / 200; from 1.0.4 the face is set in Roboto as the 1.0.0 build looked on
 the watch, at the user's request: the ExtraBold hours were too heavy.)
 A 270° arc (default Body Battery) wraps the face with its number in the gap at 6 o'clock. A single
 accent tick sweeps the rim for seconds. Three small data fields under the time. Nothing else.
@@ -36,13 +36,13 @@ Call `dc.setAntiAlias(true)` before drawing.
 | Seconds comet | line from r 224 → r 202 (y 3 → 25 at 12 o'clock), width 4, round caps, accent, rotated to `sec × 6°`. Active mode only |
 | Arc track | r 198, width 4, colour `rule`, 270° from clock 225° (bottom-left) clockwise to clock 135° (bottom-right). In CIQ degrees: from 225° clockwise to 315° (`Graphics.ARC_CLOCKWISE`, 225 → −45) |
 | Arc fill | same arc, accent, round caps, length = 270° × pct, starting at the bottom-left end |
-| Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), Roboto Regular 26 px (enlarged from the design's 13 px, then from 22 px in 1.1.0), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
-| Hours | Roboto Condensed Bold 156 px (same digit height as Barlow at 164 px; 176 px in 1.1.0–1.2.0 was too big), colour `numerals`, right-aligned to x = 222 (x = 214 with the colon), digits vertically centred at y ≈ 196 (digit height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
+| Date | weekday + date by the `DateFormat` setting: `MON 28-09-2026` / `MON 09-28-2026` (day and month padded), or `MON 28 SEP` (day without padding, month; upper case), Roboto Regular 26 px (enlarged from the design's 13 px, then from 22 px in 1.0.4), letter-spacing ≈ 2 px, colour `dim`, centred at y ≈ 94 |
+| Hours | Roboto Condensed Bold 156 px (same digit height as Barlow at 164 px; 176 px in a 1.0.4 test build was too big), colour `numerals`, right-aligned to x = 222 (x = 214 with the colon), digits vertically centred at y ≈ 196 (digit height ≈ 115 px), follows the watch's `DeviceSettings.is24Hour`: zero-padded 24 h, or 1–12 unpadded in 12 h (no AM/PM marker; Sunrise / Sunset fields too) |
 | Minutes | same size, Roboto Condensed Regular, colour `numerals` (AOD: Roboto Condensed Light, `dim`), left-aligned from x = 232 (x = 240 with the colon) |
 | Colon | optional (`TimeColon` phone setting or the editor's "APEX with colon" style, off by default): minutes' font and colour, centred at x = 228 (1 px away from the heavier hours), centred on the digits by the font generator |
 | Separator | 60 × 1 px line, x 197 → 257, y 280, colour `rule` |
-| Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label Roboto Regular 18 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility, 16 px before 1.1.0) colour `dim` centred at y ≈ 302, value Roboto Condensed Bold 34 px (28 px before 1.1.0) colour `ink` centred at y ≈ 334. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
-| Arc readout | value Roboto Condensed Bold 32 px (26 px before 1.1.0), accent, centred at (227, 386); label Roboto Regular 16 px (letter-spacing ≈ 2 px; enlarged from 9 px, 14 px before 1.1.0) `dim`, centred at (227, 412) |
+| Data fields | row centred on x = 227; up to 3 columns, 36 px gap; each column centred: label Roboto Regular 18 px (letter-spacing ≈ 2 px; enlarged from the design's 10 px for legibility, 16 px before 1.0.4) colour `dim` centred at y ≈ 302, value Roboto Condensed Bold 34 px (28 px before 1.0.4) colour `ink` centred at y ≈ 334. Empty slots are skipped and the row re-centres. Measure widths with `dc.getTextWidthInPixels` |
+| Arc readout | value Roboto Condensed Bold 32 px (26 px before 1.0.4), accent, centred at (227, 386); label Roboto Regular 16 px (letter-spacing ≈ 2 px; enlarged from 9 px, 14 px before 1.0.4) `dim`, centred at (227, 412) |
 
 Use `dc.getWidth()` / 454 as a scale factor so the layout survives other resolutions.
 
@@ -148,8 +148,12 @@ the phone settings (editor wins when it has a value).
 - Style 1 "APEX" (default) / style 2 "APEX with colon" (`ApexEditor.STYLE_COLON`)
 - Accent colour = accent; Data colour = numerals (time digits)
 - While a slot is being edited the editor draws it (`drawSlot`) right after each scroll, before the
-  face's next `onUpdate`: `drawSlot` re-reads the edited configuration and lays the fields out again,
-  or it shows the previous choice (fixed in 1.2.0)
+  face's next `onUpdate`, and asks for its drawable (`getComplicationDrawable`) before it reports the
+  edit: the face takes the new type from that `ComplicationRef` and lays the fields out again in
+  `drawSlot`, or it shows the previous choice
+- The editor zooms the selected slot in and out around the centre of its box (`editorSlotBox`), so
+  `drawSlot` draws a field centred on that box, not at its layout position (otherwise the zoom
+  throws the left field off the screen)
 - Every data slot lists its types explicitly with a `default` (HR, Steps, Sunset, Body Battery), and both colour lists mark a default. Never use `allowAny` on a slot: it cannot carry a default, and the editor then fills the slot with its own first choice (Battery) as soon as Data is opened
 - Test in the simulator with File → Edit Watch Face (Ctrl+E); Simulation → Complications sets values
 
@@ -207,7 +211,7 @@ Add the permissions the sources need (e.g. `SensorHistory`, `UserProfile`, `Posi
 
 Roboto and Roboto Condensed (static hinted TTFs from googlefonts/roboto, Apache 2.0, licence in
 `tools/fonts/LICENSE-roboto.txt`; the design's Barlow Condensed and DM Mono files stay there, unused
-since 1.3.0) are converted to Connect IQ bitmap fonts (BMFont `.fnt` + `.png`) by
+since 1.0.4) are converted to Connect IQ bitmap fonts (BMFont `.fnt` + `.png`) by
 `tools\make-fonts.ps1`, one set per screen size in `resources-round-<W>x<W>/fonts/`. Regenerate after
 changing sizes or glyphs. Sizes are the 454 px design sizes × width / 454, with minimums for small
 screens; MIP screens get 1-bit hinted glyphs below 20 px. Each font's line box runs from cap top to

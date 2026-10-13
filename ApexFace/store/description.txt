@@ -57,5 +57,9 @@ Notes
 • Any value that isn't available is shown as "--".
 • Your data stays on the watch. APEX doesn't send anything anywhere.
 
-WHAT'S NEW (version 1.3.0)
-• New look: the face is set in Roboto again, as in the first version. Lighter hours, clearer minutes, date and data.
+WHAT'S NEW (version 1.0.4)
+• New look: the face uses Roboto again, as in the first version, with lighter hours.
+• Larger date, data fields and arc value; the time keeps its size.
+• New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app, or pick the "APEX with colon" style in the on-watch editor.
+• More data fields in the Connect IQ app, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
+• On-watch editor: the data you scroll to is shown right away, and the left field stays in place while you edit it.

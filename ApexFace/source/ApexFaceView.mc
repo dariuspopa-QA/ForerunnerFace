@@ -50,6 +50,8 @@ class ApexFaceView extends WatchUi.WatchFace {
     private const SEP_HALF = 30.0f;
     private const SEP_Y = 280.0f;
     private const FIELD_GAP = 36.0f;
+    // Narrowest box the editor zooms a field in (and the design pitch of the columns)
+    private const EDIT_BOX_W = 110.0f;
     private const FIELD_LABEL_Y = 302.0f;
     private const FIELD_LABEL_SIZE = 18;
     private const FIELD_VALUE_Y = 334.0f;
@@ -487,17 +489,26 @@ class ApexFaceView extends WatchUi.WatchFace {
         return (index >= 0 && index < 3) ? mFieldBoxes[index] : null;
     }
 
-    // slotBox for the editor's highlight. The editor asks for the selected slot before
-    // the face has laid out its fields; until then a field gets its column's design box
-    // (left / centre / right), so the slot is never left without a drawable.
+    // The box the editor zooms the selected slot in and out around (its centre).
+    // drawSlot draws a field centred on this box, so the zoom keeps it in place: the
+    // editor can keep a box from before the face laid out its fields (1.0.4 test builds drew the
+    // left field at its layout position, and the zoom threw it off the screen). A
+    // field's box is its column (at least EDIT_BOX_W wide), or the column's design
+    // position (left / centre / right) until the fields are laid out.
     function editorSlotBox(slot as Number) as [Number, Number, Number, Number] or Null {
         var box = slotBox(slot);
         var index = slot - ApexEditor.SLOT_FIELD_1;
-        if (box != null || index < 0 || index > 2) {
+        if (index < 0 || index > 2) {
             return box;
         }
+        var cx = (C + (index - 1) * EDIT_BOX_W) * mScale;
+        var w = px(EDIT_BOX_W);
+        if (box != null) {
+            cx = box[0] + box[2] / 2.0f;
+            w = box[2] > w ? box[2] : w;
+        }
         var top = px(FIELD_LABEL_Y - 12);
-        return [px(C - 160 + index * 110), top, px(100), px(mFieldValueY + 18) - top];
+        return [Math.round(cx - w / 2.0f).toNumber(), top, w, px(mFieldValueY + 18) - top];
     }
 
     // Fields first; the rim and the readout below the fields count as the arc.
@@ -516,9 +527,10 @@ class ApexFaceView extends WatchUi.WatchFace {
         return null;
     }
 
-    // The editor draws the selected slot before the face's next onUpdate (and the
-    // first time before any): lay the fields out again for the current choice.
-    function drawSlot(dc as Dc, slot as Number) as Void {
+    // The editor draws the selected slot (box = its editorSlotBox) before the face's
+    // next onUpdate, and the first time before any: the fields are laid out again for
+    // the current choice, and a field is drawn centred on its box.
+    function drawSlot(dc as Dc, slot as Number, box as [Number, Number, Number, Number]) as Void {
         dc.setAntiAlias(true);
         if (slot == ApexEditor.SLOT_ARC) {
             drawArcSlot(dc);
@@ -526,7 +538,7 @@ class ApexFaceView extends WatchUi.WatchFace {
             var index = slot - ApexEditor.SLOT_FIELD_1;
             if (index >= 0 && index < 3) {
                 layoutFields(dc, System.getClockTime());
-                drawField(dc, index);
+                drawFieldAt(dc, index, (box[0] + box[2] / 2.0f) / mScale);
             }
         }
     }
@@ -763,11 +775,17 @@ class ApexFaceView extends WatchUi.WatchFace {
 
     private function drawField(dc as Dc, index as Number) as Void {
         var box = mFieldBoxes[index];
+        if (box != null) {
+            drawFieldAt(dc, index, (box[0] + box[2] / 2.0f) / mScale);
+        }
+    }
+
+    // Label and value of a field centred on cx (design units).
+    private function drawFieldAt(dc as Dc, index as Number, cx as Float) as Void {
         var texts = mFieldTexts[index];
-        if (box == null || texts == null) {
+        if (texts == null) {
             return;
         }
-        var cx = (box[0] + box[2] / 2.0f) / mScale;
         drawTracked(dc, texts[0], cx, FIELD_LABEL_Y, mFontLabel, LABEL_TRACKING, mDim);
         dc.setColor(mInk, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx * mScale, mFieldValueY * mScale, mFontValue, texts[1],

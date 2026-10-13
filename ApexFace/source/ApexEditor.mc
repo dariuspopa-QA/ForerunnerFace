@@ -21,15 +21,18 @@ class ApexSlotDrawable extends WatchUi.Drawable {
 
     private var mView as ApexFaceView;
     private var mSlot as Number;
+    private var mBox as [Number, Number, Number, Number];
 
     function initialize(view as ApexFaceView, slot as Number, box as [Number, Number, Number, Number]) {
         Drawable.initialize({:locX => box[0], :locY => box[1], :width => box[2], :height => box[3]});
         mView = view;
         mSlot = slot;
+        mBox = box;
     }
 
+    // Centred on the box: the editor zooms the drawable around the box's centre.
     function draw(dc as Dc) as Void {
-        mView.drawSlot(dc, mSlot);
+        mView.drawSlot(dc, mSlot, mBox);
     }
 }
 

@@ -70,6 +70,30 @@ function editModeShowsEveryFieldSlot(logger as Logger) as Boolean {
     return true;
 }
 
+// The editor zooms the selected field around its box's centre, so that box must be
+// centred on the field (1.0.4 test builds: the left field was thrown off the screen) and on the
+// screen, also when the editor asks before the fields are laid out.
+(:test)
+function editorBoxIsCentredOnItsField(logger as Logger) as Boolean {
+    var fresh = new ApexFaceView(true);
+    var w = ApexTestUtil.px(454);
+    fresh.onLayout((Graphics.createBufferedBitmap({:width => w, :height => w}).get() as Graphics.BufferedBitmap).getDc());
+    for (var slot = 1; slot <= 3; slot++) {
+        var box = fresh.editorSlotBox(slot) as [Number, Number, Number, Number];
+        Test.assertMessage(box[0] >= 0 && box[0] + box[2] <= ApexTestUtil.px(454), "slot " + slot + " box off the screen");
+    }
+    var view = new ApexFaceView(true);
+    ApexTestUtil.render(view);
+    for (var slot = 1; slot <= 3; slot++) {
+        var field = view.slotBox(slot) as [Number, Number, Number, Number];
+        var box = view.editorSlotBox(slot) as [Number, Number, Number, Number];
+        var off = (box[0] * 2 + box[2]) - (field[0] * 2 + field[2]);
+        Test.assertMessage(off >= -2 && off <= 2, "slot " + slot + " box centre off by " + off / 2.0);
+        Test.assert(box[2] >= field[2]);
+    }
+    return true;
+}
+
 (:test)
 function slotAtFindsEachSlotByItsBox(logger as Logger) as Boolean {
     var view = new ApexFaceView(true);
@@ -105,7 +129,7 @@ function editorSlotsDrawOnTheirOwn(logger as Logger) as Boolean {
     for (var slot = 1; slot <= ApexEditor.SLOT_ARC; slot++) {
         view.setEditingSlot(slot);
         view.onUpdate(dc);
-        view.drawSlot(dc, slot);
+        view.drawSlot(dc, slot, view.editorSlotBox(slot) as [Number, Number, Number, Number]);
     }
     view.setEditingSlot(null);
     view.onUpdate(dc);

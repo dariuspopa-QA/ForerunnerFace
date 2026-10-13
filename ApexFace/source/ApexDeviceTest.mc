@@ -204,7 +204,7 @@ function everyModeDrawsOnThisScreen(logger as Logger) as Boolean {
         var editor = new ApexFaceView(true);
         var edc = ApexTestUtil.render(editor);
         for (var slot = 1; slot <= ApexEditor.SLOT_ARC; slot++) {
-            editor.drawSlot(edc, slot);
+            editor.drawSlot(edc, slot, editor.editorSlotBox(slot) as [Number, Number, Number, Number]);
         }
     } finally {
         ApexTestUtil.restoreProperties(saved);

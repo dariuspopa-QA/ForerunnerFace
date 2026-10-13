@@ -1,92 +1,47 @@
 # Changelog
 
-## 1.3.0
+## 1.0.4
 
 Store text ("What's new", also in `store/description.txt`):
 
-> • New look: the face is set in Roboto again, as in the first version. Lighter hours, clearer minutes, date and data.
+> • New look: the face uses Roboto again, as in the first version, with lighter hours.
+> • Larger date, data fields and arc value; the time keeps its size.
+> • New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app, or pick the "APEX with colon" style in the on-watch editor.
+> • More data fields in the Connect IQ app, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
+> • On-watch editor: the data you scroll to is shown right away, and the left field stays in place while you edit it.
 
-Details (since 1.2.1):
+Details (since 1.0.3). Test builds of this release were numbered 1.1.0–1.3.0 (local tags
+`ApexFace/v1.1.0` … `v1.3.0`, sideloaded only, never published):
 
-- Typefaces as in the 1.0.0 build (the user's preferred look): time in Roboto Condensed
-  (hours Bold, minutes Regular), date and labels in Roboto Regular, field and arc values
-  in Roboto Condensed Bold. Always-on: hours and minutes in Roboto Condensed Light, to keep
-  the lit pixels low. Bitmap fonts generated from the static hinted Roboto TTFs
-  (googlefonts/roboto, Apache 2.0).
-- Sizes as in 1.2.1, except the time: 156 px, the same digit height as Barlow at 164 px
-  (Roboto Condensed is wider; at 164 px the time with the colon would cross the arc).
-- Colon: 26 px gap between hours and minutes (22 px before), 1 px right of centre.
-- Tests: colon-width check adjusted for Roboto's colon (ink about half its advance).
-
-## 1.2.1
-
-Store text ("What's new", also in `store/description.txt`):
-
-> • The time is back to its original size; the date and data fields stay larger.
-> • On-watch editor: the data you scroll to is shown right away, and the first field no longer disappears while you edit it.
-
-Details (since 1.2.0):
-
-- Time back to 164 px (1.0 size; 176 px since 1.1.0 was too big on the watch), its row
-  at y 196, centred between date and separator. Date and field sizes stay as in 1.1.0.
-- Fix (editor, still in 1.2.0): the preview of the slot being edited showed the previous
-  data type. The editor asks for the slot's drawable (`getComplicationDrawable`) with the
-  type just scrolled to before it reports the edit, and the saved configuration can still
-  hold the old one then; the face now takes the type from that `ComplicationRef`. The
-  1.2.0 re-read of the configuration in `drawSlot` is gone.
-- Fix (editor): the first field went blank when the editor opened on it. The editor asks
-  for that slot before the face has laid out its fields, and the face returned no
-  drawable; it now uses the column's design box until the layout exists.
-- Screenshots with and without the colon: `dist/screenshots-1.2.1/` (not committed).
-
-## 1.2.0
-
-Store text ("What's new", also in `store/description.txt`):
-
-> • On-watch editor: the data field you scroll to is now shown right away (it showed the previous choice).
-> • More data fields in the Connect IQ app settings, the same as on the watch: Intensity minutes, Pulse Ox, Respiration, Sleep score, VO2 max (run and bike), Pressure, Weekly run distance and Solar intensity.
-> • New style in the on-watch editor: APEX with colon, a colon between hours and minutes.
-
-Details (since 1.1.0):
-
-- Fix: in the on-watch editor a data slot showed the previously selected type. The editor
-  draws the slot it animates right after each scroll, before the face's next update, and
-  the slot was drawn from the field texts cached at that update. `drawSlot` now re-reads
-  the edited configuration and recomputes the field layout first.
+- Typefaces as in the 1.0.0 build: time in Roboto Condensed (hours Bold, minutes Regular),
+  date and labels in Roboto Regular, field and arc values in Roboto Condensed Bold;
+  always-on time in Roboto Condensed Light. Replaces the Barlow Condensed (ExtraBold hours
+  were too heavy on the watch) and DM Mono of 1.0.1–1.0.3. Bitmap fonts generated from the
+  static hinted Roboto TTFs (googlefonts/roboto, Apache 2.0) for all 9 screen sizes.
+- Sizes (454 px design): time 156 px (the same digit height as Barlow at 164 px; Roboto
+  Condensed is wider), date 22 → 26 px, field values 28 → 34 px, field labels 16 → 18 px,
+  arc value 26 → 32 px, arc label 14 → 16 px. Other screens scale with their width; text at
+  its minimum size stays as it was (labels on 218–260 px, the arc label up to 280 px, the
+  date on 218 px). Layout: date at y 94, time at y 196, separator at 280, field labels /
+  values at 302 / 334, arc value at 386. Date letter spacing 3 → 2 px so it fits the arc.
+- Colon: new `TimeColon` setting (off by default) and editor style 2 "APEX with colon";
+  whichever was changed last wins. Drawn in the minutes' font and colour, centred on the
+  digits; hours and minutes move apart to make room for it.
 - Phone settings: field ids 17–25 (Intensity minutes, Pulse Ox, Respiration, Sleep score,
   VO2 max run / bike, Pressure, Weekly run distance, Solar intensity), read through the
-  same Complications data the editor uses; types missing on a watch show `--`. The editor
-  maps those types to the same ids, so both sides show the same label.
-- Pressure shows hPa without the unit (`1013`); weekly run distance in km or mi with one
-  decimal (`RUN KM` / `RUN MI`); the system reports Pa and metres.
-- Editor styles: "APEX" and "APEX with colon". The colon follows whichever of the phone's
-  TimeColon setting and the editor style was changed last.
-- Tests: the new fields round-trip between setting id and editor type and render on every
-  watch; 402 resource checks.
-
-## 1.1.0
-
-Store text ("What's new", also in `store/description.txt`):
-
-> • Bigger text: the time, the date, the three data fields and the arc value are all larger and easier to read.
-> • New option: a colon between hours and minutes. Turn on "Colon between hours and minutes" in the face's settings in the Connect IQ app.
-
-Details (since 1.0.3):
-
-- New `TimeColon` setting (on / off, default off, so the face looks as before apart from the
-  sizes). The colon uses the minutes' thin weight and colour (dim in always-on), centred on the
-  digits; the hours and minutes move apart to make room for it.
-- Larger type (454 px design sizes): time 164 → 176 px, date 22 → 26 px, field values
-  28 → 34 px, field labels 16 → 18 px, arc value 26 → 32 px, arc label 14 → 16 px. Other
-  screens scale with their width. Text already at its minimum size stays as it was: labels
-  on 218–260 px screens, the arc label up to 280 px and the date on 218 px.
-- Layout re-fitted around the bigger time: date at y 94, time at y 202, separator at 280,
-  field labels / values at 302 / 334, arc value at 386.
-- The date's letter spacing goes from 3 to 2 px so the larger date still fits inside the arc.
-- Fonts regenerated for all 9 screen sizes; the minutes font gains a `:` glyph.
-- New per-watch tests: date and time (with and without colon, at the top corners) inside the
-  arc, the longest arc label clear of the bottom ticks, and the colon setting in every mode.
-- The resource check accepts on / off settings.
+  same Complications data the editor uses; types a watch lacks show `--`. Pressure in hPa
+  without the unit, weekly run distance in km or mi with one decimal.
+- Fix (editor): the slot being edited showed the previously selected type. The editor asks
+  for the slot's drawable (`getComplicationDrawable`) with the type just scrolled to before
+  it reports the edit; the face now takes the type from that `ComplicationRef`.
+- Fix (editor): the left field disappeared while being edited. The editor asks for the slot
+  before the face has laid out its fields (it now gets its column's design box), and it
+  zooms the slot around the centre of that box while the face drew the field at its layout
+  position, which threw it off the screen; `drawSlot` now draws a field centred on its box.
+- Tests: date and time (with and without colon) inside the arc and the longest arc label
+  clear of the ticks on every screen size; the new fields round-trip between setting id
+  and editor type; the editor box is centred on its field; the resource check accepts
+  on / off settings (402 checks).
 
 ## 1.0.3
 
