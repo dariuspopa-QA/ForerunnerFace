@@ -21,7 +21,23 @@
             <listEntry value="1">@Strings.FocusSteps</listEntry>
             <listEntry value="2">@Strings.FocusHeart</listEntry>
             <listEntry value="3">@Strings.FocusStress</listEntry>
+            <listEntry value="4">@Strings.FocusResp</listEntry>
         </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.BarBattery" title="@Strings.BarBatteryTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.BarSteps" title="@Strings.BarStepsTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.BarHeart" title="@Strings.BarHeartTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.BarStress" title="@Strings.BarStressTitle">
+        <settingConfig type="boolean"/>
+    </setting>
+    <setting propertyKey="@Properties.BarResp" title="@Strings.BarRespTitle">
+        <settingConfig type="boolean"/>
     </setting>
     <setting propertyKey="@Properties.BottomLine" title="@Strings.LineTitle">
         <settingConfig type="list">

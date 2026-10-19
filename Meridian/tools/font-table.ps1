@@ -4,10 +4,10 @@
 $fonts = @(
     @('Hours', 'hours', 'SpaceGrotesk-Bold.ttf', 112, 0, $digits),
     @('Minutes', 'minutes', 'SpaceGrotesk-Light.ttf', 112, 0, $digits),
-    @('Value', 'value', 'SpaceGrotesk-Medium.ttf', 32, 20, ($digits + ',-')),
+    @('Value', 'value', 'SpaceGrotesk-Medium.ttf', 32, 20, ($digits + $upper + $lower + $degree + ',.:/%- ')),
     @('Date', 'date', 'IBMPlexMono-Regular.ttf', 19, 15, ($upper + $digits + ' -')),
     @('DateBold', 'date_bold', 'IBMPlexMono-Medium.ttf', 19, 15, $upper),
-    @('Label', 'label', 'IBMPlexMono-Regular.ttf', 15, 13, ($upper + $lower + $digits + ' /%-')),
+    @('Label', 'label', 'IBMPlexMono-Regular.ttf', 15, 13, ($upper + $lower + $digits + ' ./%-()')),
     @('Line', 'line', 'IBMPlexMono-Regular.ttf', 17, 14, ($ascii + $degree + $middot)),
     @('Seconds', 'seconds', 'IBMPlexMono-Medium.ttf', 24, 18, $digits)
 )

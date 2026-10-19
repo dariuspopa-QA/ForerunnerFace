@@ -15,13 +15,15 @@ class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
-    // Palette (AMOLED). dim is brighter than the mockup's 0x8E8B85 so labels read on the watch.
-    private const INK = 0xF3F1EC;
-    private const DIM = 0xA3A09A;
-    private const TRACK = 0x2B2A28;
-    private const SUN = 0xF2B544;
-    private const SUN_SOFT = 0x5A4520;
-    private const SLEEP = 0x6F7CFF;
+    // Palette: AMOLED, or the mockup's MIP theme (64 colours: channels 00/55/AA/FF) on MIP
+    // screens, set in onLayout. dim is brighter than the mockup's 0x8E8B85 so labels read on
+    // the watch.
+    private var mInk as Number = 0xF3F1EC;
+    private var mDim as Number = 0xA3A09A;
+    private var mTrack as Number = 0x2B2A28;
+    private var mSun as Number = 0xF2B544;
+    private var mSunSoft as Number = 0x5A4520;
+    private var mSleep as Number = 0x6F7CFF;
     // Always-On
     private const AOD_HOURS = 0xB9B6B0;
     private const AOD_MINUTES = 0x8E8B85;
@@ -44,11 +46,25 @@ class FaceView extends FaceCoreView {
     private const LINE_Y = 335.0f;
 
     enum { RING_DAY = 0, RING_ACTIVITY = 1 }
-    enum { FOCUS_BATTERY = 0, FOCUS_STEPS = 1, FOCUS_HEART = 2, FOCUS_STRESS = 3 }
+    enum { FOCUS_BATTERY = 0, FOCUS_STEPS = 1, FOCUS_HEART = 2, FOCUS_STRESS = 3, FOCUS_RESP = 4 }
     enum { LINE_SMART = 0, LINE_SUNSET = 1, LINE_WEATHER = 2, LINE_EVENT = 3 }
+
+    // The focus metrics that get a bar (settings Bar*), in this order
+    private const BAR_KEYS = ["BarBattery", "BarSteps", "BarHeart", "BarStress", "BarResp"] as Array<String>;
+    private const BAR_DEFAULTS = [1, 1, 1, 1, 0] as Array<Number>;
+    private const BAR_W = 40.0f;
+    private const BAR_GAP = 8.0f;
+
+    // Data slots (on-watch editor): 1 = the focus row, 2 = the bottom line. A picked system
+    // field replaces the face's own text there; without one (or before it has a value) the
+    // face shows its own. Boxes in design px: centred, SLOT_W wide.
+    enum { SLOT_FOCUS = 1, SLOT_LINE = 2 }
+    private const SLOT_W = 300.0f;
+    private const ICON_NONE = -1;
 
     private var mRingMode as Number = RING_DAY;
     private var mFocus as Number = FOCUS_BATTERY;
+    private var mBars as Array<Number> = [FOCUS_BATTERY, FOCUS_STEPS, FOCUS_HEART, FOCUS_STRESS] as Array<Number>;
     private var mLine as Number = LINE_SMART;
     private var mSeconds as Boolean = false;
     private var mAodRing as Boolean = true;
@@ -69,8 +85,20 @@ class FaceView extends FaceCoreView {
         loadSettings();
     }
 
+    function onLayout(dc as Dc) as Void {
+        FaceCoreView.onLayout(dc);
+        if (!mAmoled) {
+            mInk = 0xFFFFFF;
+            mDim = 0xAAAAAA;
+            mTrack = 0x555555;
+            mSun = 0xFFAA00;
+            mSunSoft = 0xAA5500;
+            mSleep = 0x00AAFF;
+        }
+    }
+
     function loadFonts() as Void {
-        var f = FaceKit.loadFonts([Rez.Fonts.Hours, Rez.Fonts.Minutes, Rez.Fonts.Value, Rez.Fonts.Date, Rez.Fonts.DateBold, Rez.Fonts.Label, Rez.Fonts.Line, Rez.Fonts.Seconds] as Array<ResourceId>,
+        var f = loadFontSet([Rez.Fonts.Hours, Rez.Fonts.Minutes, Rez.Fonts.Value, Rez.Fonts.Date, Rez.Fonts.DateBold, Rez.Fonts.Label, Rez.Fonts.Line, Rez.Fonts.Seconds] as Array<ResourceId>,
             [Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_NUMBER_THAI_HOT, Graphics.FONT_SMALL, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_TINY] as Array<FontType>);
         mFontHours = f[0];
         mFontMinutes = f[1];
@@ -87,11 +115,31 @@ class FaceView extends FaceCoreView {
     function loadSettings() as Void {
         mAccent = FaceKit.prop("AccentColor", 0xFF6A3D);
         mRingMode = FaceKit.prop("RingMode", RING_DAY);
-        mFocus = FaceKit.prop("Focus", FOCUS_BATTERY);
         mLine = FaceKit.prop("BottomLine", LINE_SMART);
         mSeconds = FaceKit.prop("ShowSeconds", 0) == 1;
         mAodRing = FaceKit.prop("AodRing", 1) == 1;
         mDateSetting = FaceKit.prop("DateFormat", FaceFormat.DATE_WATCH);
+        var bars = [] as Array<Number>;
+        for (var i = 0; i < BAR_KEYS.size(); i++) {
+            if (FaceKit.prop(BAR_KEYS[i], BAR_DEFAULTS[i]) == 1) {
+                bars.add(i);
+            }
+        }
+        // The focus metric: the phone setting, or the bar tapped on the watch, whichever
+        // changed last
+        var focus = FaceKit.prop("Focus", FOCUS_BATTERY);
+        var tapped = null;
+        try {
+            var t = Application.Storage.getValue("tapFocus");
+            tapped = t instanceof Number ? t : null;
+        } catch (e) {
+            tapped = null;
+        }
+        mFocus = FaceEditor.pick("edFocus", focus, tapped, FOCUS_BATTERY);
+        if (bars.size() == 0) {
+            bars.add(mFocus);
+        }
+        mBars = bars;
         var editor = FaceEditor.settingsFor(null);
         if (editor == null) {
             return;
@@ -100,7 +148,9 @@ class FaceView extends FaceCoreView {
             applyEditor(editor);
             return;
         }
-        // Outside the editor, whichever of phone and editor changed the setting last wins
+        // Outside the editor, whichever of phone and editor changed the setting last wins;
+        // the data slots exist only in the editor
+        applySlots(editor);
         mRingMode = FaceEditor.pick("edRing", mRingMode, editorRing(editor), RING_DAY);
         mAccent = FaceEditor.pick("edAccent", mAccent, editorAccent(editor), 0xFF6A3D);
     }
@@ -115,6 +165,7 @@ class FaceView extends FaceCoreView {
         if (accent != null) {
             mAccent = accent;
         }
+        applySlots(settings);
     }
 
     private function editorRing(settings as Application.WatchFaceConfig.Settings) as Number or Null {
@@ -131,7 +182,7 @@ class FaceView extends FaceCoreView {
 
     function onUpdate(dc as Dc) as Void {
         dc.setAntiAlias(true);
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.setColor(ink(Graphics.COLOR_BLACK), Graphics.COLOR_BLACK);
         dc.clear();
         mData.refresh();
         var clock = System.getClockTime();
@@ -150,10 +201,48 @@ class FaceView extends FaceCoreView {
             drawDayDial(dc, nowH, 0.0f, 0.0f, false);
         }
         drawDate(dc, now, 0.0f, 0.0f, false);
-        drawTime(dc, clock, mFontHours, INK, INK, 0.0f, 0.0f, mSeconds && mAwake);
-        drawFocus(dc);
+        drawTime(dc, clock, mFontHours, mInk, mInk, 0.0f, 0.0f, mSeconds && mAwake);
         drawBars(dc);
-        drawBottomLine(dc, nowH);
+        for (var slot = SLOT_FOCUS; slot <= SLOT_LINE; slot++) {
+            if (slot != mEditingSlot) {
+                drawSlot(dc, slot);
+            }
+        }
+    }
+
+    // ---- Data slots -----------------------------------------------------------
+
+    function slots() as Array<Number> {
+        return [SLOT_FOCUS, SLOT_LINE] as Array<Number>;
+    }
+
+    // The focus row from cap top of the label to below the value; the bottom line around
+    // its icon and text. Neither is drawn in Always-On.
+    function slotBox(slot as Number) as [Number, Number, Number, Number] or Null {
+        var top;
+        var h;
+        if (slot == SLOT_FOCUS) {
+            top = FOCUS_BASE - 30;
+            h = 36;
+        } else if (slot == SLOT_LINE) {
+            top = LINE_Y - 14;
+            h = 28;
+        } else {
+            return null;
+        }
+        return [((C - SLOT_W / 2) * mScale).toNumber(), (top * mScale).toNumber(),
+            (SLOT_W * mScale).toNumber(), (h * mScale).toNumber()] as [Number, Number, Number, Number];
+    }
+
+    function drawSlot(dc as Dc, slot as Number) as Void {
+        if (slot == SLOT_FOCUS) {
+            drawFocus(dc);
+        } else if (slot == SLOT_LINE) {
+            var clock = System.getClockTime();
+            var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+            FaceDemo.time(clock, now);
+            drawBottomLine(dc, clock.hour + clock.min / 60.0f);
+        }
     }
 
     // Always-On, as ApexFace: date, light hours, dim minutes and the four major ticks, plus
@@ -179,7 +268,7 @@ class FaceView extends FaceCoreView {
     private function drawAodTicks(dc as Dc, dx as Float, dy as Float) as Void {
         var cx = (C + dx) * mScale;
         var cy = (C + dy) * mScale;
-        dc.setColor(AOD_TICK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(AOD_TICK), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(3.0f, mScale));
         var r0 = mRingMode == RING_ACTIVITY ? 158 : 176;
         for (var i = 0; i < 4; i++) {
@@ -197,7 +286,7 @@ class FaceView extends FaceCoreView {
         var w = FaceKit.penWidth(aod ? 3.0f : DAY_W, mScale);
 
         if (!aod) {
-            dc.setColor(TRACK, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mTrack), Graphics.COLOR_TRANSPARENT);
             dc.setPenWidth(FaceKit.penWidth(2.0f, mScale));
             dc.drawCircle(cx, cy, r);
         }
@@ -205,7 +294,7 @@ class FaceView extends FaceCoreView {
         var sleep = mData.sleepTime;
         var wake = mData.wakeTime;
         if (sleep != null && wake != null) {
-            dc.setColor(aod ? 0x2A2F66 : FaceKit.mix(SLEEP, 0x000000, 0.85f), Graphics.COLOR_TRANSPARENT);
+            dc.setColor(aod ? 0x2A2F66 : FaceKit.mix(mSleep, 0x000000, 0.85f), Graphics.COLOR_TRANSPARENT);
             FaceKit.roundArc(dc, cx, cy, r, hourDeg(sleep), hourDeg(wake), w);
         }
 
@@ -214,11 +303,11 @@ class FaceView extends FaceCoreView {
         if (rise != null && set != null) {
             var doneTo = nowH < rise ? rise : (nowH > set ? set : nowH);
             if (doneTo < set) {
-                dc.setColor(aod ? 0x3A2D16 : SUN_SOFT, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ink(aod ? 0x3A2D16 : mSunSoft), Graphics.COLOR_TRANSPARENT);
                 FaceKit.roundArc(dc, cx, cy, r, hourDeg(doneTo), hourDeg(set), w);
             }
             if (doneTo > rise) {
-                dc.setColor(aod ? 0x7A5B22 : SUN, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ink(aod ? 0x7A5B22 : mSun), Graphics.COLOR_TRANSPARENT);
                 FaceKit.roundArc(dc, cx, cy, r, hourDeg(rise), hourDeg(doneTo), w);
             }
         }
@@ -226,13 +315,13 @@ class FaceView extends FaceCoreView {
         if (!aod) {
             for (var h = 0; h < 24; h++) {
                 var major = h % 6 == 0;
-                dc.setColor(major ? DIM : TRACK, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ink(major ? mDim : mTrack), Graphics.COLOR_TRANSPARENT);
                 dc.setPenWidth(FaceKit.penWidth(major ? 3.0f : 2.0f, mScale));
                 var a = FaceKit.clockPoint(hourDeg(h.toFloat()), major ? 176 : 184);
                 var b = FaceKit.clockPoint(hourDeg(h.toFloat()), 192);
                 dc.drawLine(cx + a[0] * mScale, cy + a[1] * mScale, cx + b[0] * mScale, cy + b[1] * mScale);
             }
-            dc.setColor(DIM, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mDim), Graphics.COLOR_TRANSPARENT);
             var labels = ["00", "06", "12", "18"];
             for (var i = 0; i < 4; i++) {
                 var p = FaceKit.clockPoint(hourDeg(i * 6.0f), 160);
@@ -246,16 +335,16 @@ class FaceView extends FaceCoreView {
         var nx = cx + n[0] * mScale;
         var ny = cy + n[1] * mScale;
         if (aod) {
-            dc.setColor(0x9A9790, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(0x9A9790), Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(nx, ny, 4 * mScale);
             return;
         }
-        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(2.5f, mScale));
         dc.drawCircle(nx, ny, 14 * mScale);
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(Graphics.COLOR_BLACK), Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(nx, ny, 10 * mScale);
-        dc.setColor(INK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mInk), Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(nx, ny, 7 * mScale);
         dc.setPenWidth(1);
     }
@@ -272,11 +361,11 @@ class FaceView extends FaceCoreView {
             FaceData.fraction(mData.intensity, mData.intensityGoal),
             FaceData.fraction(mData.floors, mData.floorsGoal)
         ];
-        var colors = [mAccent, SUN, SLEEP];
+        var colors = [mAccent, mSun, mSleep];
         for (var i = 0; i < 3; i++) {
             var r = ((aod ? RING_R - 4 : RING_R) - i * ACT_STEP) * mScale;
             if (!aod) {
-                dc.setColor(TRACK, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ink(mTrack), Graphics.COLOR_TRANSPARENT);
                 dc.setPenWidth(w);
                 dc.drawCircle(cx, cy, r);
             }
@@ -304,7 +393,7 @@ class FaceView extends FaceCoreView {
         var y = (DATE_Y + dy) * mScale;
         dc.setColor(aod ? FaceKit.mix(mAccent, 0x000000, 0.7f) : mAccent, Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left, y, mFontDateBold, day, track, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(aod ? AOD_MINUTES : DIM, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(aod ? AOD_MINUTES : mDim), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left + wDay + gap, y, mFontDate, rest, track, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
@@ -322,12 +411,12 @@ class FaceView extends FaceCoreView {
         var wS = seconds ? gap + dc.getTextWidthInPixels(sec, mFontSeconds) : 0.0f;
         var left = (C + dx) * mScale - (wH + gap + wM + wS) / 2;
         var y = (TIME_Y + dy) * mScale;
-        dc.setColor(hoursColor, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(hoursColor), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left, y, hoursFont, hours, track, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(minutesColor, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(minutesColor), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left + wH + gap, y, mFontMinutes, minutes, track, Graphics.TEXT_JUSTIFY_LEFT);
         if (seconds) {
-            dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
             var top = (TIME_BASE + dy) * mScale - Graphics.getFontAscent(mFontSeconds);
             dc.drawText(left + wH + gap + wM + gap, top, mFontSeconds, sec, Graphics.TEXT_JUSTIFY_LEFT);
         }
@@ -352,67 +441,150 @@ class FaceView extends FaceCoreView {
                 var level = s == null ? "" : (s <= 25 ? "rest" : (s <= 50 ? "low" : (s <= 75 ? "med" : "high")));
                 return ["STRESS", s != null ? s.toString() : "--", level, s != null ? FaceKit.clamp01(s / 100.0f) : null];
             }
+            case FOCUS_RESP: {
+                // breaths per minute; the bar spans 8 (calm) to 24
+                var r = mData.respiration();
+                return ["RESPIRATION", r != null ? r.toString() : "--", "brpm",
+                    r != null ? FaceKit.clamp01((r - 8) / 16.0f) : null];
+            }
         }
         var bb = mData.bodyBattery;
         return ["BODY BATTERY", bb != null ? bb.toString() : "--", "/100", bb != null ? FaceKit.clamp01(bb / 100.0f) : null];
     }
 
-    // Label, value and unit on one baseline, centred.
+    // The focus row: [label, value, unit, fill] of the field picked for the focus slot, or
+    // of the focus metric without one.
+    function focusRow(picked as [String, String] or Null) as [String, String, String, Float or Null] {
+        if (picked != null) {
+            return [picked[1], picked[0], "", null];
+        }
+        return metric(mFocus);
+    }
+
+    // Label, value and unit on one baseline, centred. A row wider than the slot (a long
+    // system field) drops the label's letter-spacing, then takes a system font for the value.
     private function drawFocus(dc as Dc) as Void {
-        var m = metric(mFocus);
-        var track = 2.0f * mScale;
+        var m = focusRow(slotText(SLOT_FOCUS));
+        var maxW = (SLOT_W - 4) * mScale;
         var gap = 8.0f * mScale;
-        var wL = FaceKit.trackedWidth(dc, mFontLabel, m[0], track);
-        var wV = dc.getTextWidthInPixels(m[1], mFontValue);
+        var valueFont = mFontValue;
+        var wV = dc.getTextWidthInPixels(m[1], valueFont);
         var wU = m[2].length() > 0 ? gap + dc.getTextWidthInPixels(m[2], mFontLabel) : 0;
+        var track = fitTracking(dc, mFontLabel, m[0], 2.0f * mScale, maxW - gap - wV - wU);
+        var wL = FaceKit.trackedWidth(dc, mFontLabel, m[0], track);
+        if (wL + gap + wV + wU > maxW) {
+            valueFont = Graphics.FONT_XTINY;
+            wV = dc.getTextWidthInPixels(m[1], valueFont);
+        }
+        if (wL == 0) {
+            gap = 0.0f;
+        }
         var left = C * mScale - (wL + gap + wV + wU) / 2;
         var base = FOCUS_BASE * mScale;
         var labelY = base - Graphics.getFontAscent(mFontLabel) / 2.0f;
-        dc.setColor(DIM, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mDim), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, left, labelY, mFontLabel, m[0], track, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(INK, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(left + wL + gap, base - Graphics.getFontAscent(mFontValue), mFontValue, m[1], Graphics.TEXT_JUSTIFY_LEFT);
+        dc.setColor(ink(mInk), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(left + wL + gap, base - Graphics.getFontAscent(valueFont), valueFont, m[1], Graphics.TEXT_JUSTIFY_LEFT);
         if (m[2].length() > 0) {
-            dc.setColor(DIM, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mDim), Graphics.COLOR_TRANSPARENT);
             dc.drawText(left + wL + gap + wV + gap, base - Graphics.getFontAscent(mFontLabel), mFontLabel, m[2],
                 Graphics.TEXT_JUSTIFY_LEFT);
         }
     }
 
-    // Four mini bars (battery, steps, heart, stress); the focus metric's in the accent.
+    // A mini bar per chosen focus metric (Bar* settings; by default battery, steps, heart,
+    // stress); the focus metric's in the accent. On touch watches a tap on a bar makes it
+    // the focus (onFacePress).
     private function drawBars(dc as Dc) as Void {
-        var w = 40.0f * mScale;
-        var h = 5.0f * mScale;
-        var gap = 8.0f * mScale;
-        var left = C * mScale - (4 * w + 3 * gap) / 2;
-        var top = BARS_Y * mScale - h / 2;
-        for (var i = 0; i < 4; i++) {
-            var x = left + i * (w + gap);
-            dc.setColor(TRACK, Graphics.COLOR_TRANSPARENT);
+        var w = BAR_W * mScale;
+        // whole pixels, at least 3: the 218 px screen drops a 2.4 px rounded bar entirely
+        var h = Math.round(5.0f * mScale).toFloat();
+        h = h < 3.0f ? 3.0f : h;
+        var top = Math.round(BARS_Y * mScale - h / 2).toFloat();
+        // a field picked for the focus slot replaces the focus metric: no bar in the accent
+        var focus = slotText(SLOT_FOCUS) == null ? mFocus : -1;
+        for (var i = 0; i < mBars.size(); i++) {
+            var x = barLeft(i) * mScale;
+            var id = mBars[i];
+            dc.setColor(ink(mTrack), Graphics.COLOR_TRANSPARENT);
             dc.fillRoundedRectangle(x, top, w, h, h / 2);
-            var f = metric(i)[3];
+            var f = metric(id)[3];
             if (f != null && f > 0.0f) {
                 var fw = w * f;
-                dc.setColor(i == mFocus ? mAccent : DIM, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ink(id == focus ? mAccent : mDim), Graphics.COLOR_TRANSPARENT);
                 dc.fillRoundedRectangle(x, top, fw < h ? h : fw, h, h / 2);
             }
         }
     }
 
-    // Icon + text: sunset countdown, weather, or the next calendar event.
+    // Left edge of bar i in design px (the row is centred).
+    private function barLeft(i as Number) as Float {
+        var n = mBars.size();
+        return C - (n * BAR_W + (n - 1) * BAR_GAP) / 2 + i * (BAR_W + BAR_GAP);
+    }
+
+    // A tap on a bar (the mockup's 10 px touch padding above and below, half the gap
+    // either side) makes its metric the focus until the next tap or phone setting change.
+    function onFacePress(x as Number, y as Number) as Boolean {
+        if (alwaysOn() || mEditMode) {
+            return false;
+        }
+        var dx = x / mScale;
+        var dy = y / mScale;
+        if (dy < BARS_Y - 14 || dy > BARS_Y + 14) {
+            return false;
+        }
+        for (var i = 0; i < mBars.size(); i++) {
+            var left = barLeft(i) - BAR_GAP / 2;
+            if (dx >= left && dx < left + BAR_W + BAR_GAP) {
+                try {
+                    Application.Storage.setValue("tapFocus", mBars[i]);
+                } catch (e) {
+                    return false;
+                }
+                loadSettings();
+                WatchUi.requestUpdate();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Icon + text: sunset countdown, weather, or the next calendar event; or the field
+    // picked for the bottom-line slot ("VO2 MAX 52"), without an icon. Text wider than the
+    // slot takes a system font.
     private function drawBottomLine(dc as Dc, nowH as Float) as Void {
-        var line = bottomLine(nowH);
+        var line = lineOf(slotText(SLOT_LINE), nowH);
         if (line == null) {
             return;
         }
-        var icon = 16.0f * mScale;
-        var gap = 8.0f * mScale;
-        var wT = dc.getTextWidthInPixels(line[1] as String, mFontLine);
+        var hasIcon = line[0] != ICON_NONE;
+        var icon = hasIcon ? 16.0f * mScale : 0.0f;
+        var gap = hasIcon ? 8.0f * mScale : 0.0f;
+        var font = mFontLine;
+        var wT = dc.getTextWidthInPixels(line[1], font);
+        if (icon + gap + wT > (SLOT_W - 4) * mScale) {
+            font = Graphics.FONT_XTINY;
+            wT = dc.getTextWidthInPixels(line[1], font);
+        }
         var left = C * mScale - (icon + gap + wT) / 2;
         var y = LINE_Y * mScale;
-        drawIcon(dc, line[0] as Number, left, y - icon / 2, icon);
-        dc.setColor(DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(left + icon + gap, y, mFontLine, line[1] as String, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        if (hasIcon) {
+            drawIcon(dc, line[0], left, y - icon / 2, icon);
+        }
+        dc.setColor(ink(mDim), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(left + icon + gap, y, font, line[1], Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // [icon, text] of the bottom line: the picked field ("LABEL value", no icon), or the
+    // face's own line; null when there is nothing to show.
+    function lineOf(picked as [String, String] or Null, nowH as Float) as [Number, String] or Null {
+        if (picked != null) {
+            var text = picked[1].length() > 0 ? picked[1] + " " + picked[0] : picked[0];
+            return [ICON_NONE, text];
+        }
+        return bottomLine(nowH);
     }
 
     enum { ICON_SUNSET = 0, ICON_SUNRISE = 1, ICON_WEATHER = 2, ICON_EVENT = 3 }
@@ -475,7 +647,7 @@ class FaceView extends FaceCoreView {
     // Stroke icons from the mockup, drawn in a 24-unit box scaled to size px.
     private function drawIcon(dc as Dc, icon as Number, x as Float, y as Float, size as Float) as Void {
         var k = size / 24.0f;
-        dc.setColor(SUN, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mSun), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(2.0f, mScale));
         if (icon == ICON_SUNSET || icon == ICON_SUNRISE) {
             dc.drawLine(x + 3 * k, y + 18 * k, x + 21 * k, y + 18 * k);

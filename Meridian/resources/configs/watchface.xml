@@ -1,11 +1,17 @@
 <resources>
-    <!-- Garmin's native on-device watch face editor (fr970). Style = outer ring
-         (1 day timeline, 2 activity rings); accent colour. -->
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it). Style = outer ring
+         (1 day timeline, 2 activity rings); accent colour; two data slots. Complication ids are the
+         view's slots: 1 = the focus row, 2 = the bottom line; with no field picked a slot shows the
+         face's own focus metric / line. -->
     <watchface-config>
         <styles>
             <style id="1" label="@Strings.RingDay" default="true"/>
             <style id="2" label="@Strings.RingActivity"/>
         </styles>
+        <data>
+            <complication id="1" allowAny="true"/>
+            <complication id="2" allowAny="true"/>
+        </data>
         <accentColors>
             <color label="@Strings.ColorEmber" default="true">0xFF6A3D</color>
             <color label="@Strings.ColorMint">0x3DDC97</color>

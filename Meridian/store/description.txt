@@ -1,0 +1,52 @@
+APP NAME
+Meridian
+
+SHORT DESCRIPTION
+Your day on a 24-hour dial: the sun's arc, last night's sleep, and the time in bold.
+
+DESCRIPTION
+Meridian puts your whole day on one ring. Noon sits at the top, midnight at the bottom: the sun's arc runs from sunrise to sunset (the part of the day already gone in bright gold), your sleep window sits on the night side, and a marker shows where you are now. In the middle, the time in heavy hours and light minutes, one focus metric and a smart bottom line.
+
+What's on the face
+• 24-hour day dial: sun arc from sunrise to sunset, sleep window from your sleep and wake times, hour ticks with 00 / 06 / 12 / 18 and a now-marker in your accent colour
+• Or activity rings instead: steps to your step goal, weekly intensity minutes to your goal, floors to your floor goal
+• Weekday (in the accent colour) and date: SAT 10 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
+• Big time: bold hours, light minutes, seconds on wrist raise if you want them
+• One focus metric with its unit: Body Battery, Steps, Heart rate, Stress or Respiration
+• Mini bars under it for the metrics you pick; the focus metric's bar lights up. On touch watches, tap a bar to make it the focus
+• Bottom line: "Sunset in 2h 12m" while the sun is up, otherwise the weather or your next calendar event (or pick one of them)
+• 12-hour or 24-hour time, as set on your watch
+
+Colours
+Accent: Ember, Mint, Sky, Bone, Amber or Rose. On MIP watches the face switches to a palette made for their 64 colours.
+
+Always-on mode
+On AMOLED watches, always-on mode shows the date, a thin time and four hour marks, plus (if you keep it) the day dial or activity rings as fine lines. It lights few pixels and moves slightly every minute to protect the screen. On MIP watches the full face stays on.
+
+Customise
+• On your phone: open Meridian in the Connect IQ Store app and change its settings: accent, outer ring, focus metric, which metrics get a bar, bottom line, seconds, always-on ring and date format.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the outer ring (Style), the accent colour, and under Data what the focus row and the bottom line show (Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
+• Whatever you changed last, on the phone or on the watch, is what the face shows.
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• Sunrise and sunset come from your watch's weather data or last GPS position; the sleep window comes from the sleep and wake times in your user profile.
+• Respiration needs a watch that measures it. Any value that isn't available is shown as "--".
+• Your data stays on the watch. Meridian doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release, on 66 round Garmin watches (AMOLED and MIP).

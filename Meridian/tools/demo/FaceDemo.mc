@@ -26,6 +26,7 @@ module FaceDemo {
         data.hrOverride = 62;
         data.eventOverride = "18:30";
         data.sleepOverride = 82;
+        data.respirationOverride = 14;
         data.bodyBattery = 68;
     }
 

@@ -13,11 +13,18 @@
     <string id="RingDay">24 h day timeline</string>
     <string id="RingActivity">Activity rings</string>
 
-    <string id="FocusTitle">Focus metric</string>
+    <string id="FocusTitle">Focus metric (or tap its bar on the watch)</string>
     <string id="FocusBattery">Body Battery</string>
     <string id="FocusSteps">Steps</string>
     <string id="FocusHeart">Heart rate</string>
     <string id="FocusStress">Stress</string>
+    <string id="FocusResp">Respiration</string>
+
+    <string id="BarBatteryTitle">Bar: Body Battery</string>
+    <string id="BarStepsTitle">Bar: Steps</string>
+    <string id="BarHeartTitle">Bar: Heart rate</string>
+    <string id="BarStressTitle">Bar: Stress</string>
+    <string id="BarRespTitle">Bar: Respiration</string>
 
     <string id="LineTitle">Bottom line</string>
     <string id="LineSmart">Smart (sunset, weather, next event)</string>

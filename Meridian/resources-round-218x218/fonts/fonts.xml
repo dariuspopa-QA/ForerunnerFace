@@ -1,0 +1,10 @@
+<fonts>
+    <font id="Hours" filename="hours.fnt" antialias="true"/>
+    <font id="Minutes" filename="minutes.fnt" antialias="true"/>
+    <font id="Value" filename="value.fnt" antialias="false"/>
+    <font id="Date" filename="date.fnt" antialias="false"/>
+    <font id="DateBold" filename="date_bold.fnt" antialias="false"/>
+    <font id="Label" filename="label.fnt" antialias="false"/>
+    <font id="Line" filename="line.fnt" antialias="false"/>
+    <font id="Seconds" filename="seconds.fnt" antialias="false"/>
+</fonts>

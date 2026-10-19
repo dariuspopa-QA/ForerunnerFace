@@ -2,8 +2,14 @@
     <property id="AccentColor" type="number">0xFF6A3D</property>
     <!-- 0 day timeline, 1 activity rings -->
     <property id="RingMode" type="number">0</property>
-    <!-- 0 Body Battery, 1 steps, 2 heart rate, 3 stress -->
+    <!-- 0 Body Battery, 1 steps, 2 heart rate, 3 stress, 4 respiration -->
     <property id="Focus" type="number">0</property>
+    <!-- which focus metrics get a mini bar -->
+    <property id="BarBattery" type="boolean">true</property>
+    <property id="BarSteps" type="boolean">true</property>
+    <property id="BarHeart" type="boolean">true</property>
+    <property id="BarStress" type="boolean">true</property>
+    <property id="BarResp" type="boolean">false</property>
     <!-- 0 smart, 1 sunset, 2 weather, 3 next event -->
     <property id="BottomLine" type="number">0</property>
     <property id="ShowSeconds" type="boolean">false</property>

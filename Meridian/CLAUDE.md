@@ -14,14 +14,22 @@ rings (steps / step goal, weekly intensity minutes / goal, floors / goal). In th
 countdown in daylight, else weather, else next calendar event).
 
 Deviations from the mockup: the dim grey is 0xA3A09A (mockup 0x8E8B85, too faint); dial labels
-sit at r 160 (mockup 165) because the labels are larger; the bars can't be tapped (watch faces
-get no taps outside the editor), so the focus metric is a setting; no MIP theme (all products
-are AMOLED).
+sit at r 160 (mockup 165) because the labels are larger; on touch watches a tap on a bar switches the focus metric
+(`onFacePress`); the Focus setting covers watches without touch. The MIP theme (64 colours) is the
+mockup's, set in `onLayout`.
 
 ## Settings
 
-AccentColor, RingMode (0 day, 1 activity), Focus (0-3), BottomLine (0 smart, 1 sunset,
-2 weather, 3 event), ShowSeconds, AodRing. On-watch editor (fr970): style = ring mode, accent.
+AccentColor, RingMode (0 day, 1 activity), Focus (0-3, 4 respiration), BarBattery / BarSteps /
+BarHeart / BarStress / BarResp (which metrics get a mini bar: the mockup's "Focus metrics" checkboxes),
+BottomLine (0 smart, 1 sunset, 2 weather, 3 event), ShowSeconds, AodRing. A tapped bar is stored as
+`tapFocus`; phone Focus vs tap: whichever changed last (`FaceEditor.pick("edFocus", ...)`). On-watch editor: style = ring mode, accent,
+and two data slots (FaceCore `FaceSlots`): 1 = the focus row, 2 = the bottom line. A picked system
+field replaces the face's own text there (`focusRow` / `lineOf`; the line shows `LABEL value`
+without an icon, and no bar is in the accent); with no field, or before it has a value, the face
+shows its own. The Value and Label fonts carry letters and `.:/%°()` so picked fields render; a
+row still too wide drops letter-spacing, then takes a system font. Meridian's `applyEditor` doesn't
+call `FaceCoreView.applyEditor`, so it and `loadSettings` call `applySlots` themselves.
 
 Time and date, as in ApexFace 1.0.2: the time follows the watch's 12 / 24 h setting
 (`FaceKit.hourText`, 12 h unpadded, no AM/PM). DateFormat: 0 Watch (default; month first if
@@ -35,8 +43,9 @@ mockup's `SAT 10 OCT` look, 2 `MON 28-09-2026`, 3 `MON 09-28-2026` (`FaceKit.dat
   `width / 454`. `FaceView` extends `FaceCoreView`. The shared code (FaceKit, FaceFormat, FaceData, FaceEditor,
   base view and app) lives once in `../FaceCore` (see `FaceCore/CLAUDE.md`), on `base.sourcePath` in
   both jungles. `source/<Name>Test.mc` tests only this face: every display mode and setting value.
-- Products: fr265 (416 px), fr265s (360), fr965 and fr970 (454), all AMOLED, API 5.0+.
-  The on-watch editor config is in `resources-fr970/configs/watchface.xml` (fr970 only).
+- Products: every round watch on API 5.0+, 66 of them, 218-466 px, AMOLED and MIP (as ApexFace;
+  `FaceCore/tools/products.ps1`, see "Every round watch" in `FaceCore/CLAUDE.md`). The on-watch
+  editor config is in `resources/configs/watchface.xml` (used where the firmware has the editor).
 - Fonts: Google Fonts (OFL) turned into Connect IQ bitmap fonts per screen size by
   `tools\make-fonts.ps1` (sizes and glyphs in `tools/font-table.ps1`, TTFs in `tools/fonts/`),
   output in `resources-round-<W>x<W>/fonts/`. Each font's line box runs from cap top to the
