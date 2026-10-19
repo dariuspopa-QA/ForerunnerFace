@@ -1,0 +1,8 @@
+<fonts>
+    <font id="Num" filename="num.fnt" antialias="false"/>
+    <font id="Label" filename="label.fnt" antialias="false"/>
+    <font id="Gear" filename="gear.fnt" antialias="false"/>
+    <font id="Lcd" filename="lcd.fnt" antialias="false"/>
+    <font id="Mono" filename="mono.fnt" antialias="false"/>
+    <font id="Bar" filename="bar.fnt" antialias="false"/>
+</fonts>
