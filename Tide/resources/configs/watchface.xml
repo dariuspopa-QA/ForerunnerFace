@@ -1,0 +1,37 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the
+         water colour and two data slots. Complication ids are the view's slots (FaceView.slots):
+         1 = the tag at the water surface, 2 = the line at the bottom.
+         Every slot lists its types with a default: an allowAny slot can't carry one, and the
+         editor then fills it with its own first choice (Battery) as soon as Data is opened. -->
+    <watchface-config>
+        <data>
+            <complication id="1">
+                <type default="true">Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+            </complication>
+            <complication id="2">
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type default="true">Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+            </complication>
+        </data>
+        <accentColors>
+            <color label="@Strings.ColorLagoon" default="true">0x3FD0C9</color>
+            <color label="@Strings.ColorCoral">0xFF7A59</color>
+            <color label="@Strings.ColorLime">0xB8E05A</color>
+            <color label="@Strings.ColorIris">0x8E9BFF</color>
+        </accentColors>
+    </watchface-config>
+</resources>
