@@ -11,7 +11,7 @@ What's on the face
 • Hour and minute hands shaped like combination wrenches, and a second hand in the accent colour
 • Five lug nuts numbered in tightening order (1-3-5-2-4), lit as you reach each fifth of your step goal
 • The star lines between the tightened nuts, dashed ahead
-• TORQUE SEQUENCE: nuts done out of 5 and today's steps
+• TORQUE SEQUENCE: nuts done out of 5 and today's steps (or another reading of your choice, set on the watch)
 • Minute track with hour marks, and the date at the top: SAT 11 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
 
 Colours
@@ -22,7 +22,7 @@ On AMOLED watches, always-on mode shows the nut outlines (tightened ones in the 
 
 Customise
 • On your phone: open Lug Star in the Connect IQ Store app and change the accent colour and date format.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour, and under Data the reading after the nut count (steps unless you pick Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970

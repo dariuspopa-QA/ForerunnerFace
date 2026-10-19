@@ -13,7 +13,7 @@ What's on the face
 • Big time
 • ON CLOCK: time since the shift started; BOOK: the shift length in hours; LEFT: time to the end, in the accent colour
 • Hazard band with the next stop: START before the shift, then BREAK and END with their times, and SHIFT OVER when you're done
-• Weekday, date and heart rate at the bottom; the date as SAT 11 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
+• Weekday, date and heart rate (or another reading of your choice, set on the watch) at the bottom; the date as SAT 11 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
 • 12-hour or 24-hour time, as set on your watch
 
 Settings
@@ -27,7 +27,7 @@ On AMOLED watches, always-on mode shows the shift as a thin arc, the next stop a
 
 Customise
 • On your phone: open Flat Rate in the Connect IQ Store app and set your shift, break, repair order, bay, job line, accent colour and date format.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour, and under Data the reading on the bottom line (heart rate unless you pick Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970

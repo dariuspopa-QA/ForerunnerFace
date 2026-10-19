@@ -19,6 +19,7 @@ Each value is printed next to its lobe. The lowest one is highlighted, so you kn
 What's on the face
 • The bloom: three nested layers of one colour, redrawn as your readings change
 • Large time and the date in the core
+• Your heart rate at the bottom of the dial, or another reading of your choice (set on the watch)
 • Weekday and date in your watch's style (DD-MM-YYYY or MM-DD-YYYY), or the short SAT 10
 • 12-hour or 24-hour time, as set on your watch
 
@@ -32,7 +33,7 @@ On AMOLED watches, always-on mode shows only the outline of the bloom and a thin
 
 Customise
 • On your phone: open Bloom in the Connect IQ Store app and change its settings: bloom colour, custom colour, lowest value colour and date format.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the bloom colour (Style) and the highlight colour (Accent).
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the bloom colour (Style), the highlight colour (Accent), and under Data the reading at the bottom of the dial (heart rate unless you pick Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
 • Whatever you changed last, on the phone or on the watch, is what the face shows.
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)

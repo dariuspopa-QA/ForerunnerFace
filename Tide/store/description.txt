@@ -14,7 +14,7 @@ What's on the face
 • Bubbles: one for every 1,000 steps (up to nine)
 • Huge hours over minutes, light above the water and dark below it
 • Weekday and date at the top: SAT 10 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
-• Today's steps at the bottom
+• Today's steps at the bottom (or another reading of your choice, set on the watch)
 • 12-hour or 24-hour time, as set on your watch
 
 Colours
@@ -25,7 +25,7 @@ On AMOLED watches, always-on mode shows only the water line and thin digits. It 
 
 Customise
 • On your phone: open Tide in the Connect IQ Store app and change the water colour and date format.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the water colour.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the water colour, and under Data what the number at the surface and the line at the bottom show (Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970

@@ -12,7 +12,7 @@ What's on the face
 • Snow line: lower when you're stressed, high when you're calm
 • Summit flag: your progress to the step goal, with the percentage
 • Sun on a dotted arc from sunrise to sunset; a crescent moon at night
-• Thin, large time, the date, and the next sunset or sunrise
+• Thin, large time, the date, and the next sunset or sunrise (or another reading of your choice, set on the watch)
 • Weekday and date: SAT 10 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
 • 12-hour or 24-hour time, as set on your watch
 
@@ -24,7 +24,7 @@ On AMOLED watches, always-on mode shows the ridge as a fine line and a thin time
 
 Customise
 • On your phone: open Terrain in the Connect IQ Store app and change the flag colour and date format.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the flag colour.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the flag colour, and under Data what the line under the time shows (sunset and sunrise unless you pick Body Battery, steps, heart rate, stress, calories, floors, intensity minutes or battery).
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970

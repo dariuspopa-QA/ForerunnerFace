@@ -121,6 +121,8 @@ public static class Win2 {
     [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr h, IntPtr hdc, uint flags);
     [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int c);
+    [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr h);
+    [DllImport("user32.dll")] public static extern uint GetDpiForSystem();
 }
 '@
 }
@@ -140,8 +142,10 @@ $bmp = New-Object System.Drawing.Bitmap ($r.R - $r.L), ($r.B - $r.T)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $hdc = $g.GetHdc(); [Win2]::PrintWindow($p.MainWindowHandle, $hdc, 2) | Out-Null; $g.ReleaseHdc($hdc); $g.Dispose()
 # Window chrome: 8 px side border; the menu bar can wrap, so measure from the bottom
-# (8 px border + 21 px status bar under the device image)
-$ox = 8 + $loc.x; $oy = ($r.B - $r.T) - 8 - 21 - $devH + $loc.y; $w = $loc.width; $h = $loc.height
+# (8 px border + 21 px status bar under the device image). PrintWindow draws a DPI-unaware
+# simulator at 96 dpi, so its content fills only rect / (system dpi / window dpi) of the bitmap.
+$scale = [Win2]::GetDpiForSystem() / [double][Math]::Max(1, [Win2]::GetDpiForWindow($p.MainWindowHandle))
+$ox = 8 + $loc.x; $oy = [int][Math]::Round(($r.B - $r.T) / $scale) - 8 - 21 - $devH + $loc.y; $w = $loc.width; $h = $loc.height
 $shot = New-Object System.Drawing.Bitmap $w, $h
 $g = [System.Drawing.Graphics]::FromImage($shot)
 $g.DrawImage($bmp, (New-Object System.Drawing.Rectangle 0, 0, $w, $h), (New-Object System.Drawing.Rectangle $ox, $oy, $w, $h), 'Pixel')
