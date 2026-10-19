@@ -167,7 +167,7 @@ class FaceView extends WatchUi.WatchFace {
                 }
             }
         }
-        if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
+        if (editedType == null || editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
             _editingSlot = null;
         }
         if (!_editMode) {
