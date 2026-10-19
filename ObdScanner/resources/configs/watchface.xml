@@ -1,0 +1,83 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the accent
+         colour, and the four PID rows as data slots (ids 1-4, top to bottom). Each row defaults
+         to its own PID (heart rate, steps, battery, stress), which the face draws in its own
+         format (zero-padded bpm, battery as volts); any other type shows the system value.
+         Typed lists with a default, not allowAny: an allowAny slot can't carry a default, and
+         the editor fills it with Battery (see ApexFace). Types from ApexFace's editor-basic,
+         which exist on every product. -->
+    <watchface-config>
+        <data>
+            <complication id="1">
+                <type default="true">Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_PULSE_OX</type>
+                <type>Complications.COMPLICATION_TYPE_RESPIRATION_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_RECOVERY_TIME</type>
+                <type>Complications.COMPLICATION_TYPE_VO2MAX_RUN</type>
+                <type>Complications.COMPLICATION_TYPE_ALTITUDE</type>
+                <type>Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT</type>
+            </complication>
+            <complication id="2">
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type default="true">Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_PULSE_OX</type>
+                <type>Complications.COMPLICATION_TYPE_RESPIRATION_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_RECOVERY_TIME</type>
+                <type>Complications.COMPLICATION_TYPE_VO2MAX_RUN</type>
+                <type>Complications.COMPLICATION_TYPE_ALTITUDE</type>
+                <type>Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT</type>
+            </complication>
+            <complication id="3">
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type default="true">Complications.COMPLICATION_TYPE_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_PULSE_OX</type>
+                <type>Complications.COMPLICATION_TYPE_RESPIRATION_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_RECOVERY_TIME</type>
+                <type>Complications.COMPLICATION_TYPE_VO2MAX_RUN</type>
+                <type>Complications.COMPLICATION_TYPE_ALTITUDE</type>
+                <type>Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT</type>
+            </complication>
+            <complication id="4">
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+                <type default="true">Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_PULSE_OX</type>
+                <type>Complications.COMPLICATION_TYPE_RESPIRATION_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_RECOVERY_TIME</type>
+                <type>Complications.COMPLICATION_TYPE_VO2MAX_RUN</type>
+                <type>Complications.COMPLICATION_TYPE_ALTITUDE</type>
+                <type>Complications.COMPLICATION_TYPE_NOTIFICATION_COUNT</type>
+            </complication>
+        </data>
+        <accentColors>
+            <color label="@Strings.ColorAmber" default="true">0xFFB000</color>
+            <color label="@Strings.ColorGreen">0x7DFF6A</color>
+            <color label="@Strings.ColorCyan">0x5FD3FF</color>
+            <color label="@Strings.ColorRed">0xFF5A3C</color>
+        </accentColors>
+    </watchface-config>
+</resources>

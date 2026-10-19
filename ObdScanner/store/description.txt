@@ -1,0 +1,50 @@
+APP NAME
+OBD Scanner
+
+SHORT DESCRIPTION
+Your watch as a diagnostic tester: live PIDs, a heart-rate graph and a fault code.
+
+DESCRIPTION
+OBD Scanner is part of Shop Floor, a family of watch faces for people who work on cars. It looks like the screen of a scan tool plugged into your own diagnostic port: one-colour LCD, a live PID table and a trouble code at the bottom.
+
+What's on the face
+• Check-engine lamp and "OBD-II · LIVE"
+• Time with seconds, and the date
+• PID table: HEART.RATE, STEP.COUNT, BATT.VOLT (the watch battery as a car battery's voltage, 11.8-12.7 V) and STRESS.LOAD
+• Bar graph of your heart rate over the last 24 hours (the highest reading of each hour)
+• Fault code: P0562 SYSTEM VOLTAGE LOW below 15 % battery, P0217 when your stress runs over 75, and otherwise a rotating joke code such as P1010 10MM SOCKET NOT FOUND
+• Weekday and date: SAT 11 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
+• 12-hour or 24-hour time, as set on your watch
+
+Colours
+Screen: Amber, Green, Cyan or Red.
+
+Always-on mode
+On AMOLED watches, always-on mode shows the lamp, a dim time and the fault code. It lights very few pixels and moves slightly every minute to protect the screen. On MIP watches the full face stays on; the seconds show while the watch is awake.
+
+Customise
+• On your phone: open OBD Scanner in the Connect IQ Store app and change the screen colour and date format.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the screen colour, and under Data what each of the four PID rows shows (heart rate, steps, battery and stress unless you pick other readings).
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• OBD Scanner keeps the hourly heart rate on the watch, so the graph stays complete on watches that hold less history.
+• Any value that isn't available is shown as "--".
+• Your data stays on the watch. OBD Scanner doesn't connect to a car or send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release, on 66 round Garmin watches (AMOLED and MIP).

@@ -1,0 +1,8 @@
+<fonts>
+    <font id="Head" filename="head.fnt" antialias="false"/>
+    <font id="Time" filename="time.fnt" antialias="true"/>
+    <font id="Date" filename="date.fnt" antialias="false"/>
+    <font id="Row" filename="row.fnt" antialias="false"/>
+    <font id="Small" filename="small.fnt" antialias="false"/>
+    <font id="Code" filename="code.fnt" antialias="false"/>
+</fonts>
