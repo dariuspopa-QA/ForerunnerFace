@@ -7,6 +7,6 @@ $fonts = @(
     @('Sec', 'sec', 'BarlowCondensed-ExtraBold.ttf', 30, 22, $digits),
     @('Socket', 'socket', 'BarlowCondensed-ExtraBold.ttf', 20, 16, ($digits + '?')),
     @('Date', 'date', 'BarlowCondensed-SemiBold.ttf', 19, 16, ($upper + $digits + ' -')),
-    @('Label', 'label', 'BarlowCondensed-SemiBold.ttf', 15, 13, $upper),
-    @('Value', 'value', 'BarlowCondensed-ExtraBold.ttf', 27, 21, ($digits + ',.V-'))
+    @('Label', 'label', 'BarlowCondensed-SemiBold.ttf', 15, 13, ($upper + $digits + ' ./%-')),
+    @('Value', 'value', 'BarlowCondensed-ExtraBold.ttf', 27, 21, ($digits + $upper + $lower + ',.:/%- '))
 )

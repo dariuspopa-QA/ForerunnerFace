@@ -14,6 +14,54 @@ module SocketSetTest {
         return true;
     }
 
+    // The three readouts are the data slots: side by side left to right, apart, and a tap on
+    // each one's centre finds it.
+    (:test)
+    function threeReadoutSlots(logger as Logger) as Boolean {
+        var view = new FaceView(true);
+        FaceTestUtil.render(view);
+        Test.assertEqual(view.slots().size(), 3);
+        Test.assert(view.slotBox(0) == null);
+        Test.assert(view.slotBox(4) == null);
+        var prevRight = -1;
+        for (var slot = 1; slot <= 3; slot++) {
+            var box = view.slotBox(slot) as [Number, Number, Number, Number];
+            Test.assertMessage(box[0] > prevRight, "slot " + slot + " overlaps the one before");
+            prevRight = box[0] + box[2];
+            Test.assertEqual(view.slotAt(box[0] + box[2] / 2, box[1] + box[3] / 2), slot);
+        }
+        return true;
+    }
+
+    // Without a picked field each slot shows the face's own reading.
+    (:test)
+    function emptySlotsShowOwnReadings(logger as Logger) as Boolean {
+        var view = new FaceView(true);
+        FaceTestUtil.render(view);
+        var labels = ["HR", "BATT", "ODO"];
+        for (var slot = 1; slot <= 3; slot++) {
+            Test.assert(view.slotText(slot) == null);
+            Test.assertEqual(view.ownReadout(slot)[1], labels[slot - 1]);
+        }
+        Test.assert(view.ownReadout(2)[0].find("V") != null);
+        return true;
+    }
+
+    // In the editor, the face leaves out the slot being previewed and the preview draws it alone.
+    (:test)
+    function drawsWhileEachSlotIsEdited(logger as Logger) as Boolean {
+        var view = new FaceView(true);
+        var dc = FaceTestUtil.render(view);
+        for (var slot = 1; slot <= 3; slot++) {
+            view.setEditingSlot(slot);
+            view.onUpdate(dc);
+            view.drawSlot(dc, slot);
+        }
+        view.setEditingSlot(null);
+        view.onUpdate(dc);
+        return true;
+    }
+
     (:test)
     function drawsEverySettingValue(logger as Logger) as Boolean {
         var view = new FaceView(false);

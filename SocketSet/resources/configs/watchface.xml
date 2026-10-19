@@ -1,0 +1,19 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the accent
+         colour and the three readouts under the time as data slots. Complication ids are the view's
+         slots: 1 = left (HR), 2 = middle (BATT), 3 = right (ODO); with no field picked a slot shows
+         the face's own reading. -->
+    <watchface-config>
+        <data>
+            <complication id="1" allowAny="true"/>
+            <complication id="2" allowAny="true"/>
+            <complication id="3" allowAny="true"/>
+        </data>
+        <accentColors>
+            <color label="@Strings.ColorSafetyOrange" default="true">0xFF6A13</color>
+            <color label="@Strings.ColorHiVisYellow">0xFFD400</color>
+            <color label="@Strings.ColorCoolantBlue">0x3AD0FF</color>
+            <color label="@Strings.ColorRedline">0xE83A3A</color>
+        </accentColors>
+    </watchface-config>
+</resources>

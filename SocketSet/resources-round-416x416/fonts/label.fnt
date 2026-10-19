@@ -1,7 +1,7 @@
 info face="Barlow Condensed SemiBold" size=14 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1
 common lineHeight=13 base=11 scaleW=512 scaleH=13 pages=1 packed=0
 page id=0 file="label.png"
-chars count=26
+chars count=41
 char id=65 x=0 y=0 width=7 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
 char id=66 x=8 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
 char id=67 x=15 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
@@ -28,3 +28,18 @@ char id=87 x=157 y=0 width=9 height=11 xoffset=0 yoffset=0 xadvance=9 page=0 chn
 char id=88 x=167 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
 char id=89 x=174 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
 char id=90 x=181 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=48 x=188 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=49 x=195 y=0 width=4 height=11 xoffset=0 yoffset=0 xadvance=4 page=0 chnl=15
+char id=50 x=200 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=51 x=207 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=52 x=214 y=0 width=7 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=53 x=222 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=54 x=229 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=55 x=236 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=5 page=0 chnl=15
+char id=56 x=243 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=57 x=250 y=0 width=6 height=11 xoffset=0 yoffset=0 xadvance=6 page=0 chnl=15
+char id=32 x=257 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=3 page=0 chnl=15
+char id=46 x=259 y=0 width=3 height=2 xoffset=0 yoffset=8 xadvance=3 page=0 chnl=15
+char id=47 x=263 y=0 width=5 height=11 xoffset=0 yoffset=0 xadvance=5 page=0 chnl=15
+char id=37 x=269 y=0 width=10 height=11 xoffset=0 yoffset=0 xadvance=11 page=0 chnl=15
+char id=45 x=280 y=0 width=5 height=2 xoffset=0 yoffset=5 xadvance=5 page=0 chnl=15
