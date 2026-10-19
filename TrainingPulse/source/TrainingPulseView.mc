@@ -185,7 +185,7 @@ class TrainingPulseView extends WatchUi.WatchFace {
                 // Not saved: the editor wins again next time, as before
             }
         }
-        if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
+        if (editedType == null || editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
             _editingSlot = null;
         }
         if (!_editMode) {
@@ -506,7 +506,8 @@ class TrainingPulseView extends WatchUi.WatchFace {
             var steps = ActivityMonitor.getInfo().steps;
             return [shortNumber(steps == null ? 0 : steps), "STEPS", null];
         } else if (kind == 7) {
-            var fl = ActivityMonitor.getInfo().floorsClimbed;
+            var am = ActivityMonitor.getInfo();
+            var fl = (am has :floorsClimbed) ? am.floorsClimbed : null;   // none without a barometer
             return [fl == null ? "--" : fl.format("%d"), "FLOORS", null];
         } else if (kind == 8) {
             var dist = ActivityMonitor.getInfo().distance;

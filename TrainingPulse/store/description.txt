@@ -1,0 +1,50 @@
+APP NAME
+Training Pulse
+
+SHORT DESCRIPTION
+Six data fields under the time, with your heart rate coloured by training zone.
+
+DESCRIPTION
+Training Pulse is a data face for people who train. Under the time sit six fields you choose, in three rows, and your heart rate takes the colour of the zone you're in (from your Garmin heart-rate zones), so a glance tells you how hard you're working.
+
+What's on the face
+• Big time, 12-hour or 24-hour (or follow the watch)
+• Weekday and date: MON 28 SEP, DD-MM-YYYY or MM-DD-YYYY
+• Six fields, each one of: Heart rate, Stress, Recovery time, Calories, Watch battery, Body Battery, Steps, Floors climbed, Distance today, 7-day distance or Temperature
+• Heart rate coloured by zone: grey, blue, green, orange, red for zones 1 to 5
+• Sunrise and sunset times
+• Notification count, alarm count and do-not-disturb icon (each can be turned off)
+
+Colours and backgrounds
+Accent: Lime, Ice blue, Orange, Pink or White. Background: none, Orbits, Waves, Halftone dots, Blobs, Topographic or Rays, in subtle, medium or bold intensity, tinted with the accent or grey.
+
+Always-on mode
+On AMOLED watches, always-on mode shows a dimmed time with hour ticks and (if you want) the date. It moves slightly every minute to protect the screen. On MIP watches the full face stays on.
+
+Customise
+• On your phone: open Training Pulse in the Connect IQ Store app and change its settings: accent, background, the six fields, clock and date format, sunrise / sunset and status icons.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the background, accent colour and fields.
+• Whatever you changed last, on the phone or on the watch, is what the face shows.
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• Heart-rate zones come from your Garmin Connect profile; without them the heart rate is white.
+• Any value that isn't available on your watch is shown as "--".
+• Your data stays on the watch. Training Pulse doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release, on 66 round Garmin watches (AMOLED and MIP).
