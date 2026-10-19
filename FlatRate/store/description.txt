@@ -1,0 +1,51 @@
+APP NAME
+Flat Rate
+
+SHORT DESCRIPTION
+A shift clock for the shop: time on the clock, booked hours, time left, next stop.
+
+DESCRIPTION
+Flat Rate is part of Shop Floor, a family of watch faces for people who work on cars. It's a shift clock: a ring of 100 segments fills as your shift goes by, the boxes under the time show how long you've been on the clock and how much is left, and a hazard-stripe band names the next stop.
+
+What's on the face
+• Shift ring: fills from the start of your shift to its end; the last tenth turns red
+• Repair order and bay number on the top line (each hidden when set to 0), and your own job line
+• Big time
+• ON CLOCK: time since the shift started; BOOK: the shift length in hours; LEFT: time to the end, in the accent colour
+• Hazard band with the next stop: START before the shift, then BREAK and END with their times, and SHIFT OVER when you're done
+• Weekday, date and heart rate at the bottom; the date as SAT 11 OCT, or DD-MM-YYYY / MM-DD-YYYY as your watch shows it
+• 12-hour or 24-hour time, as set on your watch
+
+Settings
+• Shift start (05:00-11:00), shift length (4-12 hours), break time (or no break)
+• Repair order number, bay number and the job line text (up to 22 characters)
+• Accent: Hi-Vis, Yellow, Safety Orange or Coolant Blue
+• Date format
+
+Always-on mode
+On AMOLED watches, always-on mode shows the shift as a thin arc, the next stop and thin digits. It lights very few pixels and moves slightly every minute to protect the screen. On MIP watches the full face stays on.
+
+Customise
+• On your phone: open Flat Rate in the Connect IQ Store app and set your shift, break, repair order, bay, job line, accent colour and date format.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour.
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• Your data stays on the watch. Flat Rate doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release, on 66 round Garmin watches (AMOLED and MIP).

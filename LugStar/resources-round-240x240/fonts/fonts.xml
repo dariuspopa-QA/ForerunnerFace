@@ -1,0 +1,6 @@
+<fonts>
+    <font id="Seq" filename="seq.fnt" antialias="false"/>
+    <font id="Date" filename="date.fnt" antialias="false"/>
+    <font id="Label" filename="label.fnt" antialias="false"/>
+    <font id="Count" filename="count.fnt" antialias="false"/>
+</fonts>

@@ -6,6 +6,8 @@
     <property id="ShiftStart" type="number">420</property>
     <property id="ShiftLength" type="number">480</property>
     <property id="BreakTime" type="number">720</property>
+    <!-- repair order number on the top line, 0 hides it -->
+    <property id="RepairOrder" type="number">0</property>
     <property id="Bay" type="number">3</property>
     <property id="JobName" type="string">ON THE CLOCK</property>
 </properties>

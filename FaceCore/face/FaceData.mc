@@ -37,6 +37,7 @@ class FaceData {
     var hrOverride as Number or Null;
     var eventOverride as String or Null;
     var sleepOverride as Number or Null;
+    var respirationOverride as Number or Null;
     var hrHoursOverride as Array<Number or Null> or Null;
 
     private var mMinute as Number = -1;
@@ -190,6 +191,15 @@ class FaceData {
         }
         var value = complicationValue(42 as Complications.Type);
         return value instanceof Number ? value : null;
+    }
+
+    // Breaths per minute, or null (COMPLICATION_TYPE_RESPIRATION_RATE).
+    function respiration() as Number or Null {
+        if (respirationOverride != null) {
+            return respirationOverride;
+        }
+        var value = complicationValue(Complications.COMPLICATION_TYPE_RESPIRATION_RATE);
+        return value instanceof Number ? value : (value instanceof Float ? Math.round(value).toNumber() : null);
     }
 
     private function complicationValue(type as Complications.Type) as Object or Null {

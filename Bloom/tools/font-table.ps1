@@ -5,6 +5,6 @@ $fonts = @(
     @('Time', 'time', 'SpaceGrotesk-Bold.ttf', 60, 0, ($digits + ':')),
     @('TimeAod', 'time_aod', 'SpaceGrotesk-Light.ttf', 60, 0, ($digits + ':')),
     @('Date', 'date', 'IBMPlexMono-Medium.ttf', 12, 11, ($upper + $digits + ' -')),
-    @('Value', 'value', 'IBMPlexMono-Medium.ttf', 14, 12, ($digits + 'hk.%-')),
-    @('Key', 'key', 'IBMPlexMono-Regular.ttf', 10, 9, $upper)
+    @('Value', 'value', 'IBMPlexMono-Medium.ttf', 14, 12, ($digits + $upper + 'hk.%-/')),
+    @('Key', 'key', 'IBMPlexMono-Regular.ttf', 10, 9, ($upper + $digits + ' .-'))
 )

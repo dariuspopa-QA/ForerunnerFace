@@ -1,0 +1,10 @@
+<fonts>
+    <font id="Time" filename="time.fnt" antialias="true"/>
+    <font id="TimeAod" filename="time_aod.fnt" antialias="true"/>
+    <font id="Top" filename="top.fnt" antialias="false"/>
+    <font id="Job" filename="job.fnt" antialias="false"/>
+    <font id="BoxLabel" filename="box_label.fnt" antialias="false"/>
+    <font id="BoxValue" filename="box_value.fnt" antialias="false"/>
+    <font id="Band" filename="band.fnt" antialias="false"/>
+    <font id="Bottom" filename="bottom.fnt" antialias="false"/>
+</fonts>

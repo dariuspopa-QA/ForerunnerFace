@@ -1,0 +1,69 @@
+import Toybox.Activity;
+import Toybox.ActivityMonitor;
+import Toybox.Lang;
+import Toybox.System;
+import Toybox.Time;
+import Toybox.Time.Gregorian;
+
+// Screenshots only (shot.ps1 copies this into a scratch build of a face without a demo build
+// and points the face's sensor and clock calls here): the real objects with fixed values,
+// Sat 11 Oct 2026 10:08:42 and representative readings, as in the demo builds.
+module ShotData {
+    var hour as Number = 10;
+    var minute as Number = 8;
+    var second as Number = 42;
+
+    function clock() as System.ClockTime {
+        var c = System.getClockTime();
+        c.hour = hour;
+        c.min = minute;
+        c.sec = second;
+        return c;
+    }
+
+    function info() as ActivityMonitor.Info {
+        var i = ActivityMonitor.getInfo();
+        i.steps = 8412;
+        i.stepGoal = 10000;
+        i.calories = 1846;
+        i.distance = 641000;
+        if (i has :floorsClimbed) { i.floorsClimbed = 12; }
+        if (i has :floorsClimbedGoal) { i.floorsClimbedGoal = 15; }
+        if (i has :activeMinutesWeekGoal) { i.activeMinutesWeekGoal = 150; }
+        if (i has :stressScore) { i.stressScore = 24; }
+        if (i has :timeToRecovery) { i.timeToRecovery = 14; }
+        return i;
+    }
+
+    function activity() as Activity.Info or Null {
+        var a = Activity.getActivityInfo();
+        if (a != null) {
+            a.currentHeartRate = 58;
+        }
+        return a;
+    }
+
+    function stats() as System.Stats {
+        var s = System.getSystemStats();
+        s.battery = 84.0f;
+        return s;
+    }
+
+    function greg(moment as Time.Moment, format as Time.DateFormat) as Gregorian.Info {
+        var g = Gregorian.info(moment, format);
+        g.hour = hour;
+        g.min = minute;
+        g.sec = second;
+        g.year = 2026;
+        if (format == Time.FORMAT_SHORT) {
+            g.day = 11;
+            g.month = 10;
+            g.day_of_week = 7;
+        } else {
+            g.day = 11;
+            g.month = "Oct";
+            g.day_of_week = "Sat";
+        }
+        return g;
+    }
+}

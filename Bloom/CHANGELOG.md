@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+- A data slot in the on-watch editor: a sixth label at the bottom of the dial, below the shape
+  (default heart rate), can show Body Battery, Steps, Stress, Calories, Floors, Intensity minutes
+  or Battery instead. The five lobes keep their own readings.
+
+## 1.1.0 (15 Oct 2026)
+
+Store text ("What's new", also in `store/description.txt`):
+
+> • Now on 66 round Garmin watches, AMOLED and MIP, from 218 to 466 px: Forerunner, fēnix, epix, Enduro, Venu, vívoactive, Instinct AMOLED, quatix, tactix, MARQ, D2, Descent and Approach.
+
+Details:
+
+- Every round watch on API 5.0+ (66 products), like ApexFace: fonts for nine screen sizes, the
+  on-watch editor (now `resources/configs`) wherever the firmware has it.
+- Watches without texture fills (Forerunner 165 / 255 / 70, vivoactive 5, Instinct 3 AMOLED,
+  Approach S50, Descent G2): when the shape doesn't cover the time, the dark text is drawn
+  clipped to the shape in strips (before, the time vanished there).
+- Small screens: a label moves in along its spoke until it fits the round screen.
+- MIP watches: no Always-On (the full face stays on); guide circle and spokes in neutral grey.
+- Store: `store/watches/` (the face on every screen size).
+
 ## 1.0.0 (11 Oct 2026)
 
 Store text ("What's new", also in `store/description.txt`):

@@ -1,4 +1,5 @@
 import Toybox.Application;
+import Toybox.Complications;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
@@ -15,12 +16,13 @@ class FaceView extends FaceCoreView {
 
     private const C = FaceKit.C;
 
-    private const SKY = 0x0C1220;
-    private const FAR_RANGE = 0x161F31;
-    private const RIDGE_FILL = 0x24324A;
+    // Night-sky blues; MIP screens (64 colours) get black, navy and grey instead (onLayout)
+    private var mSky as Number = 0x0C1220;
+    private var mFarRange as Number = 0x161F31;
+    private var mRidgeFill as Number = 0x24324A;
     private const RIDGE_LINE = 0x9FB2CC;
     private const SNOW = 0xEEF2F7;
-    private const SUN_PATH = 0x2A3550;
+    private var mSunPath as Number = 0x2A3550;
     private const SUN = 0xF2B544;
     private const MOON = 0xC9D3E2;
     private const INK = 0xF3F1EC;
@@ -39,6 +41,12 @@ class FaceView extends FaceCoreView {
     private const DATE_Y = 80.5f;
     private const TIME_Y = 139.5f;
     private const SUN_LINE_Y = 192.5f;
+
+    // Editor data slot (resources/configs/watchface.xml) and its tap box (design px): the
+    // line under the time (sunset / sunrise by default)
+    private const SLOT_SUN = 1;
+    private const SLOT_BOX_W = 260.0f;
+    private const SLOT_BOX_H = 36.0f;
 
     private const FAR = [[0, 338], [58, 306], [112, 322], [172, 284], [232, 310], [292, 270], [350, 300],
         [402, 284], [454, 304], [454, 454], [0, 454]];
@@ -60,8 +68,18 @@ class FaceView extends FaceCoreView {
         loadSettings();
     }
 
+    function onLayout(dc as Dc) as Void {
+        FaceCoreView.onLayout(dc);
+        if (!mAmoled) {
+            mSky = 0x000000;
+            mFarRange = 0x000055;
+            mRidgeFill = 0x555555;
+            mSunPath = 0x555555;
+        }
+    }
+
     function loadFonts() as Void {
-        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.Date, Rez.Fonts.Small, Rez.Fonts.Flag] as Array<ResourceId>,
+        var f = loadFontSet([Rez.Fonts.Time, Rez.Fonts.Date, Rez.Fonts.Small, Rez.Fonts.Flag] as Array<ResourceId>,
             [Graphics.FONT_NUMBER_HOT, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
         mFontTime = f[0];
         mFontDate = f[1];
@@ -85,19 +103,19 @@ class FaceView extends FaceCoreView {
             return;
         }
 
-        dc.setColor(SKY, SKY);
+        dc.setColor(ink(mSky), mSky);
         dc.clear();
         drawSky(dc, nowH);
 
-        dc.setColor(FAR_RANGE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mFarRange), Graphics.COLOR_TRANSPARENT);
         dc.fillPolygon(scaled(FAR as Array<Array<Numeric>>, 0.0f, 0.0f));
 
         // Ridge, snow above the stress line, outline
-        dc.setColor(RIDGE_FILL, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mRidgeFill), Graphics.COLOR_TRANSPARENT);
         dc.fillPolygon(ridgeFill());
         var stress = mData.stress;
         drawSnow(dc, 250.0f + (stress != null ? stress : 25) * 1.5f);
-        dc.setColor(RIDGE_LINE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(RIDGE_LINE), Graphics.COLOR_TRANSPARENT);
         drawRidgeLine(dc, 0.0f, 0.0f, 2.0f);
 
         drawFlag(dc);
@@ -107,12 +125,12 @@ class FaceView extends FaceCoreView {
 
     // Always-On: the ridge outline and the time, dimmed and moved every minute (aodShift).
     private function drawAlwaysOn(dc as Dc, clock as System.ClockTime) as Void {
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.setColor(ink(Graphics.COLOR_BLACK), Graphics.COLOR_BLACK);
         dc.clear();
         var shift = aodShift(clock.min);
         var dx = shift[0].toFloat();
         var dy = shift[1].toFloat();
-        dc.setColor(0x4A5872, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(0x4A5872), Graphics.COLOR_TRANSPARENT);
         drawRidgeLine(dc, dx, dy, 2.0f);
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         FaceDemo.time(clock, now);
@@ -123,31 +141,78 @@ class FaceView extends FaceCoreView {
     private function drawText(dc as Dc, now as Gregorian.Info, nowH as Float, ink as Number, dim as Number,
             dx as Float, dy as Float, sunLine as Boolean) as Void {
         var cx = (C + dx) * mScale;
-        dc.setColor(dim, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(dim), Graphics.COLOR_TRANSPARENT);
         var date = FaceKit.dateText(now, FaceKit.dateFormat(mDateSetting));
         FaceKit.drawTracked(dc, cx, (DATE_Y + dy) * mScale, mFontDate, date, 3.0f * mScale, Graphics.TEXT_JUSTIFY_CENTER);
 
-        dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(ink), Graphics.COLOR_TRANSPARENT);
         var time = FaceKit.hourText(now.hour as Number) + ":" + FaceKit.twoDigits(now.min as Number);
         FaceKit.drawTracked(dc, cx, (TIME_Y + dy) * mScale, mFontTime, time, -3.0f * mScale, Graphics.TEXT_JUSTIFY_CENTER);
 
-        if (!sunLine) {
+        // The line under the time is the editor's data slot; the editor draws it while
+        // previewing it.
+        if (!sunLine || mEditingSlot == SLOT_SUN) {
             return;
         }
-        var rise = mData.sunrise;
-        var set = mData.sunset;
-        if (rise == null || set == null) {
+        drawSunLine(dc, cx, (SUN_LINE_Y + dy) * mScale, nowH, dim);
+    }
+
+    // "sunset 18:42" in daylight, else "sunrise 06:51" (the mockup), or the picked field.
+    private function drawSunLine(dc as Dc, cx as Float, y as Float, nowH as Float, dim as Number) as Void {
+        var text = sunLineText(nowH);
+        if (text == null) {
             return;
         }
-        var text = (nowH >= rise && nowH < set) ? "sunset " + FaceKit.clockText(set) : "sunrise " + FaceKit.clockText(rise);
-        dc.setColor(dim, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, (SUN_LINE_Y + dy) * mScale, mFontSmall, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.setColor(ink(dim), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, y, mFontSmall, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // ---- Data slot (on-watch editor) ---------------------------------------------
+    // 1 = the line under the time. Sunset (the default) keeps the face's own sunset /
+    // sunrise line; any other field shows as "value label" in the line's lower case.
+
+    function slots() as Array<Number> {
+        return [SLOT_SUN] as Array<Number>;
+    }
+
+    function slotBox(slot as Number) as [Number, Number, Number, Number] or Null {
+        if (slot != SLOT_SUN) {
+            return null;
+        }
+        return [((C - SLOT_BOX_W / 2) * mScale).toNumber(), ((SUN_LINE_Y - SLOT_BOX_H / 2) * mScale).toNumber(),
+            (SLOT_BOX_W * mScale).toNumber(), (SLOT_BOX_H * mScale).toNumber()];
+    }
+
+    function drawSlot(dc as Dc, slot as Number) as Void {
+        if (slot == SLOT_SUN) {
+            var clock = System.getClockTime();
+            drawSunLine(dc, C * mScale, SUN_LINE_Y * mScale, clock.hour + clock.min / 60.0f, DIM);
+        }
+    }
+
+    // The line's text: the face's own sun line while the slot holds sunset or nothing, else
+    // the picked field ("--" until it has a value); null = nothing to draw.
+    function sunLineText(nowH as Float) as String or Null {
+        var type = slotType(SLOT_SUN);
+        if (type == null || type == Complications.COMPLICATION_TYPE_SUNSET) {
+            var rise = mData.sunrise;
+            var set = mData.sunset;
+            if (rise == null || set == null) {
+                return null;
+            }
+            return (nowH >= rise && nowH < set) ? "sunset " + FaceKit.clockText(set) : "sunrise " + FaceKit.clockText(rise);
+        }
+        var t = slotText(SLOT_SUN);
+        if (t == null) {
+            return FaceFormat.NO_VALUE;
+        }
+        return (t[1].length() > 0 ? t[0] + " " + t[1] : t[0]).toLower();
     }
 
     // Dotted sun path from horizon to horizon; the sun on it by the time of day, or the
     // moon on the same path through the night.
     private function drawSky(dc as Dc, nowH as Float) as Void {
-        dc.setColor(SUN_PATH, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mSunPath), Graphics.COLOR_TRANSPARENT);
         var dots = 44;
         for (var k = 0; k <= dots; k++) {
             var p = skyPoint(k.toFloat() / dots);
@@ -160,17 +225,17 @@ class FaceView extends FaceCoreView {
         }
         if (nowH >= rise && nowH < set) {
             var s = skyPoint((nowH - rise) / (set - rise));
-            dc.setColor(FaceKit.mix(SUN, SKY, 0.16f), Graphics.COLOR_TRANSPARENT);
+            dc.setColor(FaceKit.mix(SUN, mSky, 0.16f), Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(s[0] * mScale, s[1] * mScale, 24 * mScale);
-            dc.setColor(SUN, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(SUN), Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(s[0] * mScale, s[1] * mScale, 13 * mScale);
         } else {
             var night = 24.0f - set + rise;
             var since = nowH >= set ? nowH - set : nowH + 24.0f - set;
             var m = skyPoint(since / night);
-            dc.setColor(MOON, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(MOON), Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(m[0] * mScale, m[1] * mScale, 11 * mScale);
-            dc.setColor(SKY, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mSky), Graphics.COLOR_TRANSPARENT);
             dc.fillCircle((m[0] + 5) * mScale, (m[1] - 4) * mScale, 10 * mScale);
         }
     }
@@ -283,7 +348,7 @@ class FaceView extends FaceCoreView {
 
     // Snow: every part of the ridge above the snow line, as one polygon per peak.
     private function drawSnow(dc as Dc, snowY as Float) as Void {
-        dc.setColor(SNOW, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(SNOW), Graphics.COLOR_TRANSPARENT);
         var cap = [] as Array<[Float, Float]>;
         for (var i = 0; i < mRidge.size(); i++) {
             var p = mRidge[i];
@@ -333,11 +398,11 @@ class FaceView extends FaceCoreView {
         var fx = xAt(gi);
         var fy = yAt(mValues[i0] + (mValues[i0 + 1] - mValues[i0]) * t) - 2;
         var top = fy - 30;
-        dc.setColor(INK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(INK), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(2.0f, mScale));
         dc.drawLine(fx * mScale, fy * mScale, fx * mScale, top * mScale);
         dc.setPenWidth(1);
-        dc.setColor(mAccent, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
         dc.fillPolygon([[fx * mScale, top * mScale], [(fx + 20) * mScale, (top + 7) * mScale], [fx * mScale, (top + 14) * mScale]]);
         // Percentage left of the pole, or right of the flag near the left edge
         var pct = Math.round(goal * 100).toNumber().toString() + "%";
@@ -352,13 +417,13 @@ class FaceView extends FaceCoreView {
     private function drawNow(dc as Dc) as Void {
         var x = xAt(24.0f);
         var y = yAt(mValues[24]);
-        dc.setColor(SKY, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mSky), Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(x * mScale, y * mScale, 7 * mScale);
-        dc.setColor(INK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(INK), Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(x * mScale, y * mScale, 5 * mScale);
         var hr = mData.heartRate();
         if (hr != null) {
-            dc.setColor(NOW_LABEL, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(NOW_LABEL), Graphics.COLOR_TRANSPARENT);
             // Inside the mountain, under and left of the dot (clear of the outline and the screen edge)
             dc.drawText((x - 10) * mScale, (y + 18) * mScale, mFontSmall, hr.toString() + " bpm",
                 Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);

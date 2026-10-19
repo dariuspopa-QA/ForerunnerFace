@@ -1,4 +1,5 @@
 import Toybox.Application;
+import Toybox.Complications;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
@@ -44,6 +45,14 @@ class FaceView extends FaceCoreView {
     private const DATE_TRACK = 2.0f;
     private const KEY_TRACK = 1.5f;
 
+    // Editor data slot (resources/configs/watchface.xml): a sixth label, value over key, at
+    // the bottom of the dial below the shape (heart rate by default). The five lobes keep
+    // their own readings whatever it shows.
+    private const SLOT_BOTTOM = 1;
+    private const SLOT_Y = 412.0f;
+    private const SLOT_BOX_W = 150.0f;
+    private const SLOT_BOX_H = 40.0f;
+
     private const KEYS = ["ENERGY", "STEPS", "SLEEP", "CALM", "RECOVERY"] as Array<String>;
     // Palettes: [outer, mid, core]. Rose, Sage, Sky are the mockup's; the others (and a
     // custom colour) take mid / core as the outer colour at 65 % / 30 % over white.
@@ -80,7 +89,7 @@ class FaceView extends FaceCoreView {
     }
 
     function loadFonts() as Void {
-        var f = FaceKit.loadFonts([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Date, Rez.Fonts.Value, Rez.Fonts.Key] as Array<ResourceId>,
+        var f = loadFontSet([Rez.Fonts.Time, Rez.Fonts.TimeAod, Rez.Fonts.Date, Rez.Fonts.Value, Rez.Fonts.Key] as Array<ResourceId>,
             [Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_XTINY, Graphics.FONT_XTINY, Graphics.FONT_XTINY] as Array<FontType>);
         mFontTime = f[0];
         mFontTimeAod = f[1];
@@ -102,6 +111,10 @@ class FaceView extends FaceCoreView {
         if (mFromEditor) {
             editorColors(editor as Application.WatchFaceConfig.Settings);
         }
+        // The data slot has no phone setting: the editor's field always applies
+        if (editor != null) {
+            applySlots(editor);
+        }
         applyColors();
     }
 
@@ -116,6 +129,7 @@ class FaceView extends FaceCoreView {
         setColorsFromEditor(true);
         mFromEditor = true;
         editorColors(settings);
+        applySlots(settings);
         applyColors();
     }
 
@@ -196,7 +210,7 @@ class FaceView extends FaceCoreView {
 
     function onUpdate(dc as Dc) as Void {
         dc.setAntiAlias(true);
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.setColor(ink(Graphics.COLOR_BLACK), Graphics.COLOR_BLACK);
         dc.clear();
         if (mData.refresh() || mOutline.size() == 0) {
             readValues();
@@ -222,7 +236,7 @@ class FaceView extends FaceCoreView {
             var b = FaceKit.clockPoint(90.0f + Math.toDegrees(end / GUIDE_R), GUIDE_R);
             dc.drawLine((C + a[0]) * mScale, (C + a[1]) * mScale, (C + b[0]) * mScale, (C + b[1]) * mScale);
         }
-        dc.setColor(SPOKE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(SPOKE), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(1.5f, mScale));
         for (var i = 0; i < 5; i++) {
             var a = FaceKit.clockPoint(i * 72, 40);
@@ -239,38 +253,139 @@ class FaceView extends FaceCoreView {
         var box = textBox(dc, time, date);
         var covered = covers(box);
         if (!covered) {
-            dc.setColor(INK, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(INK), Graphics.COLOR_TRANSPARENT);
             drawCentre(dc, time, date, 0.0f, 0.0f);
         }
         var palette = mColors;
         var scales = [1.0f, 0.78f, 0.56f];
+        var textured = dc has :setFill;
+        var outer = [] as Array<[Float, Float]>;
         for (var i = 0; i < 3; i++) {
             var pts = shape(scales[i], 0.0f, 0.0f);
+            if (i == 0) {
+                outer = pts;
+            }
             solid(dc, palette[i]);
             dc.fillPolygon(pts);
-            if (!covered) {
+            if (!covered && textured) {
                 fillDarkText(dc, pts, box, palette[i], time, date);
             }
         }
         if (covered) {
-            dc.setColor(TIME_DARK, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(TIME_DARK), Graphics.COLOR_TRANSPARENT);
             drawCentre(dc, time, date, 0.0f, 0.0f);
+        } else if (!textured) {
+            // No texture fills (watches without enhanced graphics): the dark text clipped
+            // to the shape instead
+            dc.setColor(ink(TIME_DARK), Graphics.COLOR_TRANSPARENT);
+            var rects = insideRects(outer, box);
+            for (var i = 0; i < rects.size(); i++) {
+                var r = rects[i];
+                dc.setClip(r[0], r[1], r[2], r[3]);
+                drawCentre(dc, time, date, 0.0f, 0.0f);
+            }
+            dc.clearClip();
         }
         solid(dc, INK);
 
         // Labels around the shape: value over key; the lowest value in orange
         for (var i = 0; i < 5; i++) {
-            var p = FaceKit.clockPoint(i * 72, LABEL_R);
-            var x = (C + p[0]) * mScale;
-            var y = (C + p[1]) * mScale;
-            dc.setColor(i == mLowest ? mLow : INK, Graphics.COLOR_TRANSPARENT);
+            var p = labelPoint(dc, i);
+            var x = p[0];
+            var y = p[1];
+            dc.setColor(ink(i == mLowest ? mLow : INK), Graphics.COLOR_TRANSPARENT);
             dc.drawText(x, y + VALUE_DY * mScale, mFontValue, mTexts[i],
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-            dc.setColor(KEY, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(KEY), Graphics.COLOR_TRANSPARENT);
             FaceKit.drawTracked(dc, x - KEY_TRACK / 2 * mScale, y + KEY_DY * mScale, mFontKey, KEYS[i],
                 KEY_TRACK * mScale, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
+        // The data slot; the editor draws it while previewing it.
+        if (mEditingSlot != SLOT_BOTTOM) {
+            drawBottom(dc);
+        }
+    }
+
+    // The slot's value over its key, like the five labels (nothing without a reading).
+    private function drawBottom(dc as Dc) as Void {
+        var t = bottomLabel();
+        if (t == null) {
+            return;
+        }
+        var x = C * mScale;
+        var y = SLOT_Y * mScale;
+        dc.setColor(ink(INK), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + VALUE_DY * mScale, mFontValue, t[0], Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.setColor(ink(KEY), Graphics.COLOR_TRANSPARENT);
+        FaceKit.drawTracked(dc, x - KEY_TRACK / 2 * mScale, y + KEY_DY * mScale, mFontKey, t[1],
+            fitTracking(dc, mFontKey, t[1], KEY_TRACK * mScale, SLOT_BOX_W * mScale), Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    // ---- Data slot (on-watch editor) ---------------------------------------------
+
+    function slots() as Array<Number> {
+        return [SLOT_BOTTOM] as Array<Number>;
+    }
+
+    function slotBox(slot as Number) as [Number, Number, Number, Number] or Null {
+        if (slot != SLOT_BOTTOM) {
+            return null;
+        }
+        return [((C - SLOT_BOX_W / 2) * mScale).toNumber(), ((SLOT_Y - SLOT_BOX_H / 2) * mScale).toNumber(),
+            (SLOT_BOX_W * mScale).toNumber(), (SLOT_BOX_H * mScale).toNumber()];
+    }
+
+    function drawSlot(dc as Dc, slot as Number) as Void {
+        if (slot == SLOT_BOTTOM) {
+            drawBottom(dc);
+        }
+    }
+
+    // [value, KEY] of the slot: "72" / "HR" while it holds heart rate or nothing, else the
+    // picked field ("--" until it has a value); the key shortened to fit the bottom of the
+    // dial. Null without a heart rate reading.
+    function bottomLabel() as [String, String] or Null {
+        var type = slotType(SLOT_BOTTOM);
+        if (type == null || type == Complications.COMPLICATION_TYPE_HEART_RATE) {
+            var hr = mData.heartRate();
+            return hr != null ? [hr.toString(), "HR"] : null;
+        }
+        var t = slotText(SLOT_BOTTOM);
+        if (t == null) {
+            return [FaceFormat.NO_VALUE, ""];
+        }
+        var key = t[1].toUpper();
+        if (key.length() > 12) {
+            key = key.substring(0, 12) as String;
+        }
+        return [t[0].toUpper(), key];
+    }
+
+    // Centre (px) of label i at LABEL_R, moved in along its spoke as far as needed to keep
+    // the label inside the round screen: on small screens the text minimums make the
+    // labels wider than the mockup's.
+    private function labelPoint(dc as Dc, i as Number) as [Float, Float] {
+        var w = dc.getTextWidthInPixels(mTexts[i], mFontValue);
+        var wk = FaceKit.trackedWidth(dc, mFontKey, KEYS[i], KEY_TRACK * mScale);
+        var half = (wk > w ? wk : w) / 2.0f;
+        var top = VALUE_DY * mScale - dc.getFontHeight(mFontValue) / 2.0f;
+        var bottom = KEY_DY * mScale + dc.getFontHeight(mFontKey) / 2.0f;
+        var edge = C * mScale - 3;
+        var r = LABEL_R;
+        while (r > GUIDE_R) {
+            var p = FaceKit.clockPoint(i * 72, r);
+            var x = p[0] * mScale;
+            var y = p[1] * mScale;
+            var fx = (x < 0 ? x - half : x + half);
+            var fy = (y < 0 ? y + top : y + bottom);
+            if (fx * fx + fy * fy <= edge * edge) {
+                break;
+            }
+            r -= 1.0f;
+        }
+        var q = FaceKit.clockPoint(i * 72, r);
+        return [(C + q[0]) * mScale, (C + q[1]) * mScale];
     }
 
     // Time and date centred, shifted by (-ox, -oy) px (to draw into the text bitmap).
@@ -341,9 +456,9 @@ class FaceView extends FaceCoreView {
         }
         var bdc = bitmap.getDc();
         bdc.setAntiAlias(true);
-        bdc.setColor(color, color);
+        bdc.setColor(ink(color), color);
         bdc.clear();
-        bdc.setColor(TIME_DARK, Graphics.COLOR_TRANSPARENT);
+        bdc.setColor(ink(TIME_DARK), Graphics.COLOR_TRANSPARENT);
         drawCentre(bdc, time, date, box[0].toFloat(), box[1].toFloat());
 
         // The texture's offset maps to the polygon's bounding-box top-left corner
@@ -366,6 +481,85 @@ class FaceView extends FaceCoreView {
         dc.fillPolygon(pts);
         dc.clearClip();
         solid(dc, color);
+    }
+
+    private var mRectsKey as String = "";
+    private var mRects as Array<Array<Number>> = [] as Array<Array<Number>>;
+
+    // Clip rectangles [x, y, w, h] (px) covering the part of the text box inside the
+    // polygon: 3 px strips, each from the lower of the shape's tops to the higher of its
+    // bottoms at the strip's two edges, merged into one rectangle where the shape spans the
+    // whole box.
+    private function insideRects(pts as Array<[Float, Float]>, box as [Number, Number, Number, Number]) as Array<Array<Number>> {
+        var key = mKey + box.toString();
+        if (key.equals(mRectsKey)) {
+            return mRects;
+        }
+        mRectsKey = key;
+        var rects = [] as Array<Array<Number>>;
+        var step = 3;
+        var boxTop = box[1];
+        var boxBottom = box[1] + box[3];
+        var spans = verticalSpans(pts, box[0], step, box[2] / step + 2);
+        var tops = spans[0];
+        var bottoms = spans[1];
+        var runStart = -1;
+        var k = 0;
+        for (var x = box[0]; x < box[0] + box[2]; x += step) {
+            var top = Math.ceil(tops[k] > tops[k + 1] ? tops[k] : tops[k + 1]).toNumber();
+            var bottom = Math.floor(bottoms[k] < bottoms[k + 1] ? bottoms[k] : bottoms[k + 1]).toNumber();
+            k++;
+            top = top < boxTop ? boxTop : top;
+            bottom = bottom > boxBottom ? boxBottom : bottom;
+            if (top == boxTop && bottom == boxBottom) {
+                if (runStart < 0) {
+                    runStart = x;
+                }
+                continue;
+            }
+            if (runStart >= 0) {
+                rects.add([runStart, boxTop, x - runStart, box[3]]);
+                runStart = -1;
+            }
+            if (bottom > top) {
+                rects.add([x, top, step, bottom - top]);
+            }
+        }
+        if (runStart >= 0) {
+            rects.add([runStart, boxTop, box[0] + box[2] - runStart, box[3]]);
+        }
+        mRects = rects;
+        return rects;
+    }
+
+    // [tops, bottoms] (px) of the polygon along the vertical lines x0, x0 + step, ...
+    // (count of them); top > bottom where a line misses it. Each edge visits only the lines
+    // it crosses, so this stays cheap (the watchdog on small watches).
+    private function verticalSpans(pts as Array<[Float, Float]>, x0 as Number, step as Number, count as Number) as [Array<Float>, Array<Float>] {
+        var tops = new Array<Float>[count];
+        var bottoms = new Array<Float>[count];
+        for (var k = 0; k < count; k++) {
+            tops[k] = 100000.0f;
+            bottoms[k] = -100000.0f;
+        }
+        var n = pts.size();
+        for (var i = 0; i < n; i++) {
+            var p = pts[i];
+            var q = pts[(i + 1) % n];
+            var lo = p[0] < q[0] ? p[0] : q[0];
+            var hi = p[0] < q[0] ? q[0] : p[0];
+            var k0 = Math.ceil((lo - x0) / step).toNumber();
+            var k1 = Math.ceil((hi - x0) / step).toNumber() - 1;
+            k0 = k0 < 0 ? 0 : k0;
+            k1 = k1 >= count ? count - 1 : k1;
+            for (var k = k0; k <= k1; k++) {
+                var x = (x0 + k * step).toFloat();
+                var y = p[1] + (q[1] - p[1]) * (x - p[0]) / (q[0] - p[0]);
+                tops[k] = y < tops[k] ? y : tops[k];
+                bottoms[k] = y > bottoms[k] ? y : bottoms[k];
+            }
+        }
+        return [tops, bottoms];
     }
 
     private var mTextBitmap as BufferedBitmapReference or Null;
@@ -391,7 +585,7 @@ class FaceView extends FaceCoreView {
         if (dc has :setFill) {
             dc.setFill(0xFF000000 | color);
         }
-        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(color), Graphics.COLOR_TRANSPARENT);
     }
 
     // Always-On: the shape's outline and a light time, moved every minute (aodShift).
@@ -408,7 +602,7 @@ class FaceView extends FaceCoreView {
             dc.drawLine(a[0], a[1], b[0], b[1]);
         }
         dc.setPenWidth(1);
-        dc.setColor(0xB9B6B0, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(0xB9B6B0), Graphics.COLOR_TRANSPARENT);
         FaceKit.drawTracked(dc, (C + dx - TIME_TRACK / 2) * mScale, (TIME_Y + dy) * mScale, mFontTimeAod, time,
             TIME_TRACK * mScale, Graphics.TEXT_JUSTIFY_CENTER);
     }

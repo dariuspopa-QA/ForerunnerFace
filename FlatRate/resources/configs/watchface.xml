@@ -1,0 +1,26 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the accent
+         colour and one data slot. Complication id 1 is the view's slot (FaceView.slots): the reading on the bottom line (heart rate by default).
+         The slot lists its types with a default: an allowAny slot can't carry one, and the
+         editor then fills it with its own first choice (Battery) as soon as Data is opened. -->
+    <watchface-config>
+        <data>
+            <complication id="1">
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type default="true">Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+            </complication>
+        </data>
+        <accentColors>
+            <color label="@Strings.ColorHiVis" default="true">0xD7FF1F</color>
+            <color label="@Strings.ColorYellow">0xFFD400</color>
+            <color label="@Strings.ColorSafetyOrange">0xFF6A13</color>
+            <color label="@Strings.ColorCoolantBlue">0x3AD0FF</color>
+        </accentColors>
+    </watchface-config>
+</resources>

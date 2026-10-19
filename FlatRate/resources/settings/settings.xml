@@ -57,6 +57,9 @@
             <listEntry value="840">@Strings.Break840</listEntry>
         </settingConfig>
     </setting>
+    <setting propertyKey="@Properties.RepairOrder" title="@Strings.RoTitle" prompt="@Strings.RoPrompt">
+        <settingConfig type="numeric" min="0" max="999999"/>
+    </setting>
     <setting propertyKey="@Properties.Bay" title="@Strings.BayTitle" prompt="@Strings.BayPrompt">
         <settingConfig type="numeric" min="0" max="99"/>
     </setting>

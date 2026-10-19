@@ -1,7 +1,7 @@
 info face="Barlow Condensed ExtraBold" size=21 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1
 common lineHeight=17 base=15 scaleW=512 scaleH=17 pages=1 packed=0
 page id=0 file="count.png"
-chars count=41
+chars count=43
 char id=65 x=0 y=0 width=11 height=15 xoffset=0 yoffset=0 xadvance=11 page=0 chnl=15
 char id=66 x=12 y=0 width=10 height=15 xoffset=0 yoffset=0 xadvance=10 page=0 chnl=15
 char id=67 x=23 y=0 width=10 height=15 xoffset=0 yoffset=0 xadvance=10 page=0 chnl=15
@@ -42,4 +42,6 @@ char id=32 x=386 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=4 page=0 chnl
 char id=47 x=388 y=0 width=9 height=15 xoffset=0 yoffset=0 xadvance=9 page=0 chnl=15
 char id=44 x=398 y=0 width=4 height=6 xoffset=0 yoffset=11 xadvance=5 page=0 chnl=15
 char id=45 x=403 y=0 width=7 height=3 xoffset=0 yoffset=7 xadvance=7 page=0 chnl=15
-char id=183 x=411 y=0 width=5 height=4 xoffset=0 yoffset=6 xadvance=5 page=0 chnl=15
+char id=46 x=411 y=0 width=5 height=4 xoffset=0 yoffset=11 xadvance=5 page=0 chnl=15
+char id=37 x=417 y=0 width=16 height=15 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+char id=183 x=434 y=0 width=5 height=4 xoffset=0 yoffset=6 xadvance=5 page=0 chnl=15

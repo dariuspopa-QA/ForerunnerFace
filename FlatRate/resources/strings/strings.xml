@@ -44,6 +44,8 @@
     <string id="ShiftStartTitle">Shift start</string>
     <string id="ShiftLengthTitle">Shift length</string>
     <string id="BreakTitle">Break</string>
+    <string id="RoTitle">Repair order</string>
+    <string id="RoPrompt">RO number (0 hides it)</string>
     <string id="BayTitle">Bay number</string>
     <string id="BayPrompt">Bay (0 hides it)</string>
     <string id="JobTitle">Job line</string>

@@ -1,0 +1,39 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): style = bloom palette,
+         accent colour = the lowest value's highlight, and one data slot (complication id 1 = FaceView.slots: a sixth label at the bottom
+         of the dial, heart rate by default). The slot lists its types with a default: an allowAny slot
+         can't carry one, and the editor then fills it with its own first choice (Battery). -->
+    <watchface-config>
+        <styles>
+            <style id="1" label="@Strings.PaletteRose" default="true"/>
+            <style id="2" label="@Strings.PaletteSage"/>
+            <style id="3" label="@Strings.PaletteSky"/>
+            <style id="4" label="@Strings.PaletteCoral"/>
+            <style id="5" label="@Strings.PaletteGold"/>
+            <style id="6" label="@Strings.PaletteLilac"/>
+            <style id="7" label="@Strings.PaletteAqua"/>
+            <style id="8" label="@Strings.PalettePearl"/>
+        </styles>
+        <data>
+            <complication id="1">
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_STEPS</type>
+                <type default="true">Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_BATTERY</type>
+            </complication>
+        </data>
+        <accentColors>
+            <color label="@Strings.ColorOrange" default="true">0xFF8A3D</color>
+            <color label="@Strings.ColorRed">0xFF4A4A</color>
+            <color label="@Strings.ColorYellow">0xFFD23D</color>
+            <color label="@Strings.ColorLime">0xC8FF2E</color>
+            <color label="@Strings.ColorCyan">0x4FD1FF</color>
+            <color label="@Strings.ColorMagenta">0xFF5AC8</color>
+            <color label="@Strings.ColorWhite">0xF3F1EC</color>
+        </accentColors>
+    </watchface-config>
+</resources>

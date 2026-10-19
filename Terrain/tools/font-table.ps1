@@ -3,6 +3,6 @@
 $fonts = @(
     @('Time', 'time', 'Outfit-ExtraLight.ttf', 92, 0, ($digits + ':')),
     @('Date', 'date', 'IBMPlexMono-Regular.ttf', 17, 14, ($upper + $digits + ' -')),
-    @('Small', 'small', 'IBMPlexMono-Regular.ttf', 16, 13, ($lower + $digits + ' :-')),
+    @('Small', 'small', 'IBMPlexMono-Regular.ttf', 16, 13, ($lower + $digits + ' :-.%/')),
     @('Flag', 'flag', 'IBMPlexMono-Medium.ttf', 16, 13, ($digits + '%-'))
 )

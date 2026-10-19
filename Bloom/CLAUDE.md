@@ -31,7 +31,9 @@ Colours (all editable):
 - `CustomColor`: hex text (`7A5CFF`, `#7A5CFF`, `0x7A5CFF`), phone only; overrides the palette
   with the same derived layers. Empty = palette.
 - `Highlight`: colour of the lowest value (default orange `0xFF8A3D`, seven choices).
-- On-watch editor (fr970): style 1-8 = palette, accent colour = highlight.
+- On-watch editor: style 1-8 = palette, accent colour = highlight, and one data slot: a sixth
+  label at the bottom of the dial (heart rate by default; `FaceView.slots`, see "Data slots" in
+  `FaceCore/CLAUDE.md`). The slot always follows the editor (no phone setting).
 - Whichever was changed last wins: phone (`BloomApp.onSettingsChanged` ->
   `phoneSettingsChanged`) or editor (`FaceEditorDelegate` -> `applyEditor`), stored as
   `ColorsFromEditor` in `Application.Storage`. The editor always reports its defaults, so
@@ -49,8 +51,9 @@ mockup's `SAT 10` (Bloom shows no month), 2 `MON 28-09-2026`, 3 `MON 09-28-2026`
   `width / 454`. `FaceView` extends `FaceCoreView`. The shared code (FaceKit, FaceFormat, FaceData, FaceEditor,
   base view and app) lives once in `../FaceCore` (see `FaceCore/CLAUDE.md`), on `base.sourcePath` in
   both jungles. `source/<Name>Test.mc` tests only this face: every display mode and setting value.
-- Products: fr265 (416 px), fr265s (360), fr965 and fr970 (454), all AMOLED, API 5.0+.
-  The on-watch editor config is in `resources-fr970/configs/watchface.xml` (fr970 only).
+- Products: every round watch on API 5.0+, 66 of them, 218-466 px, AMOLED and MIP (as ApexFace;
+  `FaceCore/tools/products.ps1`, see "Every round watch" in `FaceCore/CLAUDE.md`). The on-watch
+  editor config is in `resources/configs/watchface.xml` (used where the firmware has the editor).
 - Fonts: Google Fonts (OFL) turned into Connect IQ bitmap fonts per screen size by
   `tools\make-fonts.ps1` (sizes and glyphs in `tools/font-table.ps1`, TTFs in `tools/fonts/`),
   output in `resources-round-<W>x<W>/fonts/`. Each font's line box runs from cap top to the
