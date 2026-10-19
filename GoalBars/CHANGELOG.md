@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.0
+
+Store text ("What's new"):
+
+> • Now on 66 round Garmin watches, AMOLED and MIP, with the layout sized for every screen.
+
+Details:
+
+- Products: the 66 round watches on API 5.0+ (FaceCore/tools/products.ps1).
+- Backgrounds moved to `resources-round-WxW/drawables` for all 9 screen sizes; configs to
+  `resources/configs`.
+- Without vector fonts (MIP watches and some AMOLED ones) each font falls back to the largest
+  system font no taller than its design size instead of a fixed system font.
+- Firmware without the watch face editor no longer crashes on
+  `WATCH_FACE_CONFIG_TYPE_COMPLICATION` when settings load.
+- Watches without a barometer (vívoactive 6, Approach S50) no longer crash on the Floors field.
+
 ## 1.0.0
 
 First numbered release (earlier builds had no version).

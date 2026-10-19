@@ -125,6 +125,7 @@ class GoalBarsView extends WatchUi.WatchFace {
     private var _labFont = Graphics.FONT_XTINY;
     private var _statusFont = Graphics.FONT_XTINY;
     private var _ticks = null;
+    private var _mip = false;
 
     // Cached baked-image background (see bgImage())
     private var _bgImage = null;
@@ -255,7 +256,7 @@ class GoalBarsView extends WatchUi.WatchFace {
                 }
             }
         }
-        if (editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
+        if (editedType == null || editedType != WatchUi.WATCH_FACE_CONFIG_TYPE_COMPLICATION) {
             _editingSlot = null;
         }
         subscribeBottom();
@@ -338,7 +339,25 @@ class GoalBarsView extends WatchUi.WatchFace {
             var f = Graphics.getVectorFont({ :face => faces, :size => size.toNumber() });
             if (f != null) { return f; }
         }
-        return fallback;
+        return systemFont(size, fallback);
+    }
+
+    // Without vector fonts: the largest system font no taller than the design size
+    // (number fonts only stand in for number fonts, they have no letters).
+    private function systemFont(size, fallback) {
+        var fonts = [Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_SMALL,
+                     Graphics.FONT_MEDIUM, Graphics.FONT_LARGE];
+        if (fallback == Graphics.FONT_NUMBER_HOT || fallback == Graphics.FONT_NUMBER_MILD) {
+            fonts = [Graphics.FONT_NUMBER_MILD, Graphics.FONT_NUMBER_MEDIUM,
+                     Graphics.FONT_NUMBER_HOT, Graphics.FONT_NUMBER_THAI_HOT];
+        }
+        var best = fonts[0];
+        for (var i = 0; i < fonts.size(); i++) {
+            if (Graphics.getFontHeight(fonts[i]) <= size * 1.25) {
+                best = fonts[i];
+            }
+        }
+        return best;
     }
 
     private function buildFonts(dc as Dc) as Void {
@@ -379,6 +398,8 @@ class GoalBarsView extends WatchUi.WatchFace {
         _r = dc.getWidth() / 2.0;
         _cx = dc.getWidth() / 2;
         _cy = dc.getHeight() / 2;
+        var settings = System.getDeviceSettings();
+        _mip = !((settings has :requiresBurnInProtection) && settings.requiresBurnInProtection);
         buildFonts(dc);
         buildTicks(_r);
     }
@@ -684,8 +705,9 @@ class GoalBarsView extends WatchUi.WatchFace {
             var pct = (am.stepGoal != null && am.stepGoal > 0) ? st.toFloat() / am.stepGoal : 0.0;
             return [pct, thousands(st, compact), dayPace()];
         } else if (kind == 1) {
-            var fc = (am.floorsClimbed == null) ? 0 : am.floorsClimbed;
-            var g = am.floorsClimbedGoal;
+            // No barometer (vívoactive 6, Approach S50): no floors fields at all.
+            var fc = ((am has :floorsClimbed) && am.floorsClimbed != null) ? am.floorsClimbed : 0;
+            var g = (am has :floorsClimbedGoal) ? am.floorsClimbedGoal : null;
             var pct = (g != null && g > 0) ? fc.toFloat() / g : 0.0;
             return [pct, fc.format("%d"), dayPace()];
         } else if (kind == 2) {
@@ -775,7 +797,9 @@ class GoalBarsView extends WatchUi.WatchFace {
         var rad = barW / 2.0;
         var h = bot - top;
 
-        dc.setColor(scaleColor(color, TRACK_TINT), Graphics.COLOR_TRANSPARENT);
+        // MIP screens have 64 colours: a dim tint of each bar rounds to a muddy
+        // red or navy, so the tracks are one dark grey there.
+        dc.setColor(_mip ? 0x555555 : scaleColor(color, TRACK_TINT), Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(x, top, barW, h, rad);
         if (pct > 0.005) {
             var fillH = h * (pct > 1.0 ? 1.0 : pct);
@@ -796,9 +820,19 @@ class GoalBarsView extends WatchUi.WatchFace {
             dc.fillRoundedRectangle(x - ext, bot - h * pace - th / 2.0, barW + 2 * ext, th, th / 2.0);
         }
 
+        var pitch = r * (_layout == 0 ? S_BAR_W + S_BAR_GAP : C_BAR_W + C_BAR_GAP) - 2;
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + rad, valY, _valFont, data[1] as String,
+        dc.drawText(x + rad, valY, _valFont, fitValue(dc, data[1] as String, pitch),
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // On small screens without vector fonts "8.4k" is wider than a bar's pitch:
+    // drop the decimal there ("8k").
+    private function fitValue(dc, s as String, maxW) as String {
+        if (dc.getTextWidthInPixels(s, _valFont) <= maxW) { return s; }
+        var dot = s.find(".");
+        if (dot == null || dot + 2 > s.length()) { return s; }
+        return s.substring(0, dot) + s.substring(dot + 2, s.length());
     }
 
     // Goal met: a black check mark punched into the bar's top cap.

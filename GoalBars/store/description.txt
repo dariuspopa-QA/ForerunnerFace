@@ -1,0 +1,51 @@
+APP NAME
+Goal Bars
+
+SHORT DESCRIPTION
+Big two-tone time and four goal bars: steps, floors, Body Battery, active minutes and more.
+
+DESCRIPTION
+Goal Bars shows how far you are towards each of your daily goals as one tall bar, next to the time in big two-tone digits. Every metric has its own colour, so you know which bar is which at a glance, and pace markers show where you should be by now.
+
+What's on the face
+• Big time: hours over minutes (Stacked) or hours:minutes centred (Classic), in Bold or Regular
+• Four goal bars, each one any of: Steps, Floors climbed, Active minutes (week), Move alert, Body Battery, Stress or Active calories (goal of 300, 500, 750 or 1000 kcal)
+• Pace markers on the bars: where you should be at this time of day
+• Weekday and date: MON 28 SEP, DD-MM-YYYY or MM-DD-YYYY
+• Heart rate at the bottom, watch battery as an arc on the left bezel
+• Notification count, alarm count and do-not-disturb icon (each can be turned off)
+• 12-hour or 24-hour time, or follow the watch
+
+Colours and backgrounds
+Accent: Lime, Ice blue, Orange, Pink or White. Background: none, Orbits, Waves, Halftone dots, Blobs, Topographic, Rays, Aurora or Deep Space, in subtle, medium or bold intensity, tinted with the accent or grey.
+
+Always-on mode
+On AMOLED watches, always-on mode shows a grey, slightly smaller time with hour ticks and (if you want) the date. It moves slightly every minute to protect the screen. On MIP watches the full face stays on.
+
+Customise
+• On your phone: open Goal Bars in the Connect IQ Store app and change its settings: layout, accent, background, bars, calories goal, pace markers, clock and date format, status icons.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the background, accent colour, bars and bottom field.
+• Whatever you changed last, on the phone or on the watch, is what the face shows.
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• Goals come from your Garmin Connect profile. Garmin has no calorie goal, so you pick one in the settings.
+• Any value that isn't available on your watch is shown as "--".
+• Your data stays on the watch. Goal Bars doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.1.0)
+• Now on 66 round Garmin watches, AMOLED and MIP, with the layout sized for every screen.
