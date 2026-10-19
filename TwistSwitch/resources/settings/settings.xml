@@ -1,0 +1,11 @@
+<settings>
+    <setting propertyKey="@Properties.TwistAngle" title="@Strings.TwistAngleTitle">
+        <settingConfig type="numeric" min="25" max="80" />
+    </setting>
+    <setting propertyKey="@Properties.PairTwists" title="@Strings.DoubleTwistTitle">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.ShowDebug" title="@Strings.ShowDebugTitle">
+        <settingConfig type="boolean" />
+    </setting>
+</settings>

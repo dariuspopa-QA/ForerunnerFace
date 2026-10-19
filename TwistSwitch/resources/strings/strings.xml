@@ -1,0 +1,12 @@
+<strings>
+    <string id="AppName">Twist Switch</string>
+
+    <string id="TwistAngleTitle">Twist angle (degrees)</string>
+    <string id="DoubleTwistTitle">Need a double twist</string>
+    <string id="ShowDebugTitle">Show twist counter</string>
+
+    <string id="MenuTitle">Ride paused</string>
+    <string id="MenuResume">Resume</string>
+    <string id="MenuSave">Save</string>
+    <string id="MenuDiscard">Discard</string>
+</strings>

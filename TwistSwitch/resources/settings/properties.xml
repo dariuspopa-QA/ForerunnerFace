@@ -1,0 +1,5 @@
+<properties>
+    <property id="TwistAngle" type="number">35</property>
+    <property id="PairTwists" type="boolean">false</property>
+    <property id="ShowDebug" type="boolean">true</property>
+</properties>
