@@ -1,0 +1,47 @@
+APP NAME
+Bearing
+
+SHORT DESCRIPTION
+A quiet compass dial: ultra-thin time, a 60-tick ring with true north, battery and steps.
+
+DESCRIPTION
+Bearing is a minimal watch face drawn like a compass bezel. Ultra-thin digits with the hours in white and the minutes in the accent colour sit in the middle of a fine 60-tick ring, with a small triangle pointing to north under 12 o'clock. Your battery sits above the time and today's steps below it.
+
+What's on the face
+• Ultra-thin time in its own digits: hours in white, minutes in the accent colour, a two-dot colon
+• 60-tick ring: grey minute ticks, accent ticks every five minutes, long ticks at 12, 3, 6 and 9
+• North triangle under 12 o'clock
+• Battery: an outline icon filled to your charge, and the percentage
+• Steps: footprints and today's count
+• 12-hour or 24-hour time, as set on your watch
+
+Colours
+Accent: Ice, Mint, Amber or Rose.
+
+Always-on mode
+On AMOLED watches, always-on mode shows only the thin time, the north triangle and the four long ticks, dimmed. It lights very few pixels and moves slightly every minute to protect the screen. On MIP watches the full face stays on.
+
+Customise
+• On your phone: open Bearing in the Connect IQ Store app and change the accent colour.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour, and under Data what the top and bottom readings show (battery, steps, Body Battery, heart rate, stress, calories, floors or intensity minutes). Battery and steps keep their icons; other readings show their name above the value.
+
+Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
+• Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970
+• fēnix: 7, 7S, 7X, 7 Pro, 7S Pro, 7X Pro, 7 Pro / 7X Pro Solar (no Wi-Fi), 8 (43 / 47 / 51 mm), 8 Solar (47 / 51 mm), 8 Pro (47 / 51 mm, MicroLED), 9 (43 / 47 / 51 mm), 9 Pro (43 / 47 / 51 mm), 9 Pro Solar (47 / 51 mm), E
+• epix: Gen 2, Pro Gen 2 (42 / 47 / 51 mm)
+• Enduro: 2, 3
+• Venu: 2, 2 Plus, 2S, 3, 3S, 4 (41 / 45 mm)
+• vívoactive: 5, 6
+• Instinct: 3 AMOLED (45 / 50 mm), Crossover AMOLED
+• quatix: 7, 7 Sapphire, 7X Solar, 7 Pro, 8 (47 / 51 mm), 8 Pro (47 / 51 mm)
+• tactix: 7, 7 AMOLED, 8 (47 / 51 mm), 8 Solar 51 mm
+• MARQ Gen 2: Athlete, Adventurer, Captain, Golfer, Commander, Carbon, Aviator
+• D2: Air X10, Air X15, Mach 1, Mach 1 Pro, Mach 2, Mach 2 Pro
+• Descent: G2, Mk3 43 mm, Mk3i (43 / 51 mm)
+• Approach: S50, S70 (42 / 47 mm)
+
+Notes
+• Your data stays on the watch. Bearing doesn't send anything anywhere.
+
+WHAT'S NEW (version 1.0.0)
+• First release, on 66 round Garmin watches (AMOLED and MIP).
