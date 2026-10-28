@@ -1,0 +1,8 @@
+<svg width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Bearing: a ticked compass bezel with the north triangle -->
+<rect width="65" height="65" fill="#000000"/>
+<circle cx="32.5" cy="32.5" r="27" stroke="#4A505A" stroke-width="1.5" stroke-dasharray="1.5 3"/>
+<path d="M32.5 4 V12 M61 32.5 H53 M32.5 61 V53 M4 32.5 H12" stroke="#8CC8F0" stroke-width="2.5"/>
+<path d="M32.5 17 L38 26 H27 Z" fill="#8CC8F0"/>
+<path d="M27 40 H38" stroke="#F2F4F7" stroke-width="1.5"/>
+</svg>

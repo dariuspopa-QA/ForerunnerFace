@@ -1,0 +1,10 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <setting propertyKey="@Properties.AccentColor" title="@Strings.AccentTitle">
+        <settingConfig type="list">
+            <listEntry value="0x8CC8F0">@Strings.ColorIce</listEntry>
+            <listEntry value="0x3DDC97">@Strings.ColorMint</listEntry>
+            <listEntry value="0xF2B544">@Strings.ColorAmber</listEntry>
+            <listEntry value="0xFF6A3D">@Strings.ColorEmber</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

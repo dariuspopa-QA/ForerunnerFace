@@ -1,0 +1,12 @@
+<resources>
+    <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the
+         accent colour (bezel ticks, north marker, minutes, battery fill, footprints). -->
+    <watchface-config>
+        <accentColors>
+            <color label="@Strings.ColorIce" default="true">0x8CC8F0</color>
+            <color label="@Strings.ColorMint">0x3DDC97</color>
+            <color label="@Strings.ColorAmber">0xF2B544</color>
+            <color label="@Strings.ColorEmber">0xFF6A3D</color>
+        </accentColors>
+    </watchface-config>
+</resources>

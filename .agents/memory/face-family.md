@@ -6,5 +6,6 @@ Every face is its own app (own manifest and app id) on the shared FaceCore, targ
   markers; calories = active kcal, total minus the BMR share so far).
 - Meridian, Tide, Terrain, Bloom come from the Meridian canvas. FlatRate, LugStar, ObdScanner, SocketSet,
   TachCluster are the Shop Floor family (for mechanics). TwistSwitch is a bike watch app, not a face.
+- Bearing (2026-10-28): minimalist compass dial from Darius's picture, thin time, battery + steps; built on FaceCore/face like Terrain.
 - ApexFace is the reference face (hands off, see apexface-hands-off.md).
 - Faces with a `demo.jungle` render fixed demo data for screenshots; never ship a demo build. Keep Always-On lit < 10 %.
