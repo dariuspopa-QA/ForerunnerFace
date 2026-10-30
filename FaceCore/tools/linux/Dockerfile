@@ -6,5 +6,5 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         openjdk-17-jre-headless libwebkit2gtk-4.0-37 libjpeg8 libcurl4 libpng16-16 libgtk-3-0 libusb-1.0-0 \
         libsecret-1-0 libsm6 libxext6 libxrender1 libxtst6 libcanberra-gtk3-module dbus-x11 \
-        ca-certificates fonts-dejavu-core xauth xvfb unzip \
+        ca-certificates fonts-dejavu-core xauth xvfb unzip python3 python3-pil \
     && rm -rf /var/lib/apt/lists/*

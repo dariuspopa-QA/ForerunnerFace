@@ -102,6 +102,9 @@ manifest). What that takes, in the core and in each face:
 On the Linux server (no PowerShell / System.Drawing, so no fonts or store shots there):
 `tools/linux/ciq.sh <tool> ...` runs `monkeyc`, `monkeydo`, `simulator` or `sdkmanager` in an Ubuntu 22.04
 image (`tools/linux/Dockerfile`, built on first use) with the host's `~/.Garmin` SDK, the repo and display `:1`.
+`tools/linux/shot.sh <face> <device> <out.png>` builds the face's demo.jungle and captures the simulator on a
+virtual display (Xvfb) in that image, so it works while the desktop is locked. Unit tests: `ciq.sh simulator &`,
+then `ciq.sh monkeydo bin/Test.prg <device> -t` (needs an unlocked desktop on :1, or run both under Xvfb as shot.sh does).
 
 Never run two of the simulator scripts at once: they share the one simulator.
 

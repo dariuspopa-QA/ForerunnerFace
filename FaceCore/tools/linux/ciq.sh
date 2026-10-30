@@ -19,9 +19,15 @@ case "$tool" in
     sdkmanager) cmd="$HOME/.Garmin/sdk-manager/bin/sdkmanager" ;;
     *) cmd="$sdk/bin/$tool" ;;
 esac
+xauth=${XAUTHORITY:-$HOME/.Xauthority}
+x11=""
+[ -f "$xauth" ] && x11="-v $xauth:/tmp/.ciq-xauth:ro -e XAUTHORITY=/tmp/.ciq-xauth"
+# The working folder's parent too (a face copy next to its ../FaceCore) when outside the repo
+work=""
+case "$PWD" in "$repo"|"$repo"/*) ;; *) up=$(dirname "$PWD"); work="-v $up:$up" ;; esac
 tty=""
 [ -t 0 ] && tty="-it"
 exec docker run --rm $tty --network host --ipc host \
-    -u "$(id -u):$(id -g)" -e HOME="$HOME" -e DISPLAY="${DISPLAY:-:1}" \
-    -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/.Garmin:$HOME/.Garmin" -v "$repo:$repo" \
+    -u "$(id -u):$(id -g)" -e HOME="$HOME" -e DISPLAY="${DISPLAY:-:1}" $x11 \
+    -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/.Garmin:$HOME/.Garmin" -v "$repo:$repo" $work \
     -w "$PWD" ciq "$cmd" "$@"
