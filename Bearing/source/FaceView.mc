@@ -1,3 +1,4 @@
+import Toybox.Complications;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
@@ -39,6 +40,15 @@ class FaceView extends FaceCoreView {
     private const STEPS_ICON_Y = 341.0f;
     private const STEPS_TEXT_Y = 377.0f;
 
+    // Editor data slots (resources/configs/watchface.xml): 1 = above the time (battery by
+    // default), 2 = below the divider (steps). Tap boxes in design px around icon and value.
+    private const SLOT_TOP = 1;
+    private const SLOT_BOTTOM = 2;
+    private const SLOT_BOX_W = 150.0f;
+    private const SLOT_TOP_Y = 115.0f;
+    private const SLOT_BOTTOM_Y = 360.0f;
+    private const SLOT_BOX_H = 66.0f;
+
     private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
     private var mFontLabel as FontType = Graphics.FONT_XTINY;
 
@@ -78,7 +88,9 @@ class FaceView extends FaceCoreView {
 
         drawTicks(dc);
         drawNorth(dc, 0.0f, 0.0f, mAccent);
-        drawBattery(dc);
+        if (mEditingSlot != SLOT_TOP) {
+            drawSlot(dc, SLOT_TOP);
+        }
         drawTime(dc, now, 0.0f, 0.0f, INK, mAccent, INK);
 
         dc.setColor(ink(DIVIDER), Graphics.COLOR_TRANSPARENT);
@@ -86,7 +98,9 @@ class FaceView extends FaceCoreView {
         dc.drawLine((C - 23) * mScale, DIVIDER_Y * mScale, (C + 23) * mScale, DIVIDER_Y * mScale);
         dc.setPenWidth(1);
 
-        drawSteps(dc);
+        if (mEditingSlot != SLOT_BOTTOM) {
+            drawSlot(dc, SLOT_BOTTOM);
+        }
     }
 
     // 60 ticks: minor grey, every fifth in the accent, longer at 12, 3, 6 and 9.
@@ -153,6 +167,63 @@ class FaceView extends FaceCoreView {
         var r = 4.5f * mScale;
         dc.fillCircle(cx, y - COLON_DY * mScale, r);
         dc.fillCircle(cx, y + COLON_DY * mScale, r);
+    }
+
+    // ---- Data slots (on-watch editor) -------------------------------------------
+    // Battery / steps (or nothing picked): the face's own icon and value. Any other field:
+    // its label in the accent where the icon sits, its value below ("--" until it has one).
+
+    function slots() as Array<Number> {
+        return [SLOT_TOP, SLOT_BOTTOM] as Array<Number>;
+    }
+
+    function slotBox(slot as Number) as [Number, Number, Number, Number] or Null {
+        if (slot != SLOT_TOP && slot != SLOT_BOTTOM) {
+            return null;
+        }
+        var y = slot == SLOT_TOP ? SLOT_TOP_Y : SLOT_BOTTOM_Y;
+        return [((C - SLOT_BOX_W / 2) * mScale).toNumber(), ((y - SLOT_BOX_H / 2) * mScale).toNumber(),
+            (SLOT_BOX_W * mScale).toNumber(), (SLOT_BOX_H * mScale).toNumber()];
+    }
+
+    function drawSlot(dc as Dc, slot as Number) as Void {
+        if (slot == SLOT_TOP) {
+            if (showsOwn(SLOT_TOP, Complications.COMPLICATION_TYPE_BATTERY)) {
+                drawBattery(dc);
+            } else {
+                drawField(dc, SLOT_TOP, BATTERY_Y, BATTERY_TEXT_Y);
+            }
+        } else if (slot == SLOT_BOTTOM) {
+            if (showsOwn(SLOT_BOTTOM, Complications.COMPLICATION_TYPE_STEPS)) {
+                drawSteps(dc);
+            } else {
+                drawField(dc, SLOT_BOTTOM, STEPS_ICON_Y, STEPS_TEXT_Y);
+            }
+        }
+    }
+
+    // True while the slot holds its default field (or none): the face draws its own icon.
+    function showsOwn(slot as Number, own as Complications.Type) as Boolean {
+        var type = slotType(slot);
+        return type == null || type == own;
+    }
+
+    // [label, value] drawn for a picked field: "" / "--" until it has a value.
+    function fieldTexts(slot as Number) as [String, String] {
+        var t = slotText(slot);
+        if (t == null) {
+            return ["", FaceFormat.NO_VALUE];
+        }
+        return [t[1], t[0]];
+    }
+
+    private function drawField(dc as Dc, slot as Number, labelY as Float, valueY as Float) as Void {
+        var t = fieldTexts(slot);
+        var justify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(C * mScale, labelY * mScale, mFontLabel, t[0], justify);
+        dc.setColor(ink(LABEL), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(C * mScale, valueY * mScale, mFontLabel, t[1], justify);
     }
 
     // Battery outline filled to the charge in the accent, the percentage under it.

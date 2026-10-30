@@ -12,6 +12,7 @@ What's on the face
 • Thin, large time: hours in white, minutes in the accent colour
 • Battery: icon filled to the charge, with the percentage
 • Steps today
+• Both lines can show another reading of your choice, set on the watch
 • 12-hour or 24-hour time, as set on your watch
 
 Colours
@@ -22,7 +23,7 @@ On AMOLED watches, always-on mode shows the hour marks, the north marker and a d
 
 Customise
 • On your phone: open Bearing in the Connect IQ Store app and pick the accent colour.
-• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize.
+• On the watch (where the firmware has the watch face editor): from the watch face, hold the menu button, select Watch Face, then START > Customize to pick the accent colour, and under Data what the lines above and below the time show (battery and steps unless you pick Body Battery, heart rate, stress, sunset, calories, floors or intensity minutes).
 
 Supported watches (66 models, round screens from 218 to 466 px, AMOLED and MIP)
 • Forerunner: 70, 165, 165 Music, 170, 170 Music, 255, 255 Music, 255S, 255S Music, 265, 265S, 570 (42 / 47 mm), 955 / Solar, 965, 970

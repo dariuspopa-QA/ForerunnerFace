@@ -17,8 +17,10 @@ are kept on purpose, they are the reference design.
 
 ## Settings
 
-AccentColor: Ice (default 0x8CC8F0), Mint, Amber, Ember, on the phone and in the on-watch editor. No
-data slots yet (the battery / steps lines could become editor slots later, as in Terrain).
+AccentColor: Ice (default 0x8CC8F0), Mint, Amber, Ember, on the phone and in the on-watch editor. Two
+editor data slots (`FaceView.slots`, see "Data slots" in `FaceCore/AGENTS.md`): 1 above the time (default
+Battery = the face's own icon and %), 2 below the divider (default Steps = footprints and count). Any
+other picked field shows its label in the accent where the icon sits and its value below.
 
 ## Layout, build, tests
 

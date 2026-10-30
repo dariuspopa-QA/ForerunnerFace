@@ -9,4 +9,6 @@
   4. `shot.ps1 -Face Bearing -Device fr970 -Demo` and compare with `Bearing/design/mockup-454.png`
      and the AOD mock (< 10 % lit); check MIP (fenix7) ticks and small screens (218 / 240 px).
   5. Show Darius the capture; then `store-shots.ps1 -Face Bearing`, finish-face-change skill.
-  Later: battery / steps lines as on-watch editor data slots (like Terrain).
+  Editor data slots (battery / steps lines) were added 2026-10-30, also uncompiled: test them in step 3-4.
+- HP server (Debian 13): Connect IQ SDK 9.2.0 + Java 21 installed 2026-10-30 (`.agents/memory/server-sdk.md`).
+  Still needed: device files (Garmin login) and webkit2gtk-4.0 / libjpeg8 for SDK Manager and simulator.

@@ -1,7 +1,28 @@
 <resources>
     <!-- Garmin's native on-device watch face editor (every watch whose firmware has it): the
-         accent colour (bezel ticks, north marker, minutes, battery fill, footprints). -->
+         accent colour (bezel ticks, north marker, minutes, battery fill, footprints) and two
+         data slots (FaceView.slots): 1 above the time (Battery keeps the face's battery icon),
+         2 below the divider (Steps keeps the footprints). Typed lists with a default: an
+         allowAny slot can't carry one (see Terrain). -->
     <watchface-config>
+        <data>
+            <complication id="1">
+                <type default="true">Complications.COMPLICATION_TYPE_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_STRESS</type>
+                <type>Complications.COMPLICATION_TYPE_SUNSET</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+            </complication>
+            <complication id="2">
+                <type default="true">Complications.COMPLICATION_TYPE_STEPS</type>
+                <type>Complications.COMPLICATION_TYPE_CALORIES</type>
+                <type>Complications.COMPLICATION_TYPE_FLOORS_CLIMBED</type>
+                <type>Complications.COMPLICATION_TYPE_INTENSITY_MINUTES</type>
+                <type>Complications.COMPLICATION_TYPE_HEART_RATE</type>
+                <type>Complications.COMPLICATION_TYPE_BODY_BATTERY</type>
+            </complication>
+        </data>
         <accentColors>
             <color label="@Strings.ColorIce" default="true">0x8CC8F0</color>
             <color label="@Strings.ColorMint">0x3DDC97</color>

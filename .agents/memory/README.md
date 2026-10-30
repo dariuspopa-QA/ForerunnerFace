@@ -11,3 +11,4 @@ One fact per file; one line per file here. Update or delete stale notes. Never s
 - [ciq-api-findings.md](ciq-api-findings.md) — setFill textures, 64-point polygons, tinting, fonts, native editor
 - [watch-push.md](watch-push.md) — MTP sideload (delete before copy), SDK and key location
 - [store-signing.md](store-signing.md) — open: Store "Signature check failed", account-registered key needed
+- [server-sdk.md](server-sdk.md) — Connect IQ SDK 9.2 on the HP server: what works, what's missing
