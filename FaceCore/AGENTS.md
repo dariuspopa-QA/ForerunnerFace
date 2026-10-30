@@ -99,6 +99,10 @@ manifest). What that takes, in the core and in each face:
 | `store-watches.txt` | the supported-watches block of every store description (`{{WATCHES}}`) |
 | `package.ps1 -Face X` | the store package `dist/<Name>-<version>.iq` (all 66 products) |
 
+On the Linux server (no PowerShell / System.Drawing, so no fonts or store shots there):
+`tools/linux/ciq.sh <tool> ...` runs `monkeyc`, `monkeydo`, `simulator` or `sdkmanager` in an Ubuntu 22.04
+image (`tools/linux/Dockerfile`, built on first use) with the host's `~/.Garmin` SDK, the repo and display `:1`.
+
 Never run two of the simulator scripts at once: they share the one simulator.
 
 ## A new face
