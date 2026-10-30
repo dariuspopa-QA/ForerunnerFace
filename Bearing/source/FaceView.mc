@@ -20,6 +20,9 @@ class FaceView extends FaceCoreView {
     private const MINOR_TICK = 0x4A505A;
     private const DIVIDER = 0x3A3F47;
     private const OUTLINE = 0xC8CDD4;
+    // Ice rounds to lavender on MIP screens (64 colours): sky blue there instead
+    private const ICE = 0x8CC8F0;
+    private const ICE_MIP = 0x55AAFF;
 
     // Bezel ticks: outer radius, and the inner radius of minor, five-minute and cardinal ticks
     private const TICK_OUT = 222.0f;
@@ -49,6 +52,9 @@ class FaceView extends FaceCoreView {
     private const SLOT_BOTTOM_Y = 360.0f;
     private const SLOT_BOX_H = 66.0f;
 
+    // The accent as drawn on this screen (accentOnScreen), set each update
+    private var mAcc as Number = ICE;
+
     private var mFontTime as FontType = Graphics.FONT_NUMBER_HOT;
     private var mFontLabel as FontType = Graphics.FONT_XTINY;
 
@@ -69,6 +75,7 @@ class FaceView extends FaceCoreView {
     function onUpdate(dc as Dc) as Void {
         dc.setAntiAlias(true);
         mData.refresh();
+        mAcc = accentOnScreen();
         var clock = System.getClockTime();
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         FaceDemo.time(clock, now);
@@ -81,17 +88,17 @@ class FaceView extends FaceCoreView {
             var dx = shift[0].toFloat();
             var dy = shift[1].toFloat();
             drawAodTicks(dc, dx, dy);
-            drawNorth(dc, dx, dy, FaceKit.mix(mAccent, 0x000000, 0.6f));
-            drawTime(dc, now, dx, dy, 0x9AA0A8, FaceKit.mix(mAccent, 0x000000, 0.7f), 0x9AA0A8);
+            drawNorth(dc, dx, dy, FaceKit.mix(mAcc, 0x000000, 0.6f));
+            drawTime(dc, now, dx, dy, 0x9AA0A8, FaceKit.mix(mAcc, 0x000000, 0.7f), 0x9AA0A8);
             return;
         }
 
         drawTicks(dc);
-        drawNorth(dc, 0.0f, 0.0f, mAccent);
+        drawNorth(dc, 0.0f, 0.0f, mAcc);
         if (mEditingSlot != SLOT_TOP) {
             drawSlot(dc, SLOT_TOP);
         }
-        drawTime(dc, now, 0.0f, 0.0f, INK, mAccent, INK);
+        drawTime(dc, now, 0.0f, 0.0f, INK, mAcc, INK);
 
         dc.setColor(ink(DIVIDER), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(1.5f, mScale));
@@ -112,11 +119,11 @@ class FaceView extends FaceCoreView {
             if (i % 15 == 0) {
                 inner = TICK_CARDINAL;
                 width = 3.0f;
-                color = (i % 30 == 0) ? FaceKit.mix(INK, mAccent, 0.5f) : mAccent;
+                color = (i % 30 == 0) ? (mAmoled ? FaceKit.mix(INK, mAcc, 0.5f) : INK) : mAcc;
             } else if (i % 5 == 0) {
                 inner = TICK_MAJOR;
                 width = 2.5f;
-                color = mAccent;
+                color = mAcc;
             }
             dc.setColor(ink(color), Graphics.COLOR_TRANSPARENT);
             drawTick(dc, i * 6.0f, inner, TICK_OUT, width, 0.0f, 0.0f);
@@ -126,7 +133,7 @@ class FaceView extends FaceCoreView {
 
     // Always-On: the 12 hour ticks only, dimmed.
     private function drawAodTicks(dc as Dc, dx as Float, dy as Float) as Void {
-        dc.setColor(ink(FaceKit.mix(mAccent, 0x000000, 0.45f)), Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(FaceKit.mix(mAcc, 0x000000, 0.45f)), Graphics.COLOR_TRANSPARENT);
         for (var i = 0; i < 12; i++) {
             drawTick(dc, i * 30.0f, AOD_TICK_IN, AOD_TICK_OUT, 2.0f, dx, dy);
         }
@@ -187,6 +194,7 @@ class FaceView extends FaceCoreView {
     }
 
     function drawSlot(dc as Dc, slot as Number) as Void {
+        mAcc = accentOnScreen();   // the editor draws slots without onUpdate
         if (slot == SLOT_TOP) {
             if (showsOwn(SLOT_TOP, Complications.COMPLICATION_TYPE_BATTERY)) {
                 drawBattery(dc);
@@ -220,7 +228,7 @@ class FaceView extends FaceCoreView {
     private function drawField(dc as Dc, slot as Number, labelY as Float, valueY as Float) as Void {
         var t = fieldTexts(slot);
         var justify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
-        dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mAcc), Graphics.COLOR_TRANSPARENT);
         dc.drawText(C * mScale, labelY * mScale, mFontLabel, t[0], justify);
         dc.setColor(ink(LABEL), Graphics.COLOR_TRANSPARENT);
         dc.drawText(C * mScale, valueY * mScale, mFontLabel, t[1], justify);
@@ -240,7 +248,7 @@ class FaceView extends FaceCoreView {
         dc.fillRectangle((left + w + 1) * mScale, (BATTERY_Y - 4) * mScale, 3 * mScale, 8 * mScale);
         var fill = (w - 8) * level / 100.0f;
         if (fill > 0) {
-            dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ink(mAcc), Graphics.COLOR_TRANSPARENT);
             dc.fillRectangle((left + 4) * mScale, (top + 4) * mScale, fill * mScale, (h - 8) * mScale);
         }
         dc.setColor(ink(LABEL), Graphics.COLOR_TRANSPARENT);
@@ -250,7 +258,7 @@ class FaceView extends FaceCoreView {
 
     // Two footprint outlines in the accent and the step count under them.
     private function drawSteps(dc as Dc) as Void {
-        dc.setColor(ink(mAccent), Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ink(mAcc), Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(FaceKit.penWidth(1.5f, mScale));
         drawFoot(dc, C - 8, STEPS_ICON_Y + 3);
         drawFoot(dc, C + 8, STEPS_ICON_Y - 3);
@@ -267,6 +275,11 @@ class FaceView extends FaceCoreView {
     }
 
     // ---- Values -----------------------------------------------------------------
+
+    // The accent setting, or its MIP stand-in.
+    function accentOnScreen() as Number {
+        return (!mAmoled && mAccent == ICE) ? ICE_MIP : mAccent;
+    }
 
     // Battery charge in percent, 0..100 (the demo build's sample value there).
     function batteryLevel() as Number {

@@ -16,7 +16,7 @@ What's on the face
 • 12-hour or 24-hour time, as set on your watch
 
 Colours
-Accent: Ice, Mint, Amber or Ember.
+Accent: Ice, Mint, Amber or Ember. On MIP watches, Ice shows as a sky blue made for their 64-colour screens.
 
 Always-on mode
 On AMOLED watches, always-on mode shows the hour marks, the north marker and a dimmed time. It lights very few pixels and moves slightly every minute to protect the screen. On MIP watches the full face stays on.

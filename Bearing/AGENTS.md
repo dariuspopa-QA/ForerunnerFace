@@ -17,7 +17,8 @@ are kept on purpose, they are the reference design.
 
 ## Settings
 
-AccentColor: Ice (default 0x8CC8F0), Mint, Amber, Ember, on the phone and in the on-watch editor. Two
+AccentColor: Ice (default 0x8CC8F0; on MIP 0x55AAFF, Ice would round to lavender, and the 12 / 6 ticks
+white instead of a teal mix: `accentOnScreen`), Mint, Amber, Ember, on the phone and in the on-watch editor. Two
 editor data slots (`FaceView.slots`, see "Data slots" in `FaceCore/AGENTS.md`): 1 above the time (default
 Battery = the face's own icon and %), 2 below the divider (default Steps = footprints and count). Any
 other picked field shows its label in the accent where the icon sits and its value below.
